@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 function useTokenCheck() {
   const [userData, setUserData] = useState({
     identificationNumber: "",
+    firstName:"",
     lastname: "",
     hospitalNumber:""
 
@@ -22,6 +23,7 @@ function useTokenCheck() {
         if (data.status === "ok") {
           setUserData({
             identificationNumber: data.decoded.identificationNumber,
+            firstName: data.decoded.firstName,
             lastname: data.decoded.lastName,
             hospitalNumber: data.decoded.hospitalNumber,
           });
@@ -38,6 +40,6 @@ function useTokenCheck() {
         console.log("Error", error);
       });
   }, []);
-  return [userData.identificationNumber, userData.lastname,userData.hospitalNumber];
+  return [userData.identificationNumber, userData.firstName,userData.lastname,userData.hospitalNumber];
 }
 export default useTokenCheck;

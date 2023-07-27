@@ -3,8 +3,11 @@ import NavBar from "../components/navBar";
 import TableEmployee from "../components/TableEmployee";
 
 import useTokenCheck from "../hooks/useTokenCheck";
+import Dashboard from "../components/Dashboard";
+
 function Home() {
-  const {identificationNumber , lastName,hospitalNumber } = useTokenCheck();
+  const [identificationNumber, firstName, lastName, hospitalNumber] =
+    useTokenCheck();
   return (
     <>
       <div id="wrapper">
@@ -23,14 +26,12 @@ function Home() {
                     className="dropdown-toggle"
                     href={"/"}
                   >
-                    <span className="block m-t-xs font-bold">
-                      David Williams
-                    </span>
-                    <span className="text-muted text-xs block">
+                    <span className="block m-t-xs font-bold">{firstName}</span>
+                    {/* <span className="text-muted text-xs block">
                       Art Director <b className="caret"></b>
-                    </span>
+                    </span> */}
                   </a>
-                  <ul className="dropdown-menu animated fadeInRight m-t-xs">
+                  {/* <ul className="dropdown-menu animated fadeInRight m-t-xs">
                     <li>
                       <a className="dropdown-item" href="profile.html">
                         Profile
@@ -52,21 +53,23 @@ function Home() {
                         Logout
                       </a>
                     </li>
-                  </ul>
+                  </ul> */}
                 </div>
                 <div className="logo-element">IN+</div>
               </li>
               <li className="active">
                 <a href="/">
                   <i className="fa fa-th-large"></i>{" "}
-                  <span className="nav-label">จัดการทั้งหมด</span>{" "}
-                  <span className="fa arrow"></span>
+                  <a href="/home">
+                    <span className="nav-label">Dashboard</span>{" "}
+                  </a>
+                  {/* <span className="fa arrow"></span> */}
                 </a>
-                <ul className="nav nav-second-level">
+                {/* <ul className="nav nav-second-level">
                   <li className="active">
                     <a href="manageproduct">จัดการนัดหมาย</a>
                   </li>
-                </ul>
+                </ul> */}
               </li>
             </ul>
           </div>
@@ -83,18 +86,15 @@ function Home() {
                   <a href="/">หน้าแรก</a>
                 </li>
                 <li class="breadcrumb-item">
-                  <a href={"/"}>จัดการทั้งหมด</a>
-                </li>
-                <li class="breadcrumb-item active">
-                  <strong>จัดการนัดหมาย</strong>
+                  <a href={"/"}>Dashboard</a>
                 </li>
               </ol>
             </div>
             <div class="col-lg-2"></div>
           </div>
           <div class="wrapper wrapper-content animated fadeInRight">
+            <Dashboard />
             <TableEmployee />
-            
           </div>{" "}
         </div>
       </div>

@@ -199,7 +199,7 @@ function TableEmployee({ onSearch }) {
         <div className="col-lg-12">
           <div className="ibox ">
             <div className="ibox-title">
-              <h5>ตารางจัดการลูกค้า</h5>
+              <h5>นัดล่าสุด</h5>
             </div>
             <div class="ibox-content">
               <div class="row">
@@ -282,11 +282,10 @@ function TableEmployee({ onSearch }) {
                   <thead>
                     <tr>
                       <th>HN</th>
-                      <th>ชื่อ</th>
-                      <th>นามสกุล</th>
+                      <th>ชื่อ-นามสกุล</th>
                       <th>วันที่นัด</th>
                       <th>เวลา</th>
-                      <th>คลินิก</th>
+                      <th>เบอร์</th>
                       <th>สถานะ</th>
                       <th>เครื่องมือ</th>
                     </tr>
@@ -297,15 +296,14 @@ function TableEmployee({ onSearch }) {
                       currentPageData.map((employee) => (
                         <tr key={employee.id}>
                           <td>{employee.hospitalNumber}</td>
-                          <td>{employee.firstName}</td>
-                          <td>{employee.lastName}</td>
+                          <td>{employee.firstName} {employee.lastName}</td>
                           <td>
                             {new Date(
                               employee.date_appointment
                             ).toLocaleDateString()}
                           </td>
                           <td>{employee.time_appointment} น.</td>
-                          <td>{employee.clinic}</td>
+                          <td>{employee.mobile}</td>
                           <td>
                             <span className={`status-${employee.status}`}>
                               {employee.status}
