@@ -125,24 +125,24 @@ function TableEmployee({ onSearch }) {
     });
   };
 
-  const handleDelete = (employeeId) => {
-    fetch(BASE_URL + `/deleteEmployee/${employeeId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Product deleted successfully");
-        fetchEmployees();
-        showAlert("success");
-      })
-      .catch((error) => {
-        console.error("Error deleting product:", error);
-        showAlert("error");
-      });
-  };
+  // const handleDelete = (employeeId) => {
+  //   fetch(BASE_URL + `/deleteEmployee/${employeeId}`, {
+  //     method: "DELETE",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log("Product deleted successfully");
+  //       fetchEmployees();
+  //       showAlert("success");
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error deleting product:", error);
+  //       showAlert("error");
+  //     });
+  // };
 
   const [readStatus, setReadStatus] = useState([]);
   const fetchTypeData = () => {
@@ -158,22 +158,24 @@ function TableEmployee({ onSearch }) {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [searchType, setSearchType] = useState("");
   const [searchHN, setSearchHN] = useState("");
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
+  const [allData, setAllData] = useState(null);
+  const shouldShowAllData = !searchResult && employees && employees.length > 0;
 
   const handleSearch = () => {
+    // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
+    console.log(searchHN);
     const searchParams = {
+      hospitalNumber: searchHN,
+      firstName: searchFirstName,
+      lastName: searchLastName,
       startDate,
       endDate,
-      searchType,
-      searchHN,
-      searchFirstName,
-      searchLastName,
     };
-
-    fetch(BASE_URL + "/searchAppointment", {
+    fetch(BASE_URL + "/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -182,15 +184,11 @@ function TableEmployee({ onSearch }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        onSearch(data);
+        setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
       })
       .catch((error) => {
-        console.error("Error searching appointments:", error);
+        console.error(error);
       });
-  };
-
-  const handleDateChange = (event) => {
-    setSelectedEmployees(event.target.value);
   };
 
   return (
@@ -205,7 +203,7 @@ function TableEmployee({ onSearch }) {
               <div class="row">
                 <div className="col-sm-2">
                   <Form.Group controlId="searchHN">
-                    <Form.Label>ค้นหาจาก HN</Form.Label>
+                    <Form.Label>HN</Form.Label>
                     <Form.Control
                       type="text"
                       value={searchHN}
@@ -215,7 +213,7 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-2">
                   <Form.Group controlId="searchFirstName">
-                    <Form.Label>ค้นหาจากชื่อ</Form.Label>
+                    <Form.Label>ชื่อ</Form.Label>
                     <Form.Control
                       type="text"
                       value={searchFirstName}
@@ -225,7 +223,7 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-2">
                   <Form.Group controlId="searchLastName">
-                    <Form.Label>ค้นหาจากนามสกุล</Form.Label>
+                    <Form.Label>นามสกุล</Form.Label>
                     <Form.Control
                       type="text"
                       value={searchLastName}
@@ -253,7 +251,7 @@ function TableEmployee({ onSearch }) {
                     />
                   </Form.Group>
                 </div>
-                <div className="col-sm-3">
+                {/* <div className="col-sm-3">
                   <Form.Group controlId="searchType">
                     <Form.Label>ประเภทการค้นหา</Form.Label>
                     <Form.Control
@@ -267,7 +265,7 @@ function TableEmployee({ onSearch }) {
                       <option value="error">นัดแล้วแต่ไม่มา</option>
                     </Form.Control>
                   </Form.Group>
-                </div>
+                </div> */}
                 <div className="col-sm-3">
                   <InputGroup style={{ marginTop: "25px" }}>
                     <Button variant="primary" onClick={handleSearch}>
@@ -291,36 +289,90 @@ function TableEmployee({ onSearch }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentPageData &&
-                      currentPageData.length > 0 &&
-                      currentPageData.map((employee) => (
-                        <tr key={employee.id}>
-                          <td>{employee.hospitalNumber}</td>
-                          <td>{employee.firstName} {employee.lastName}</td>
-                          <td>
-                            {new Date(
-                              employee.date_appointment
-                            ).toLocaleDateString()}
-                          </td>
-                          <td>{employee.time_appointment} น.</td>
-                          <td>{employee.mobile}</td>
-                          <td>
-                            <span className={`status-${employee.status}`}>
-                              {employee.status}
-                            </span>
-                          </td>
-
-                          <td>
-                            {" "}
-                            <Button
-                              variant="primary"
-                              onClick={() => handleEditModal(employee.id)}
-                            >
-                              จัดการ
-                            </Button>{" "}
-                          </td>
-                        </tr>
-                      ))}
+                    {shouldShowAllData ? (
+                      <>
+                        {employees
+                          .slice(
+                            currentPage * perPage,
+                            (currentPage + 1) * perPage
+                          )
+                          .map((employee) => (
+                            <tr key={employee.id}>
+                              <td>{employee.hospitalNumber}</td>
+                              <td>
+                                {employee.firstName} {employee.lastName}
+                              </td>
+                              <td>
+                                {new Date(
+                                  employee.date_appointment
+                                ).toLocaleDateString()}
+                              </td>
+                              <td>{employee.time_appointment} น.</td>
+                              <td>{employee.mobile}</td>
+                              <td>
+                                <span className={`status-${employee.status}`}>
+                                  {employee.status}
+                                </span>
+                              </td>
+                              <td>
+                                <Button
+                                  variant="primary"
+                                  onClick={() => handleEditModal(employee.id)}
+                                >
+                                  จัดการ
+                                </Button>{" "}
+                              </td>
+                            </tr>
+                          ))}
+                      </>
+                    ) : (
+                      <>
+                        {/* แสดงผลลัพธ์ที่ค้นหา */}
+                        {searchResult && searchResult.length > 0 ? (
+                          <>
+                            {searchResult
+                              .slice(
+                                currentPage * perPage,
+                                (currentPage + 1) * perPage
+                              )
+                              .map((employee) => (
+                                <tr key={employee.id}>
+                                  <td>{employee.hospitalNumber}</td>
+                                  <td>
+                                    {employee.firstName} {employee.lastName}
+                                  </td>
+                                  <td>
+                                    {new Date(
+                                      employee.date_appointment
+                                    ).toLocaleDateString()}
+                                  </td>
+                                  <td>{employee.time_appointment} น.</td>
+                                  <td>{employee.mobile}</td>
+                                  <td>
+                                    <span
+                                      className={`status-${employee.status}`}
+                                    >
+                                      {employee.status}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <Button
+                                      variant="primary"
+                                      onClick={() =>
+                                        handleEditModal(employee.id)
+                                      }
+                                    >
+                                      จัดการ
+                                    </Button>{" "}
+                                  </td>
+                                </tr>
+                              ))}
+                          </>
+                        ) : (
+                          <div>No results found.</div>
+                        )}
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>
