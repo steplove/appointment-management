@@ -73,7 +73,6 @@ export default function Login() {
         console.log("Error", error);
       });
   };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>

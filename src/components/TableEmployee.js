@@ -15,35 +15,9 @@ function TableEmployee({ onSearch }) {
   };
   const offset = currentPage * perPage;
   const currentPageData = employees.slice(offset, offset + perPage);
-  const [show, setShow] = useState(false);
-  const [alertType, setAlertType] = useState("");
-  const handleClose = () => {
-    setShow(false);
-    setAlertType("");
-  };
-  const handleShow = (type) => {
-    setShow(true);
-    setAlertType(type);
-    setTimeout(() => {
-      handleClose();
-    }, 3000);
-  };
-  const getIcon = () => {
-    if (alertType === "error") {
-      return <BsFillExclamationCircleFill color="red" size={54} />;
-    } else if (alertType === "success") {
-      return <BsCheckCircleFill color="green" size={64} />;
-    } else {
-      return null;
-    }
-  };
-
-  const showAlert = (type) => {
-    handleShow(type);
-  };
 
   useEffect(() => {
-    fetch(BASE_URL + "/readAppointmentALL")
+    fetch(BASE_URL + "/api/readAppointmentALL")
       .then((response) => response.json())
       .then((data) => {
         setEmployees(data);
@@ -52,7 +26,7 @@ function TableEmployee({ onSearch }) {
   }, []);
 
   const fetchEmployees = () => {
-    fetch(BASE_URL + "/readAppointmentALL")
+    fetch(BASE_URL + "/api/readAppointmentALL")
       .then((response) => response.json())
       .then((data) => {
         setEmployees(data);
@@ -94,7 +68,7 @@ function TableEmployee({ onSearch }) {
             status: selectedEmployees.status,
           };
 
-          fetch(BASE_URL + `/updateAppointment/${selectedEmployees.id}`, {
+          fetch(BASE_URL + `/api/updateAppointment/${selectedEmployees.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -119,34 +93,13 @@ function TableEmployee({ onSearch }) {
             });
         } else {
           setIsSaving(false);
-          showAlert("error");
         }
       }
     });
   };
-
-  // const handleDelete = (employeeId) => {
-  //   fetch(BASE_URL + `/deleteEmployee/${employeeId}`, {
-  //     method: "DELETE",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log("Product deleted successfully");
-  //       fetchEmployees();
-  //       showAlert("success");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error deleting product:", error);
-  //       showAlert("error");
-  //     });
-  // };
-
   const [readStatus, setReadStatus] = useState([]);
   const fetchTypeData = () => {
-    fetch(BASE_URL + "/readStatus")
+    fetch(BASE_URL + "/api/readStatus")
       .then((response) => response.json())
       .then((data) => {
         setReadStatus(data);
@@ -155,14 +108,12 @@ function TableEmployee({ onSearch }) {
   useEffect(() => {
     fetchTypeData();
   }, []);
-
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchHN, setSearchHN] = useState("");
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
   const [searchResult, setSearchResult] = useState(null);
-  const [allData, setAllData] = useState(null);
   const shouldShowAllData = !searchResult && employees && employees.length > 0;
 
   const handleSearch = () => {
@@ -175,7 +126,7 @@ function TableEmployee({ onSearch }) {
       startDate,
       endDate,
     };
-    fetch(BASE_URL + "/search", {
+    fetch(BASE_URL + "/api/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -369,7 +320,9 @@ function TableEmployee({ onSearch }) {
                               ))}
                           </>
                         ) : (
-                          <div>No results found.</div>
+                          <div>
+                            <h1>No results found.</h1>
+                          </div>
                         )}
                       </>
                     )}

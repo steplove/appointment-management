@@ -9,15 +9,17 @@ function useFetch(url) {
       try {
         const response = await fetch(url);
         const jsonData = await response.json();
+        console.log(jsonData); // Log the response data
         setData(jsonData);
         setIsLoading(false);
       } catch (error) {
         console.log('Error', error);
       }
     };
-
+  
     fetchData();
   }, [url]);
+  
 
   return { data, isLoading };
 }
