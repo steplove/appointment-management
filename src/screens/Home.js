@@ -34,7 +34,7 @@ function Home() {
               <li className="active">
                 <a href="/">
                   <i className="fa fa-th-large"></i>{" "}
-                  <a href="/home">
+                  <a href="/Home">
                     <span className="nav-label">Dashboard</span>{" "}
                   </a>
                   {/* <span className="fa arrow"></span> */}
@@ -44,6 +44,14 @@ function Home() {
                     <a href="manageproduct">จัดการนัดหมาย</a>
                   </li>
                 </ul> */}
+              </li>
+              <li>
+                <a href="/">
+                  <i className="fa fa-user"></i>{" "}
+                  <a href="/home">
+                    <span className="nav-label">จัดการลูกค้า</span>{" "}
+                  </a>
+                </a>
               </li>
             </ul>
           </div>
