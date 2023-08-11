@@ -1,11 +1,10 @@
 import React from "react";
 import NavBar from "../components/navBar";
-import TableEmployee from "../components/TableEmployee";
+import TableCustomer from "../components/TableCustomer";
 
 import useTokenCheck from "../hooks/useTokenCheck";
-import Dashboard from "../components/Dashboard";
 
-function Home() {
+function Customers() {
   const [identificationNumber, firstName, lastName, hospitalNumber] =
     useTokenCheck();
   return (
@@ -31,7 +30,7 @@ function Home() {
                 </div>
                 <div className="logo-element">IN+</div>
               </li>
-              <li className="active">
+              <li>
                 <a href="/Home">
                   <i className="fa fa-th-large"></i>{" "}
                   <a href="/Home">
@@ -45,7 +44,7 @@ function Home() {
                   </li>
                 </ul> */}
               </li>
-              <li>
+              <li  className="active">
                 <a href="/Customers">
                   <i className="fa fa-user"></i>{" "}
                   <a href="/Customers">
@@ -68,15 +67,14 @@ function Home() {
                   <a href="/">หน้าแรก</a>
                 </li>
                 <li class="breadcrumb-item">
-                  <a href={"/"}>Dashboard</a>
+                  <a href={"/"}>จัดการลูกค้า</a>
                 </li>
               </ol>
             </div>
             <div class="col-lg-2"></div>
           </div>
           <div class="wrapper wrapper-content animated fadeInRight">
-            <Dashboard />
-            <TableEmployee />
+            <TableCustomer />
           </div>{" "}
         </div>
       </div>
@@ -84,4 +82,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Customers;

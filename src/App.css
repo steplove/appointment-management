@@ -71,17 +71,17 @@ thead {
 @media only screen and (max-width: 767px) {
   /* Force table to not be like tables anymore */
   table,
-thead,
-tbody,
-th,
-td,
-tr {
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
     display: block;
   }
 
   /* Hide table headers (but not display: none;, for accessibility) */
   thead tr,
-tfoot tr {
+  tfoot tr {
     position: absolute;
     top: -9999px;
     left: -9999px;
@@ -164,4 +164,14 @@ tfoot tr {
   color: white;
   border-radius: 5px;
   background-color: red;
+}
+.status-guest {
+  color: white;
+  border-radius: 5px;
+  background-color: red;
+}
+.status-member {
+  color: white;
+  background-color: green;
+  border-radius: 5px;
 }
