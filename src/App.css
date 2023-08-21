@@ -148,30 +148,51 @@ thead {
 /* สีสำหรับสถานะ 'confirmed' */
 .status-confirmed {
   color: white;
-  background-color: green;
+  background: linear-gradient(135deg, green, darkgreen);
   border-radius: 5px;
+  background-size: 100% 100%;
 }
 
 /* สีสำหรับสถานะ 'pending' */
 .status-pending {
   color: white;
-  background-color: orange;
+  background: linear-gradient(135deg, orange, darkorange);
   border-radius: 5px;
+  background-size: 100% 100%;
 }
 
 /* สีสำหรับสถานะ 'cancelled' */
 .status-cancelled {
   color: white;
+  background: linear-gradient(135deg, red, darkred);
   border-radius: 5px;
-  background-color: red;
+  background-size: 100% 100%;
 }
+
 .status-guest {
   color: white;
   border-radius: 5px;
-  background-color: red;
+  background: linear-gradient(135deg, yellowgreen, limegreen);
+  background-size: 100% 100%;
 }
+
 .status-member {
   color: white;
-  background-color: green;
+  background: linear-gradient(135deg, green, darkgreen);
   border-radius: 5px;
+  background-size: 100% 100%;
+}
+
+.status-vip {
+  color: white;
+  background: linear-gradient(135deg, orange, darkorange);
+  border-radius: 5px;
+  background-size: 100% 100%;
+}
+
+.status-vvip {
+  color: white;
+  background: linear-gradient(135deg, red, darkred);
+  border-radius: 5px;
+  background-size: 100% 100%;
 }

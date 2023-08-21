@@ -1,114 +1,118 @@
-// import React, { useState, useEffect } from "react";
-// import { BASE_URL } from "../constants/constants";
-// import ReactPaginate from "react-paginate";
+import React, { useState, useEffect } from "react";
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { BASE_URL } from "../constants/constants";
 
-// function Test() {
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [searchResult, setSearchResult] = useState(null);
-//   const [allData, setAllData] = useState(null);
-//   const [currentPage, setCurrentPage] = useState(0);
-//   const [perPage] = useState(10);
+function Test() {
+  const [provinces, setProvinces] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [districts, setDistricts] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [subdistricts, setSubdistricts] = useState([]);
+  const [selectedSubdistrict, setSelectedSubdistrict] = useState("");
+  const [postalCode, setPostalCode] = useState("");
 
-//   // ใช้ useEffect เพื่อโหลดข้อมูลทั้งหมดครั้งแรกที่ Component ถูก render
-//   useEffect(() => {
-//     fetch(BASE_URL + "/all-data") // เปลี่ยนเส้นทางของ API ไปที่ "/all-data"
-//       .then((response) => response.json())
-//       .then((data) => {
-//         setAllData(data); // เก็บข้อมูลทั้งหมดใน state allData
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//       });
-//   }, []);
+  useEffect(() => {
+    fetch(BASE_URL + "/api/readProvince")
+      .then((response) => response.json())
+      .then((data) => setProvinces(data))
+      .catch((error) => console.error("Error fetching provinces:", error));
+  }, []);
 
-//   const handleSearch = () => {
-//     // ส่วนนี้คือการส่งคำค้นหาไปยังเซิร์ฟเวอร์ Node.js โดยใช้ fetch
-//     fetch(BASE_URL + "/search", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ term: searchTerm }),
-//     })
-//       .then((response) => response.json())
-//       .then((data) => {
-//         setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//       });
-//   };
+  const handleProvinceChange = (provinceId) => {
+    setSelectedProvince(provinceId);
+    fetch(BASE_URL + `/api/readAmphures?provinceName=${provinceId}`)
+      .then((response) => response.json())
+      .then((data) => setDistricts(data))
+      .catch((error) => console.error("Error fetching districts:", error));
+  };
 
-//   const handlePageChange = (selectedPage) => {
-//     setCurrentPage(selectedPage.selected);
-//   };
+  const handleDistrictChange = (districtId) => {
+    setSelectedDistrict(districtId);
+    fetch(BASE_URL + `/api/readDistricts?amphureId=${districtId}`)
+      .then((response) => response.json())
+      .then((data) => setSubdistricts(data))
+      .catch((error) => console.error("Error fetching subdistricts:", error));
+      console.log(selectedDistrict);
+  };
 
-//   // ตรวจสอบว่าข้อมูลทั้งหมด allData มีค่าแล้ว และไม่มีผลลัพธ์การค้นหา searchResult
-//   const shouldShowAllData = !searchResult && allData && allData.length > 0;
+  const handleSubdistrictChange = (subdistrictId) => {
+    setSelectedSubdistrict(subdistrictId);
+    fetch(BASE_URL + `/api/readPostalCodes?amphureId=${subdistrictId}`)
+      .then((response) => response.json())
+      .then((data) => setPostalCode(data))
+      .catch((error) => console.error("Error fetching postal code:", error));
+      console.log(selectedSubdistrict);
 
-//   return (
-//     <div>
-//       <input
-//         type="text"
-//         value={searchTerm}
-//         onChange={(event) => setSearchTerm(event.target.value)}
-//       />
-//       <button onClick={handleSearch}>Search</button>
+  };
+  return (
+    <Container>
+      <h2>Edit Information</h2>
+      <Form>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Province:</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedProvince}
+                onChange={(e) => handleProvinceChange(e.target.value)}
+              >
+                <option value="">Select Province</option>
+                {provinces.map((province) => (
+                  <option key={province.id} value={province.id}>
+                    {province.name_th}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group>
+              <Form.Label>District:</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedDistrict}
+                onChange={(e) => handleDistrictChange(e.target.value)}
+              >
+                <option value="">Select District</option>
+                {districts.map((district) => (
+                  <option key={district.id} value={district.id}>
+                    {district.name_th}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group>
+              <Form.Label>Subdistrict:</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedSubdistrict}
+                onChange={(e) => handleSubdistrictChange(e.target.value)}
+              >
+                <option value="">Select Subdistrict</option>
+                {subdistricts.map((subdistrict) => (
+                  <option key={subdistrict.id} value={subdistrict.id}>
+                    {subdistrict.name_th}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Form.Group>
+              <Form.Label>Postal Code:</Form.Label>
+              <Form.Control type="text" value={postalCode} readOnly />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Button variant="primary">Save Changes</Button>
+      </Form>
+    </Container>
+  );
+}
 
-//       {/* แสดงข้อมูลทั้งหมด ถ้า searchResult ยังไม่มีข้อมูล */}
-//       {shouldShowAllData && (
-//         <div>
-//           <h2>All Data</h2>
-//           {allData
-//             .slice(currentPage * perPage, (currentPage + 1) * perPage)
-//             .map((item) => (
-//               <div key={item.id}>
-//                 <p>ID: {item.id}</p>
-//                 <p>Hospital Number: {item.hospitalNumber}</p>
-//                 <p>Date: {item.date_appointment}</p>
-//                 <p>Time: {item.time_appointment}</p>
-//                 <p>Clinic: {item.clinic}</p>
-//                 <p>Doctor: {item.doctor}</p>
-//                 <p>Description: {item.description}</p>
-//                 <p>Created At: {item.created_at}</p>
-//               </div>
-//             ))}
-//         </div>
-//       )}
-//       {searchResult && (
-//         <div>
-//           <h2>Search Result</h2>
-//           {searchResult
-//           .map((item) => (
-//             <div key={item.id}>
-//               {/* แสดงข้อมูลที่ค้นหาแต่ละรายการ */}
-//               <p>ID: {item.id}</p>
-//               <p>Hospital Number: {item.hospitalNumber}</p>
-//               <p>Date: {item.date_appointment}</p>
-//               <p>Time: {item.time_appointment}</p>
-//               <p>Clinic: {item.clinic}</p>
-//               <p>Doctor: {item.doctor}</p>
-//               <p>Description: {item.description}</p>
-//               <p>Created At: {item.created_at}</p>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       <ReactPaginate
-//         previousLabel={"ก่อนหน้า"}
-//         nextLabel={"ถัดไป"}
-//         breakLabel={"..."}
-//         breakClassName={"break-me"}
-//         pageCount={Math.ceil((shouldShowAllData ? allData.length : 0) / perPage)}
-//         marginPagesDisplayed={2}
-//         pageRangeDisplayed={5}
-//         onPageChange={handlePageChange}
-//         containerClassName={"pagination"}
-//         activeClassName={"active"}
-//       />
-//     </div>
-//   );
-// }
-
-// export default Test;
+export default Test;

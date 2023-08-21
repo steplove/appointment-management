@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { BsFillExclamationCircleFill, BsCheckCircleFill } from "react-icons/bs";
-import { Form, Button, Card, Modal, InputGroup } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Modal,
+  InputGroup,
+  Col,
+  Row,
+} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import Swal from "sweetalert2";
 function TableEmployee({ onSearch }) {
-  const [identificationNumber, lastname, hospitalNumber] = useTokenCheck();
+  const [hospitalNumber] = useTokenCheck();
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage] = useState(10);
@@ -147,14 +154,13 @@ function TableEmployee({ onSearch }) {
       <div className="row">
         <div className="col-lg-12">
           <div className="ibox ">
-            <div className="ibox-title">
-              <h5>นัดล่าสุด</h5>
-            </div>
             <div class="ibox-content">
               <div class="row">
                 <div className="col-sm-2">
                   <Form.Group controlId="searchHN">
-                    <Form.Label>HN</Form.Label>
+                    <Form.Label>
+                      <h3>HN</h3>
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       value={searchHN}
@@ -164,7 +170,9 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-2">
                   <Form.Group controlId="searchFirstName">
-                    <Form.Label>ชื่อ</Form.Label>
+                    <Form.Label>
+                      <h3>ชื่อ</h3>
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       value={searchFirstName}
@@ -174,7 +182,9 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-2">
                   <Form.Group controlId="searchLastName">
-                    <Form.Label>นามสกุล</Form.Label>
+                    <Form.Label>
+                      <h3>นามสกุล</h3>
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       value={searchLastName}
@@ -184,7 +194,9 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-3">
                   <Form.Group controlId="startDate">
-                    <Form.Label>ตั้งแต่วันที่</Form.Label>
+                    <Form.Label>
+                      <h3>ตั้งแต่วันที่</h3>
+                    </Form.Label>
                     <Form.Control
                       type="date"
                       value={startDate}
@@ -194,7 +206,9 @@ function TableEmployee({ onSearch }) {
                 </div>
                 <div className="col-sm-3">
                   <Form.Group controlId="endDate">
-                    <Form.Label>ถึงวันที่</Form.Label>
+                    <Form.Label>
+                      <h3>ถึงวันที่</h3>
+                    </Form.Label>
                     <Form.Control
                       type="date"
                       value={endDate}
@@ -220,23 +234,37 @@ function TableEmployee({ onSearch }) {
                 <div className="col-sm-3">
                   <InputGroup style={{ marginTop: "25px" }}>
                     <Button variant="primary" onClick={handleSearch}>
-                      ค้นหา
+                      <h4>ค้นหา</h4>
                     </Button>
                   </InputGroup>
                 </div>
               </div>
               <br />
               <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped text-center">
                   <thead>
                     <tr>
-                      <th>HN</th>
-                      <th>ชื่อ-นามสกุล</th>
-                      <th>วันที่นัด</th>
-                      <th>เวลา</th>
-                      <th>เบอร์</th>
-                      <th>สถานะ</th>
-                      <th>เครื่องมือ</th>
+                      <th>
+                        <h3>HN</h3>
+                      </th>
+                      <th>
+                        <h3>ชื่อ-นามสกุล</h3>
+                      </th>
+                      <th>
+                        <h3>วันที่นัด</h3>
+                      </th>
+                      <th>
+                        <h3>เวลา</h3>
+                      </th>
+                      <th>
+                        <h3>เบอร์</h3>
+                      </th>
+                      <th>
+                        <h3>สถานะ</h3>
+                      </th>
+                      <th>
+                        <h3>เครื่องมือ</h3>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -249,21 +277,36 @@ function TableEmployee({ onSearch }) {
                           )
                           .map((employee) => (
                             <tr key={employee.id}>
-                              <td>{employee.hospitalNumber}</td>
                               <td>
-                                {employee.firstName} {employee.lastName}
+                                <h3>{employee.hospitalNumber}</h3>
                               </td>
                               <td>
-                                {new Date(
-                                  employee.date_appointment
-                                ).toLocaleDateString()}
+                                <h3>
+                                  {employee.firstName} {employee.lastName}
+                                </h3>
                               </td>
-                              <td>{employee.time_appointment} น.</td>
-                              <td>{employee.mobile}</td>
                               <td>
-                                <span className={`status-${employee.status}`}>
-                                  {employee.status}
-                                </span>
+                                <h3>
+                                  {" "}
+                                  {new Date(
+                                    employee.date_appointment
+                                  ).toLocaleDateString()}
+                                </h3>
+                              </td>
+                              <td>
+                                <h3>{employee.time_appointment} น.</h3>
+                              </td>
+                              <td>
+                                <h3>{employee.mobile}</h3>
+                              </td>
+                              <td>
+
+                                    <h3
+                                      className={`status-${employee.status}`}
+                                    >
+                                      {employee.status}
+                                    </h3>
+
                               </td>
                               <td>
                                 <Button

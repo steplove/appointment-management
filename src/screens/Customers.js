@@ -5,8 +5,7 @@ import TableCustomer from "../components/TableCustomer";
 import useTokenCheck from "../hooks/useTokenCheck";
 
 function Customers() {
-  const [identificationNumber, firstName, lastName, hospitalNumber] =
-    useTokenCheck();
+  const [firstName] = useTokenCheck();
   return (
     <>
       <div id="wrapper">
@@ -44,7 +43,7 @@ function Customers() {
                   </li>
                 </ul> */}
               </li>
-              <li  className="active">
+              <li className="active">
                 <a href="/Customers">
                   <i className="fa fa-user"></i>{" "}
                   <a href="/Customers">
@@ -71,7 +70,6 @@ function Customers() {
                 </li>
               </ol>
             </div>
-            <div class="col-lg-2"></div>
           </div>
           <div class="wrapper wrapper-content animated fadeInRight">
             <TableCustomer />
