@@ -9,13 +9,14 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { BASE_URL } from "../constants/constants";
+import logo from "../images/unnamed.png";
 
 // ES6 Modules or TypeScript
 import Swal from "sweetalert2";
+import { Image } from "react-bootstrap";
 function Copyright(props) {
   return (
     <Typography
@@ -55,7 +56,7 @@ export default function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "ok") {
-          Swal.fire("Login Success", "You clicked the button!", "success").then(
+          Swal.fire("เข้าสู่ระบบสำเร็จ", "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย", "success").then(
             () => {
               localStorage.setItem("token", data.token);
               window.location = "/Home";
@@ -64,8 +65,8 @@ export default function Login() {
         } else {
           Swal.fire({
             icon: "error",
-            title: "Oops...",
-            text: "Something went wrong!",
+            title: "ชื่อผู้ใช้หรือรหัสพาสเวอร์ดไม่ถูกต้อง",
+            text: "กรุณากรอกข้อมูลใหม่อีกครั้ง",
           });
         }
       })
@@ -104,8 +105,8 @@ export default function Login() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
+            <Avatar sx={{ m: 2,width: 70, height: 70 }}>
+            <Image src={logo} rounded style={{ with: "70px", height: "70px" }} />
             </Avatar>
             <Typography component="h1" variant="h5">
               Sign in

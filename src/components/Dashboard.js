@@ -12,63 +12,63 @@ function Dashboard() {
   }
   const { totalAppointment, confirmedCount, pendingCount } = data;
   return (
-    <div class="card">
-      <div class="card-title ml-4">
+    <div className="card">
+      <div className="card-title ml-4">
         <h1>Dashboard</h1>
       </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-lg-3">
-            <div class="widget style1 red-bg">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <h1 class="font-bold" style={{ fontSize: "3rem" }}>
+      <div className="card-body">
+        <div className="row">
+          <div className="col-lg-3">
+            <div className="widget style1 red-bg">
+              <div className="row">
+                <div className="col-4 text-center">
+                  <h1 claclassNamess="font-bold" style={{ fontSize: "3rem" }}>
                     {pendingCount}
                   </h1>
                 </div>
-                <div class="col-8 text-left">
+                <div className="col-8 text-left">
                   <h2> Pending Appointments </h2>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
-            <div class="widget style1 lazur-bg">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <h1 class="font-bold" style={{ fontSize: "3rem" }}>
+          <div className="col-lg-3">
+            <div className="widget style1 lazur-bg">
+              <div className="row">
+                <div className="col-4 text-center">
+                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
                     {confirmedCount}
                   </h1>
                 </div>
-                <div class="col-8 text-left">
+                <div className="col-8 text-left">
                   <h2> Today's Appointments </h2>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
-            <div class="widget style1 yellow-bg">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <h1 class="font-bold" style={{ fontSize: "3rem" }}>
+          <div className="col-lg-3">
+            <div className="widget style1 yellow-bg">
+              <div className="row">
+                <div className="col-4 text-center">
+                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
                     {totalAppointment}
                   </h1>
                 </div>
-                <div class="col-8">
+                <div className="col-8">
                   <h2> Total Appointments </h2>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-lg-3">
-            <div class="widget style1 red-bg">
-              <div class="row">
-                <div class="col-4 text-center">
-                  <h1 class="font-bold" style={{ fontSize: "3rem" }}>
+          <div className="col-lg-3">
+            <div className="widget style1 red-bg">
+              <div className="row">
+                <div className="col-4 text-center">
+                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
                     01
                   </h1>
                 </div>
-                <div class="col-8 text-left">
+                <div className="col-8 text-left">
                   <h2> Total </h2>
                   <h2>Patients</h2>
                 </div>

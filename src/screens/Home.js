@@ -6,8 +6,7 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import Dashboard from "../components/Dashboard";
 
 function Home() {
-  const [identificationNumber, firstName, lastName, hospitalNumber] =
-    useTokenCheck();
+  const [firstName] = useTokenCheck();
   return (
     <>
       <div id="wrapper">
@@ -34,11 +33,10 @@ function Home() {
               <li className="active">
                 <a href="/Home">
                   <i className="fa fa-th-large"></i>{" "}
-                  <a href="/Home">
-                    <span className="nav-label">Dashboard</span>{" "}
-                  </a>
-                  {/* <span className="fa arrow"></span> */}
+                  <span className="nav-label">Dashboard</span>{" "}
                 </a>
+
+                {/* <span className="fa arrow"></span> */}
                 {/* <ul className="nav nav-second-level">
                   <li className="active">
                     <a href="manageproduct">จัดการนัดหมาย</a>
@@ -48,9 +46,7 @@ function Home() {
               <li>
                 <a href="/Customers">
                   <i className="fa fa-user"></i>{" "}
-                  <a href="/Customers">
-                    <span className="nav-label">จัดการลูกค้า</span>{" "}
-                  </a>
+                  <span className="nav-label">จัดการลูกค้า</span>{" "}
                 </a>
               </li>
             </ul>

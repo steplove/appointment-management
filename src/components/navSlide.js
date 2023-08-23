@@ -12,7 +12,7 @@ function navSlide() {
                   className="rounded-circle"
                  
                   alt="Logo"
-                  style={{ width: "50px;", height: "50px" }}
+                  style={{ width: "50px", height: "50px" }}
                 />
                 <a
                   data-toggle="dropdown"
