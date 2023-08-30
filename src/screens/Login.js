@@ -56,16 +56,22 @@ export default function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "ok") {
-          Swal.fire("เข้าสู่ระบบสำเร็จ", "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย", "success").then(
-            () => {
-              localStorage.setItem("token", data.token);
-              window.location = "/Home";
-            }
-          );
+          Swal.fire({
+            title: "เข้าสู่ระบบสำเร็จ",
+            text: "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย",
+            icon: "success",
+            showConfirmButton: false, // ไม่แสดงปุ่ม OK
+          });
+
+          // รอเวลา 2 วินาทีก่อนที่จะเปลี่ยนหน้า
+          setTimeout(() => {
+            localStorage.setItem("token", data.token);
+            window.location = "/Home"; // เปลี่ยนหน้าไปยัง "/Home"
+          }, 2000);
         } else {
           Swal.fire({
             icon: "error",
-            title: "ชื่อผู้ใช้หรือรหัสพาสเวอร์ดไม่ถูกต้อง",
+            title: "ชื่อผู้ใช้หรือรหัสพาสเวิร์ดไม่ถูกต้อง",
             text: "กรุณากรอกข้อมูลใหม่อีกครั้ง",
           });
         }
@@ -105,8 +111,12 @@ export default function Login() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 2,width: 70, height: 70 }}>
-            <Image src={logo} rounded style={{ with: "70px", height: "70px" }} />
+            <Avatar sx={{ m: 2, width: 70, height: 70 }}>
+              <Image
+                src={logo}
+                rounded
+                style={{ with: "70px", height: "70px" }}
+              />
             </Avatar>
             <Typography component="h1" variant="h5">
               Sign in

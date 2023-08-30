@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Card, Modal, InputGroup, Col } from "react-bootstrap";
+import { Form, Button, Card, Modal, InputGroup, Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import Swal from "sweetalert2";
+
 function TableCustomer({ onSearch }) {
-  const [identificationNumber] = useTokenCheck();
+  useTokenCheck();
   const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
   const [perPage] = useState(10);
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
   };
-  // const offset = currentPage * perPage;
-  // const currentPageData = employees.slice(offset, offset + perPage);
+  const offset = currentPage * perPage;
+  employees.slice(offset, offset + perPage);
 
   useEffect(() => {
     fetch(BASE_URL + "/api/customers")
@@ -23,7 +25,10 @@ function TableCustomer({ onSearch }) {
       })
       .catch((error) => console.error(error));
   }, []);
-
+  useEffect(() => {
+    const totalPageCount = Math.ceil(employees.length / perPage);
+    setPageCount(totalPageCount);
+  }, [employees, perPage]);
   const fetchEmployees = () => {
     fetch(BASE_URL + "/api/customers")
       .then((response) => response.json())
@@ -33,9 +38,13 @@ function TableCustomer({ onSearch }) {
       .catch((error) => console.error(error));
   };
   const [showModal, setShowModal] = useState(false);
+  const [showModalMapHN, setShowModalMapHN] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+  const handleShowMapHNModal = () => setShowModalMapHN(true);
+  const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedEmployees, setSelectedEmployees] = useState(null);
+  const [mapHN, setMapHN] = useState([]);
   const fetchAddressData = (provinceName, amphureId) => {
     fetchAmphures(provinceName);
     fetchSubDistricts(amphureId);
@@ -43,8 +52,8 @@ function TableCustomer({ onSearch }) {
   };
   const handleEditModal = (employeeId) => {
     const employee = employees.find((p) => p.id === employeeId);
+    console.log(employee.id);
     setSelectedEmployees(employee);
-
     if (employee.province && employee.district) {
       console.log(
         "Fetching address data:",
@@ -60,10 +69,69 @@ function TableCustomer({ onSearch }) {
     if (employee.district && employee.subDistrict) {
       console.log("Fetching sub-districts:", employee.district);
       fetchSubDistricts(employee.district);
-      fetchPostalCodes(employee.district); // เพิ่มบรรทัดนี้
+      fetchPostalCodes(employee.district);
     }
-
     handleShowModal();
+  };
+
+  const handleMapHnModal = (employeeId) => {
+    const employee = employees.find((p) => p.id === employeeId);
+    setMapHN(employee);
+    console.log("Fetching HN:", employee.birthDate);
+
+    handleShowMapHNModal();
+  };
+  const handleMapHN = () => {
+    setShowModalMapHN(false);
+    Swal.fire({
+      title: "คุณแน่ใจที่จะMap HN?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "บันทึก",
+      cancelButtonText: "ยกเลิก",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          const data = {
+            customer_status: "member",
+          };
+
+          fetch(`${BASE_URL}/api/updateMapHN/${mapHN.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((responseData) => {
+              if (responseData && responseData.success) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Map HN สำเร็จ",
+                  showConfirmButton: false, // ทำให้ปุ่ม "OK" ไม่ปรากฏ
+                  timer: 1500, // ปิดหน้าต่างในระยะเวลาที่กำหนด (มิลลิวินาท)
+                });
+                fetchEmployees();
+                handleCloseModal();
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "การMap HN ล้มเหลว",
+                  text: "",
+                });
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
   };
 
   const [isSaving, setIsSaving] = useState(false);
@@ -111,7 +179,12 @@ function TableCustomer({ onSearch }) {
             .then((response) => response.json())
             .then((data) => {
               setIsSaving(false);
-              Swal.fire("บันทึกสำเร็จ", "", "success");
+              Swal.fire({
+                icon: "success",
+                title: "บันทึกสำเร็จ",
+                showConfirmButton: false, // ทำให้ปุ่ม "OK" ไม่ปรากฏ
+                timer: 1500, // ปิดหน้าต่างในระยะเวลาที่กำหนด (มิลลิวินาท)
+              });
               fetchEmployees();
               handleCloseModal();
             })
@@ -119,8 +192,8 @@ function TableCustomer({ onSearch }) {
               setIsSaving(false);
               Swal.fire({
                 icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!",
+                title: "บันทึกล้มเหลว",
+                text: "",
               });
               console.error("Error saving product:", error);
             });
@@ -144,6 +217,7 @@ function TableCustomer({ onSearch }) {
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
+  const [searchcustomerStatus, setCustomerStatus] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData = !searchResult && employees && employees.length > 0;
 
@@ -153,6 +227,7 @@ function TableCustomer({ onSearch }) {
       firstName: searchFirstName,
       lastName: searchLastName,
       mobile: searchMobile,
+      customerStatus: searchcustomerStatus,
     };
     fetch(BASE_URL + "/api/searchCustomers", {
       method: "POST",
@@ -164,6 +239,9 @@ function TableCustomer({ onSearch }) {
       .then((response) => response.json())
       .then((data) => {
         setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
+        const newPageCount = Math.ceil(data.result.length / perPage);
+        setPageCount(newPageCount);
+        setCurrentPage(0);
       })
       .catch((error) => {
         console.error(error);
@@ -201,8 +279,6 @@ function TableCustomer({ onSearch }) {
       });
   };
 
-  // เพิ่ม console.log ใน fetchSubDistricts และ fetchPostalCodes เช่นเดียวกัน
-
   const [subDistricts, setSubDistricts] = useState([]);
 
   const fetchSubDistricts = (amphureId) => {
@@ -229,6 +305,10 @@ function TableCustomer({ onSearch }) {
         console.error("Error fetching postal codes:", error);
       });
   };
+  const handleClose = () => {
+    setShowModalMapHN(false);
+  };
+
   return (
     <div className="row">
       <div className="col-lg-12">
@@ -265,21 +345,26 @@ function TableCustomer({ onSearch }) {
                   />
                 </Form.Group>
               </div>
-              {/* <div className="col-sm-3">
-                  <Form.Group controlId="searchType">
-                    <Form.Label>ประเภทการค้นหา</Form.Label>
-                    <Form.Control
-                      as="select"
-                      value={searchType}
-                      onChange={(e) => setSearchType(e.target.value)}
-                    >
-                      <option value="">ทั้งหมด</option>
-                      <option value="success">คนนัดแล้ว</option>
-                      <option value="warning">คนที่ยังไม่ได้นัด</option>
-                      <option value="error">นัดแล้วแต่ไม่มา</option>
-                    </Form.Control>
-                  </Form.Group>
-                </div> */}
+              <div className="col-sm-2">
+                <Form.Group controlId="searchcustomerStatus">
+                  <Form.Label>สถานะ</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={searchcustomerStatus}
+                    onChange={(e) => setCustomerStatus(e.target.value)}
+                  >
+                    <option value="">เลือกสถานะ...</option>
+                    {readStatus.map((readStatu) => (
+                      <option
+                        key={readStatu.id}
+                        value={readStatu.customer_status}
+                      >
+                        {readStatu.customer_status}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </div>
               <div className="col-sm-2" style={{ marginTop: "25px" }}>
                 <InputGroup>
                   <Button variant="primary" onClick={handleSearch}>
@@ -292,9 +377,6 @@ function TableCustomer({ onSearch }) {
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
-                  <th>
-                    <h3>เลขประจำตัวประชาชน / พาสปอร์ต</h3>
-                  </th>
                   <th>
                     <h3>ชื่อ-นามสกุล</h3>
                   </th>
@@ -318,12 +400,6 @@ function TableCustomer({ onSearch }) {
                         <tr key={employee.id} className="text-center">
                           <td>
                             <h3>
-                              {employee.identificationType} :{" "}
-                              {employee.identificationNumber}
-                            </h3>
-                          </td>
-                          <td>
-                            <h3>
                               {employee.firstName} {employee.lastName}
                             </h3>
                           </td>
@@ -338,18 +414,6 @@ function TableCustomer({ onSearch }) {
                               {employee.customer_status}
                             </h3>
                           </td>
-                          {/* <td>
-                              <Row>
-                                <Col lg={4}>{""}</Col>
-                                <Col lg={4}>
-                                  <h3
-                                    className={`status-${employee.customer_status}`}
-                                  >
-                                    {employee.customer_status}
-                                  </h3>
-                                </Col>
-                              </Row>
-                            </td> */}
                           <td>
                             <Button
                               variant="primary"
@@ -357,6 +421,17 @@ function TableCustomer({ onSearch }) {
                             >
                               <h4>จัดการ</h4>
                             </Button>{" "}
+                            {employee.customer_status === "guest" ? (
+                              <Button
+                                variant="danger"
+                                onClick={() => handleMapHnModal(employee.id)}
+                              >
+                                <h4>Map HN</h4>
+                              </Button>
+                            ) : (
+                              // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
+                              <></>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -372,13 +447,7 @@ function TableCustomer({ onSearch }) {
                             (currentPage + 1) * perPage
                           )
                           .map((employee) => (
-                            <tr key={employee.id}  className="text-center">
-                              <td>
-                                <h3>
-                                  {employee.identificationType} :{" "}
-                                  {employee.identificationNumber}
-                                </h3>
-                              </td>
+                            <tr key={employee.id} className="text-center">
                               <td>
                                 <h3>
                                   {employee.firstName} {employee.lastName}
@@ -400,8 +469,21 @@ function TableCustomer({ onSearch }) {
                                   variant="primary"
                                   onClick={() => handleEditModal(employee.id)}
                                 >
-                                  จัดการ
+                                  <h4>จัดการ</h4>
                                 </Button>{" "}
+                                {employee.customer_status === "guest" ? (
+                                  <Button
+                                    variant="danger"
+                                    onClick={() =>
+                                      handleMapHnModal(employee.id)
+                                    }
+                                  >
+                                    <h4>Map HN</h4>
+                                  </Button>
+                                ) : (
+                                  // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
+                                  <></>
+                                )}
                               </td>
                             </tr>
                           ))}
@@ -417,18 +499,77 @@ function TableCustomer({ onSearch }) {
             </table>
 
             <ReactPaginate
-              previousLabel={"ก่อนหน้า"}
-              nextLabel={"ถัดไป"}
-              breakLabel={"..."}
-              breakClassName={"break-me"}
-              pageCount={Math.ceil(employees.length / perPage)}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageChange}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
+               previousLabel={"ก่อนหน้า"}
+               nextLabel={"ถัดไป"}
+               breakLabel={"..."}
+               breakClassName={"break-me"}
+               pageCount={pageCount}
+               marginPagesDisplayed={2}
+               pageRangeDisplayed={5}
+               onPageChange={handlePageChange}
+               containerClassName={"pagination"}
+               pageClassName={"page-item"} // เพิ่มคลาสสำหรับแต่ละหน้า
+               pageLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์แต่ละหน้า
+               previousClassName={"page-item"} // เพิ่มคลาสสำหรับหน้าก่อนหน้า
+               previousLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์หน้าก่อนหน้า
+               nextClassName={"page-item"} // เพิ่มคลาสสำหรับหน้าถัดไป
+               nextLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์หน้าถัดไป
+               activeClassName={"active"} // เพิ่มคลาสสำหรับหน้าที่เลือก
+               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
           </div>
+          <Modal
+            show={showModalMapHN}
+            onHide={handleCloseMapHNModal}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Map HN</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>HN</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Birth Day</th>
+                  </tr>
+                </thead>
+                <tbody className="text-center">
+                  {mapHN.birthDate ? (
+                    <tr>
+                      <td>{mapHN.hospitalNumber}</td>
+                      <td>{mapHN.firstName}</td>
+                      <td>{mapHN.lastName}</td>
+                      <td>{mapHN.gender}</td>
+                      <td>{mapHN.birthDate.substring(0, 10)}</td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td colSpan="5">No data available</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="primary"
+                onClick={handleMapHN}
+                disabled={isSaving}
+              >
+                Map HN
+              </Button>
+              <Button variant="secondary" onClick={handleCloseMapHNModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
           <Modal show={showModal} onHide={handleCloseModal}>
             <Modal.Header>
               <Modal.Title className="font">จัดการลูกค้า </Modal.Title>{" "}
@@ -462,7 +603,6 @@ function TableCustomer({ onSearch }) {
                           })
                         }
                         disabled
-
                       />
                     </Form.Group>
                     <br />
@@ -545,10 +685,13 @@ function TableCustomer({ onSearch }) {
                         as="select"
                         value={selectedEmployees.province}
                         onChange={(e) => {
-                          console.log("Selected province:", e.target.value);
+                          const selectedProvince = e.target.value;
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            province: e.target.value,
+                            province: selectedProvince,
+                            district: "",
+                            subDistrict: "",
+                            postalCode: "",
                           });
                         }}
                       >
@@ -570,6 +713,15 @@ function TableCustomer({ onSearch }) {
                       <Form.Control
                         as="select"
                         value={selectedEmployees.district}
+                        onChange={(e) => {
+                          const selectedDistrict = e.target.value;
+                          setSelectedEmployees({
+                            ...selectedEmployees,
+                            district: selectedDistrict,
+                            subDistrict: "",
+                            postalCode: "",
+                          });
+                        }}
                       >
                         <option value="">เลือกอำเภอ...</option>
                         {amphures.map((amphur) => (
@@ -579,31 +731,6 @@ function TableCustomer({ onSearch }) {
                         ))}
                       </Form.Control>
                     </Form.Group>
-                    {/* <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>อำเภอ/เขต</h4>
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        placeholder="อำเภอ/เขต"
-                        value={selectedEmployees.district}
-                        onChange={(e) =>
-                          setSelectedEmployees({
-                            ...selectedEmployees,
-                            district: e.target.value,
-                          })
-                        }
-                      >
-                        <option value="">เลือกอำเภอ...</option>
-                        {amphures.map((amphure) => (
-                          <option key={amphure.id} value={amphure.name_th}>
-                            {amphure.name_th}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group> */}
-                    <br />
                     <Form.Group>
                       <Form.Label>
                         <h4>ตำบล</h4>
@@ -611,41 +738,23 @@ function TableCustomer({ onSearch }) {
                       <Form.Control
                         as="select"
                         value={selectedEmployees.subDistrict}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const selectedSubDistrict = e.target.value;
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            subDistrict: e.target.value,
-                          })
-                        }
+                            subDistrict: selectedSubDistrict,
+                            postalCode: "",
+                          });
+                        }}
                       >
                         <option value="">เลือกตำบล...</option>
                         {subDistricts.map((subDistrict) => (
-                          <option
-                            key={subDistrict.id}
-                            value={subDistrict.amphure_id}
-                          >
+                          <option key={subDistrict.id} value={subDistrict.id}>
                             {subDistrict.name_th}
                           </option>
                         ))}
                       </Form.Control>
                     </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>หมู่</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="หมู่"
-                        value={selectedEmployees.moo}
-                        onChange={(e) =>
-                          setSelectedEmployees({
-                            ...selectedEmployees,
-                            moo: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
                     <Form.Group>
                       <Form.Label>
                         <h4>รหัสไปรษณีย์</h4>
@@ -671,6 +780,48 @@ function TableCustomer({ onSearch }) {
                         ))}
                       </Form.Control>
                     </Form.Group>
+                    <br />
+                    <Form.Group>
+                      <Form.Label>
+                        <h4>หมู่</h4>
+                      </Form.Label>
+                      <Form.Control
+                        placeholder="หมู่"
+                        value={selectedEmployees.moo}
+                        onChange={(e) =>
+                          setSelectedEmployees({
+                            ...selectedEmployees,
+                            moo: e.target.value,
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <br />
+                    {/* <Form.Group>
+                      <Form.Label>
+                        <h4>รหัสไปรษณีย์</h4>
+                      </Form.Label>
+                      <Form.Control
+                        as="select"
+                        value={selectedEmployees.postalCode}
+                        onChange={(e) =>
+                          setSelectedEmployees({
+                            ...selectedEmployees,
+                            postalCode: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">เลือกรหัสไปรษณีย์...</option>
+                        {postalCodes.map((postalCode) => (
+                          <option
+                            key={postalCode.id}
+                            value={postalCode.zip_code}
+                          >
+                            {postalCode.zip_code}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group> */}
                     <br />
                     <Form.Group>
                       <Form.Label>
@@ -736,8 +887,8 @@ function TableCustomer({ onSearch }) {
                       />
                     </Form.Group>
                     <br />
-
-                    <Form.Group>
+                    {/* อัพเดทสถานะ */}
+                    {/* <Form.Group>
                       <Form.Label>
                         <h4>สถานะ</h4>
                       </Form.Label>
@@ -762,7 +913,7 @@ function TableCustomer({ onSearch }) {
                           </option>
                         ))}
                       </Form.Control>
-                    </Form.Group>
+                    </Form.Group> */}
 
                     <br />
                   </Card.Body>

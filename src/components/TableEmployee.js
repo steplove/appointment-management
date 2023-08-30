@@ -28,10 +28,14 @@ function TableEmployee({ onSearch }) {
       .then((response) => response.json())
       .then((data) => {
         setEmployees(data);
+        console.log(data, "data");
       })
       .catch((error) => console.error(error));
   }, []);
-
+  useEffect(() => {
+    const totalPageCount = Math.ceil(employees.length / perPage);
+    setPageCount(totalPageCount);
+  }, [employees, perPage]);
   const fetchEmployees = () => {
     fetch(BASE_URL + "/api/readAppointmentALL")
       .then((response) => response.json())
@@ -45,8 +49,10 @@ function TableEmployee({ onSearch }) {
   const handleCloseModal = () => setShowModal(false);
   const [selectedEmployees, setSelectedEmployees] = useState(null);
   const handleEditModal = (employeeId) => {
+    console.log(employeeId, "employeeId");
     const employee = employees.find((p) => p.id === employeeId);
     setSelectedEmployees(employee);
+    console.log(employee, "employee");
     handleShowModal();
   };
   const [isSaving, setIsSaving] = useState(false);
@@ -85,7 +91,12 @@ function TableEmployee({ onSearch }) {
             .then((response) => response.json())
             .then((data) => {
               setIsSaving(false);
-              Swal.fire("บันทึกสำเร็จ", "", "success");
+              Swal.fire({
+                icon: "success",
+                title: "บันทึกสำเร็จ",
+                showConfirmButton: false, // ทำให้ปุ่ม "OK" ไม่ปรากฏ
+                timer: 1500, // ปิดหน้าต่างในระยะเวลาที่กำหนด (มิลลิวินาท)
+              });
               fetchEmployees();
               handleCloseModal();
             })
@@ -120,9 +131,11 @@ function TableEmployee({ onSearch }) {
   const [searchHN, setSearchHN] = useState("");
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
+  const [searchStatus, setSearchStatus] = useState("");
+
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData = !searchResult && employees && employees.length > 0;
-
+  const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
   const handleSearch = () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     console.log(searchHN);
@@ -132,6 +145,7 @@ function TableEmployee({ onSearch }) {
       lastName: searchLastName,
       startDate,
       endDate,
+      status: searchStatus,
     };
     fetch(BASE_URL + "/api/search", {
       method: "POST",
@@ -143,6 +157,9 @@ function TableEmployee({ onSearch }) {
       .then((response) => response.json())
       .then((data) => {
         setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
+        const newPageCount = Math.ceil(data.result.length / perPage);
+        setPageCount(newPageCount);
+        setCurrentPage(0);
       })
       .catch((error) => {
         console.error(error);
@@ -216,21 +233,25 @@ function TableEmployee({ onSearch }) {
                     />
                   </Form.Group>
                 </div>
-                {/* <div className="col-sm-3">
-                  <Form.Group controlId="searchType">
-                    <Form.Label>ประเภทการค้นหา</Form.Label>
+                <div className="col-sm-3">
+                  <Form.Group controlId="searchStatus">
+                    <Form.Label>
+                      <h3>สถานะ</h3>
+                    </Form.Label>
                     <Form.Control
                       as="select"
-                      value={searchType}
-                      onChange={(e) => setSearchType(e.target.value)}
+                      value={searchStatus}
+                      onChange={(e) => setSearchStatus(e.target.value)}
                     >
-                      <option value="">ทั้งหมด</option>
-                      <option value="success">คนนัดแล้ว</option>
-                      <option value="warning">คนที่ยังไม่ได้นัด</option>
-                      <option value="error">นัดแล้วแต่ไม่มา</option>
+                      <option value="">เลือกสถานะ...</option>
+                      {readStatus.map((readStatu) => (
+                        <option key={readStatu.id} value={readStatu.status}>
+                          {readStatu.status}
+                        </option>
+                      ))}
                     </Form.Control>
                   </Form.Group>
-                </div> */}
+                </div>
                 <div className="col-sm-3" style={{ marginTop: "25px" }}>
                   <InputGroup>
                     <Button variant="primary" onClick={handleSearch}>
@@ -369,12 +390,19 @@ function TableEmployee({ onSearch }) {
                 nextLabel={"ถัดไป"}
                 breakLabel={"..."}
                 breakClassName={"break-me"}
-                pageCount={Math.ceil(employees.length / perPage)}
+                pageCount={pageCount}
                 marginPagesDisplayed={2}
                 pageRangeDisplayed={5}
                 onPageChange={handlePageChange}
                 containerClassName={"pagination"}
-                activeClassName={"active"}
+                pageClassName={"page-item"} // เพิ่มคลาสสำหรับแต่ละหน้า
+                pageLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์แต่ละหน้า
+                previousClassName={"page-item"} // เพิ่มคลาสสำหรับหน้าก่อนหน้า
+                previousLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์หน้าก่อนหน้า
+                nextClassName={"page-item"} // เพิ่มคลาสสำหรับหน้าถัดไป
+                nextLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์หน้าถัดไป
+                activeClassName={"active"} // เพิ่มคลาสสำหรับหน้าที่เลือก
+                disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
               />
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
