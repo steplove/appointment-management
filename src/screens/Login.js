@@ -15,7 +15,7 @@ import { BASE_URL } from "../constants/constants";
 import logo from "../images/unnamed.png";
 
 // ES6 Modules or TypeScript
-import Swal from "sweetalert2";
+import "sweetalert2";
 import { Image } from "react-bootstrap";
 function Copyright(props) {
   return (
@@ -132,7 +132,7 @@ export default function Login() {
                 required
                 fullWidth
                 id="identificationNumber"
-                label="identificationNumber"
+                label="Username"
                 name="identificationNumber"
                 autoComplete="identificationNumber"
                 autoFocus

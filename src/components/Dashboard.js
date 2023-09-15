@@ -3,7 +3,7 @@ import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../constants/constants";
 
 function Dashboard() {
-  const { data, isLoading } = useFetch(BASE_URL + '/api/CountStatus');
+  const { data, isLoading } = useFetch(BASE_URL + "/api/CountStatus");
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -26,8 +26,8 @@ function Dashboard() {
                     {pendingCount}
                   </h1>
                 </div>
-                <div className="col-8 text-left">
-                  <h2> Pending Appointments </h2>
+                <div className="col-8 text-center d-flex align-items-center justify-content-center">
+                  <h2>รอยืนยันนัดหมาย</h2>
                 </div>
               </div>
             </div>
@@ -40,8 +40,8 @@ function Dashboard() {
                     {confirmedCount}
                   </h1>
                 </div>
-                <div className="col-8 text-left">
-                  <h2> Today's Appointments </h2>
+                <div className="col-8 text-center d-flex align-items-center justify-content-center">
+                  <h2>นัดหมายวันนี้</h2>
                 </div>
               </div>
             </div>
@@ -54,23 +54,36 @@ function Dashboard() {
                     {totalAppointment}
                   </h1>
                 </div>
-                <div className="col-8">
-                  <h2> Total Appointments </h2>
+                <div className="col-8 text-center d-flex align-items-center justify-content-center">
+                  <h2>นัดหมายทั้งหมด</h2>
                 </div>
               </div>
             </div>
           </div>
           <div className="col-lg-3">
-            <div className="widget style1 red-bg">
+            <div className="widget style1 blue-bg">
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
                     01
                   </h1>
                 </div>
-                <div className="col-8 text-left">
-                  <h2> Total </h2>
-                  <h2>Patients</h2>
+                <div className="col-8 text-center d-flex align-items-center justify-content-center">
+                  <h2>ผู้ใช้งานทั้งหมด</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-3">
+            <div className="widget style1 navy-bg">
+              <div className="row">
+                <div className="col-4 text-center">
+                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                    01
+                  </h1>
+                </div>
+                <div className="col-8 text-center d-flex align-items-center justify-content-center">
+                  <h2>รอยืนยันตัวตน</h2>
                 </div>
               </div>
             </div>

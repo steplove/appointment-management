@@ -1,9 +1,9 @@
 import React from "react";
 import NavBar from "../components/navBar";
-import TableCustomer from "../components/TableCustomer";
+import TableDepartments from "../components/TableDepartments";
 import SlideBar from "../components/SlideBar";
-import Dashboard from "../components/Dashboard";
-function Customers() {
+
+function Departments() {
   return (
     <>
       <div id="wrapper">
@@ -14,20 +14,19 @@ function Customers() {
           </div>
           <div className="row wrapper border-bottom white-bg page-heading">
             <div className="col-lg-10">
-              <h2>จัดการลูกค้า</h2>
+              <h2>จัดการแผนก</h2>
               <ol className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="/">หน้าแรก</a>
                 </li>
                 <li className="breadcrumb-item">
-                  <a href={"/"}>จัดการผู้ใช้</a>
+                  <a href={"/"}>จัดการแผนก</a>
                 </li>
               </ol>
             </div>
           </div>
           <div className="wrapper wrapper-content animated fadeInRight">
-            <Dashboard />
-            <TableCustomer />
+            <TableDepartments />
           </div>{" "}
         </div>
       </div>
@@ -35,4 +34,4 @@ function Customers() {
   );
 }
 
-export default Customers;
+export default Departments;
