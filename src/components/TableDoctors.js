@@ -48,6 +48,7 @@ function TableDoctors({ onSearch }) {
   //-------------------------------------------------------------------------------------//
   // สถานะสำหรับแสดงหรือซ่อน modal
   const [show, setShow] = useState(false);
+  const [showEdite, setShowEdite] = useState(false);
 
   // สถานะสำหรับเก็บชื่อและรหัสแพทย์
   const [doctorName, setDoctorName] = useState("");
@@ -55,11 +56,16 @@ function TableDoctors({ onSearch }) {
 
   // ฟังก์ชั่นสำหรับแสดง modal
   const handleShow = () => setShow(true);
+  const handleShowEdite = () => setShowEdite(true);
 
   // ฟังก์ชั่นสำหรับซ่อน modal
   const handleClose = () => setShow(false);
-
-  const handleSubmit = () => {
+  const handleCloseEdite = () => setShowEdite(false);
+  const handleEditModal = () => {
+    handleShowEdite();
+  };
+  //ปุ่มยืนยันใน modal ของการเพิ่ม
+  const handleSubmitInsert = () => {
     // ใช้การจำลองการบันทึกข้อมูล
     const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
 
@@ -84,6 +90,66 @@ function TableDoctors({ onSearch }) {
       });
     }
   };
+  //ปุ่มยืนยันใน modal ของการแก้ไข
+  const handleSubmitEdite = () => {
+    // ใช้การจำลองการบันทึกข้อมูล
+    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
+
+    if (isSavedSuccessfully) {
+      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
+      Swal.fire({
+        title: "คุณแน่ใจที่จะแก้ไข?",
+        text: "",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "แก้ข้อมูลแพทย์สำเร็จ!",
+            icon: "success",
+            showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+            timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+          });
+        }
+      });
+      // หลังจากการบันทึกข้อมูล ปิด modal
+      handleCloseEdite();
+    } else {
+      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
+      Swal.fire({
+        title: "มีข้อผิดพลาด!",
+        text: "ไม่สามารถแก้ข้อมูลแพทย์ได้",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+      });
+    }
+  };
+  //ลบข้อมูลแพทย์
+  const handleDelete = () => {
+    Swal.fire({
+      title: "คุณแน่ใจที่จะลบ?",
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ยืนยัน",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "ลบข้อมูลแพทย์สำเร็จ!",
+          icon: "success",
+          showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+          timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+        });
+      }
+    });
+  };
+
   const [searchFirstName, setSearchFirstName] = useState(""); // state สำหรับเก็บค่าที่กรอก
 
   const handleSearch = async () => {
@@ -101,6 +167,21 @@ function TableDoctors({ onSearch }) {
     } else {
       // แสดงข้อผิดพลาดหรือแจ้งเตือน
       console.error("Error searching for doctor:", result.message);
+    }
+  };
+  //แสดงตัวอย่างรูปเมื่อมีการเลือกรูป
+  const [preview, setPreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreview(null);
     }
   };
   //------------------------------------------------------------------------------------//
@@ -162,10 +243,13 @@ function TableDoctors({ onSearch }) {
                         {doctor.Doctor_Code})
                       </td>
                       <td>
-                        <Button variant="primary">
+                        <Button
+                          variant="primary"
+                          onClick={() => handleEditModal()}
+                        >
                           <h4>จัดการ</h4>
                         </Button>{" "}
-                        <Button variant="danger">
+                        <Button variant="danger" onClick={() => handleDelete()}>
                           <h4>ลบ</h4>
                         </Button>
                       </td>
@@ -179,6 +263,21 @@ function TableDoctors({ onSearch }) {
                   </tr>
                 )}
               </tbody>
+              {/* <tbody>
+                <tr className="text-center">
+                  <td>
+                    <h3>test</h3>
+                  </td>
+                  <td>
+                    <Button variant="primary" onClick={() => handleEditModal()}>
+                      <h4>จัดการ</h4>
+                    </Button>{" "}
+                    <Button variant="danger" onClick={() => handleDelete()}>
+                      <h4>ลบ</h4>
+                    </Button>
+                  </td>
+                </tr>
+              </tbody> */}
             </table>
 
             <ReactPaginate
@@ -201,6 +300,64 @@ function TableDoctors({ onSearch }) {
               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
           </div>
+          <Modal show={showEdite} onHide={handleCloseEdite}>
+            <Modal.Header closeButton>
+              <Modal.Title>จัดการข้อมูลแพทย์</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              <Form>
+                <Form.Group controlId="doctorName">
+                  <Form.Label>ชื่อแพทย์</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="ป้อนชื่อแพทย์"
+                    value={doctorName}
+                    onChange={(e) => setDoctorName(e.target.value)}
+                  />
+                </Form.Group>
+
+                <Form.Group controlId="doctorCode">
+                  <Form.Label>รหัสแพทย์</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="ป้อนรหัสแพทย์"
+                    value={doctorCode}
+                    onChange={(e) => setDoctorCode(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group controlId="doctorImage">
+                  <Form.Label>รูปแพทย์</Form.Label>
+                  <div class="custom-file">
+                    <input
+                      id="logo"
+                      type="file"
+                      class="custom-file-input"
+                      onChange={handleImageChange}
+                    />
+                    <label for="logo" class="custom-file-label">
+                      Choose file...
+                    </label>
+                  </div>
+                  {preview && (
+                    <div style={{ marginTop: "20px" }}>
+                      <img
+                        src={preview}
+                        alt="Preview"
+                        style={{ maxWidth: "300px" }}
+                      />
+                    </div>
+                  )}
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleSubmitEdite}>
+                บันทึก
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>เพิ่มข้อมูลแพทย์</Modal.Title>
@@ -231,10 +388,7 @@ function TableDoctors({ onSearch }) {
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                ยกเลิก
-              </Button>
-              <Button variant="primary" onClick={handleSubmit}>
+              <Button variant="primary" onClick={handleSubmitInsert}>
                 บันทึก
               </Button>
             </Modal.Footer>

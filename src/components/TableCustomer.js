@@ -150,23 +150,23 @@ function TableCustomer({ onSearch }) {
       if (result.isConfirmed) {
         if (selectedEmployees && selectedEmployees.id) {
           const updatedEmployee = {
-            identificationType: selectedEmployees.identificationType,
-            identificationNumber: selectedEmployees.identificationNumber,
-            gender: selectedEmployees.gender,
-            prefix: selectedEmployees.prefix,
-            firstName: selectedEmployees.firstName,
-            lastName: selectedEmployees.lastName,
-            birthDate: selectedEmployees.birthDate,
-            address: selectedEmployees.address,
-            moo: selectedEmployees.moo,
-            subDistrict: selectedEmployees.subDistrict,
-            district: selectedEmployees.district,
-            province: selectedEmployees.province,
-            postalCode: selectedEmployees.postalCode,
-            mobile: selectedEmployees.mobile,
-            homePhone: selectedEmployees.homePhone,
-            email: selectedEmployees.email,
-            customer_status: selectedEmployees.customer_status,
+            IdenType: selectedEmployees.IdenType,
+            IdenNumber: selectedEmployees.IdenNumber,
+            HN: selectedEmployees.HN,
+            Gender: selectedEmployees.Gender,
+            Prefix: selectedEmployees.Prefix,
+            FirstName: selectedEmployees.FirstName,
+            LastName: selectedEmployees.LastName,
+            BirthDate: selectedEmployees.BirthDate,
+            Address: selectedEmployees.Address,
+            Moo: selectedEmployees.Moo,
+            Amphures: selectedEmployees.Amphures,
+            Districts: selectedEmployees.Districts,
+            Provinces: selectedEmployees.Provinces,
+            PostCode: selectedEmployees.PostCode,
+            MobileNo: selectedEmployees.MobileNo,
+            Email: selectedEmployees.Email,
+            Customer_Status: selectedEmployees.Customer_Status,
           };
           console.log("Saving product:", updatedEmployee);
           fetch(BASE_URL + `/api/updateCustomer/${selectedEmployees.id}`, {
@@ -400,18 +400,18 @@ function TableCustomer({ onSearch }) {
                         <tr key={employee.id} className="text-center">
                           <td>
                             <h3>
-                              {employee.firstName} {employee.lastName}
+                              {employee.FirstName} {employee.LastName}
                             </h3>
                           </td>
 
                           <td>
-                            <h3>{employee.mobile}</h3>
+                            <h3>{employee.MobileNo}</h3>
                           </td>
                           <td>
                             <h3
-                              className={`status-${employee.customer_status}`}
+                              className={`status-${employee.Customer_Status}`}
                             >
-                              {employee.customer_status}
+                              {employee.Customer_Status}
                             </h3>
                           </td>
                           <td>
@@ -421,7 +421,7 @@ function TableCustomer({ onSearch }) {
                             >
                               <h4>จัดการ</h4>
                             </Button>{" "}
-                            {employee.customer_status === "guest" ? (
+                            {employee.Customer_Status === "guest" ? (
                               <Button
                                 variant="danger"
                                 onClick={() => handleMapHnModal(employee.id)}
@@ -450,18 +450,18 @@ function TableCustomer({ onSearch }) {
                             <tr key={employee.id} className="text-center">
                               <td>
                                 <h3>
-                                  {employee.firstName} {employee.lastName}
+                                  {employee.FirstName} {employee.LastName}
                                 </h3>
                               </td>
 
                               <td>
-                                <h3>{employee.mobile}</h3>
+                                <h3>{employee.MobileNo}</h3>
                               </td>
                               <td>
                                 <h3
-                                  className={`status-${employee.customer_status}`}
+                                  className={`status-${employee.Customer_Status}`}
                                 >
-                                  {employee.customer_status}
+                                  {employee.Customer_Status}
                                 </h3>
                               </td>
                               <td>
@@ -471,7 +471,7 @@ function TableCustomer({ onSearch }) {
                                 >
                                   <h4>จัดการ</h4>
                                 </Button>{" "}
-                                {employee.customer_status === "guest" ? (
+                                {employee.Customer_Status === "guest" ? (
                                   <Button
                                     variant="danger"
                                     onClick={() =>
@@ -542,11 +542,11 @@ function TableCustomer({ onSearch }) {
                 <tbody className="text-center">
                   {mapHN.birthDate ? (
                     <tr>
-                      <td>{mapHN.hospitalNumber}</td>
-                      <td>{mapHN.firstName}</td>
-                      <td>{mapHN.lastName}</td>
-                      <td>{mapHN.gender}</td>
-                      <td>{mapHN.birthDate.substring(0, 10)}</td>
+                      <td>{mapHN.HN}</td>
+                      <td>{mapHN.FirstName}</td>
+                      <td>{mapHN.LastName}</td>
+                      <td>{mapHN.Gender}</td>
+                      <td>{mapHN.BirthDate.substring(0, 10)}</td>
                     </tr>
                   ) : (
                     <tr>
@@ -584,7 +584,7 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="ประเภทบัตร"
-                        value={selectedEmployees.identificationType}
+                        value={selectedEmployees.IdenType}
                         disabled
                       />
                     </Form.Group>
@@ -595,11 +595,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="เลขบัตร"
-                        value={selectedEmployees.identificationNumber}
+                        value={selectedEmployees.IdenNumber}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            identificationNumber: e.target.value,
+                            IdenNumber: e.target.value,
                           })
                         }
                         disabled
@@ -612,7 +612,7 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="เพศ"
-                        defaultValue={selectedEmployees.gender}
+                        defaultValue={selectedEmployees.Gender}
                         disabled
                       />
                     </Form.Group>
@@ -623,7 +623,7 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="คำนำหน้า"
-                        defaultValue={selectedEmployees.prefix}
+                        defaultValue={selectedEmployees.Prefix}
                         disabled
                       />
                     </Form.Group>
@@ -634,11 +634,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="ชื่อ"
-                        value={selectedEmployees.firstName}
+                        value={selectedEmployees.FirstName}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            firstName: e.target.value,
+                            FirstName: e.target.value,
                           })
                         }
                       />
@@ -650,11 +650,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="นามสกุล"
-                        value={selectedEmployees.lastName}
+                        value={selectedEmployees.LastName}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            lastName: e.target.value,
+                            LastName: e.target.value,
                           })
                         }
                       />
@@ -667,11 +667,11 @@ function TableCustomer({ onSearch }) {
                       <Form.Control
                         type="date"
                         placeholder="ว/ด/ปีเกิด"
-                        value={selectedEmployees.birthDate.substring(0, 10)}
+                        value={selectedEmployees.BirthDate.substring(0, 10)}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            birthDate: e.target.value,
+                            BirthDate: e.target.value,
                           })
                         }
                       />
@@ -683,15 +683,15 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         as="select"
-                        value={selectedEmployees.province}
+                        value={selectedEmployees.Provinces}
                         onChange={(e) => {
                           const selectedProvince = e.target.value;
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            province: selectedProvince,
-                            district: "",
-                            subDistrict: "",
-                            postalCode: "",
+                            Provinces: selectedProvince,
+                            Districts: "",
+                            Amphures: "",
+                            PostCode: "",
                           });
                         }}
                       >
@@ -712,14 +712,14 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         as="select"
-                        value={selectedEmployees.district}
+                        value={selectedEmployees.Districts}
                         onChange={(e) => {
                           const selectedDistrict = e.target.value;
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            district: selectedDistrict,
-                            subDistrict: "",
-                            postalCode: "",
+                            Districts: selectedDistrict,
+                            Amphures: "",
+                            PostCode: "",
                           });
                         }}
                       >
@@ -737,7 +737,7 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         as="select"
-                        value={selectedEmployees.subDistrict}
+                        value={selectedEmployees.Amphures}
                         onChange={(e) => {
                           const selectedSubDistrict = e.target.value;
                           setSelectedEmployees({
@@ -761,11 +761,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         as="select"
-                        value={selectedEmployees.postalCode}
+                        value={selectedEmployees.PostCode}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            postalCode: e.target.value,
+                            PostCode: e.target.value,
                           })
                         }
                       >
@@ -787,11 +787,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="หมู่"
-                        value={selectedEmployees.moo}
+                        value={selectedEmployees.Moo}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            moo: e.target.value,
+                            Moo: e.target.value,
                           })
                         }
                       />
@@ -829,11 +829,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="ที่อยู่"
-                        value={selectedEmployees.address}
+                        value={selectedEmployees.Address}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            address: e.target.value,
+                            Address: e.target.value,
                           })
                         }
                       />
@@ -845,11 +845,11 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="เบอร์"
-                        value={selectedEmployees.mobile}
+                        value={selectedEmployees.MobileNo}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            mobile: e.target.value,
+                            MobileNo: e.target.value,
                           })
                         }
                       />
@@ -877,44 +877,15 @@ function TableCustomer({ onSearch }) {
                       </Form.Label>
                       <Form.Control
                         placeholder="E-Mail"
-                        value={selectedEmployees.email}
+                        value={selectedEmployees.Email}
                         onChange={(e) =>
                           setSelectedEmployees({
                             ...selectedEmployees,
-                            email: e.target.value,
+                            Email: e.target.value,
                           })
                         }
                       />
                     </Form.Group>
-                    <br />
-                    {/* อัพเดทสถานะ */}
-                    {/* <Form.Group>
-                      <Form.Label>
-                        <h4>สถานะ</h4>
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        aria-label="Default select example"
-                        value={selectedEmployees.customer_status}
-                        onChange={(e) =>
-                          setSelectedEmployees({
-                            ...selectedEmployees,
-                            customer_status: e.target.value,
-                          })
-                        }
-                      >
-                        <option>เลือกประเภท</option>
-                        {readStatus.map((readStatu) => (
-                          <option
-                            key={readStatu.id}
-                            value={readStatu.customer_status}
-                          >
-                            {readStatu.customer_status}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group> */}
-
                     <br />
                   </Card.Body>
                 </Card>

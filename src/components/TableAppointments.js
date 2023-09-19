@@ -5,8 +5,6 @@ import {
   Card,
   Modal,
   InputGroup,
-  Col,
-  Row,
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
@@ -71,13 +69,13 @@ function TableEmployee({ onSearch }) {
       if (result.isConfirmed) {
         if (selectedEmployees && selectedEmployees.id) {
           const updatedEmployee = {
-            hospitalNumber: hospitalNumber,
-            firstName: selectedEmployees.firstName,
-            lastName: selectedEmployees.lastName,
-            date_appointment: selectedEmployees.date_appointment,
-            time_appointment: selectedEmployees.time_appointment,
-            clinic: selectedEmployees.clinic,
-            doctor: selectedEmployees.doctor,
+            HN: hospitalNumber,
+            FirstName: selectedEmployees.FirstName,
+            LastName: selectedEmployees.LastName,
+            Appointment_Date: selectedEmployees.Appointment_Date,
+            Appointment_Time: selectedEmployees.Appointment_Time,
+            Clinic: selectedEmployees.Clinic,
+            Doctor: selectedEmployees.Doctor,
             status: selectedEmployees.status,
           };
 
@@ -342,23 +340,23 @@ function TableEmployee({ onSearch }) {
                             .map((employee) => (
                               <tr key={employee.id}>
                                 <td>
-                                  <h3>{employee.hospitalNumber}</h3>
+                                  <h3>{employee.HN}</h3>
                                 </td>
                                 <td>
                                   <h3>
-                                    {employee.firstName} {employee.lastName}
+                                    {employee.FirstName} {employee.LastName}
                                   </h3>
                                 </td>
                                 <td>
                                   <h3>
                                     {" "}
                                     {new Date(
-                                      employee.date_appointment
+                                      employee.Appointment_Date
                                     ).toLocaleDateString()}
                                   </h3>
                                 </td>
                                 <td>
-                                  <h3>{employee.time_appointment} น.</h3>
+                                  <h3>{employee.Appointment_Time} น.</h3>
                                 </td>
                                 <td>
                                   <h3 className={`status-${employee.status}`}>
@@ -417,11 +415,11 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>ชื่อ</InputGroup.Text>
                         <Form.Control
                           placeholder="ชื่อ"
-                          value={selectedEmployees.firstName}
+                          value={selectedEmployees.FirstName}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              firstName: e.target.value,
+                              FirstName: e.target.value,
                             })
                           }
                         />
@@ -431,11 +429,11 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>นามสกุล</InputGroup.Text>
                         <Form.Control
                           placeholder="นามสกุล"
-                          value={selectedEmployees.lastName}
+                          value={selectedEmployees.LastName}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              lastName: e.target.value,
+                              LastName: e.target.value,
                             })
                           }
                         />
@@ -447,14 +445,14 @@ function TableEmployee({ onSearch }) {
                         <Form.Control
                           type="date"
                           placeholder="วันที่นัด"
-                          value={selectedEmployees.date_appointment.substring(
+                          value={selectedEmployees.Appointment_Date.substring(
                             0,
                             10
                           )}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              date_appointment: e.target.value,
+                              Appointment_Date: e.target.value,
                             })
                           }
                         />
@@ -465,14 +463,14 @@ function TableEmployee({ onSearch }) {
                         <Form.Control
                           type="time"
                           placeholder="เวลา"
-                          value={selectedEmployees.time_appointment.substring(
+                          value={selectedEmployees.Appointment_Time.substring(
                             0,
                             5
                           )}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              time_appointment: e.target.value,
+                              Appointment_Time: e.target.value,
                             })
                           }
                         />
@@ -482,11 +480,11 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>คลินิก</InputGroup.Text>
                         <Form.Control
                           placeholder="คลินิก"
-                          value={selectedEmployees.clinic}
+                          value={selectedEmployees.Clinic}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              clinic: e.target.value,
+                              Clinic: e.target.value,
                             })
                           }
                         />
@@ -496,11 +494,11 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>หมอ</InputGroup.Text>
                         <Form.Control
                           placeholder="หมอ"
-                          value={selectedEmployees.doctor}
+                          value={selectedEmployees.Doctor}
                           onChange={(e) =>
                             setSelectedEmployees({
                               ...selectedEmployees,
-                              doctor: e.target.value,
+                              Doctor: e.target.value,
                             })
                           }
                         />

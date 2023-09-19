@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../constants/constants";
+import { Spinner } from "react-bootstrap";
 
 function Dashboard() {
   const { data, isLoading } = useFetch(BASE_URL + "/api/CountStatus");
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="spiner-example">
+        <div class="sk-spinner sk-spinner-three-bounce">
+          <div class="sk-bounce1"></div>
+          <div class="sk-bounce2"></div>
+          <div class="sk-bounce3"></div>
+        </div>
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
   }
   if (data && data.error) {
     return <p>Error: {data.error}</p>;

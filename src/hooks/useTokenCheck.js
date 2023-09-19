@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../constants/constants";
 
 function useTokenCheck() {
   const [userData, setUserData] = useState({
@@ -11,7 +12,7 @@ function useTokenCheck() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:3000/authen", {
+    fetch(BASE_URL + "/authen", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -48,20 +48,25 @@ function TableEmployees({ onSearch }) {
   //-------------------------------------------------------------------------------------//
   // สถานะสำหรับแสดงหรือซ่อน modal
   const [show, setShow] = useState(false);
+  const [showEdite, setShowEdite] = useState(false);
 
   // สถานะสำหรับเก็บชื่อและรหัสพนักงาน
   const [userName, setUserName] = useState("");
   const [userCode, setUserCode] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  const [userStatus, setUserStatus] = useState("");
+  // const [userStatus, setUserStatus] = useState("");
 
   // ฟังก์ชั่นสำหรับแสดง modal
   const handleShow = () => setShow(true);
+  const handleShowEdite = () => setShow(true);
 
   // ฟังก์ชั่นสำหรับซ่อน modal
   const handleClose = () => setShow(false);
-
-  const handleSubmit = () => {
+  const handleCloseEdite = () => setShow(false);
+  const handleEditModal = () => {
+    handleShowEdite();
+  };
+  const handleSubmitInsert = () => {
     // ใช้การจำลองการบันทึกข้อมูล
     const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
 
@@ -86,6 +91,65 @@ function TableEmployees({ onSearch }) {
       });
     }
   };
+  //ปุ่มยืนยันใน modal ของการแก้ไข
+  const handleSubmitEdite = () => {
+    // ใช้การจำลองการบันทึกข้อมูล
+    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
+
+    if (isSavedSuccessfully) {
+      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
+      Swal.fire({
+        title: "คุณแน่ใจที่จะแก้ไข?",
+        text: "",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "แก้ข้อมูลพนักงานสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+            timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+          });
+        }
+      });
+      // หลังจากการบันทึกข้อมูล ปิด modal
+      handleCloseEdite();
+    } else {
+      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
+      Swal.fire({
+        title: "มีข้อผิดพลาด!",
+        text: "ไม่สามารถแก้ข้อมูลพนักงานได้",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+      });
+    }
+  };
+  //ลบข้อมูลแพทย์
+  const handleDelete = () => {
+    Swal.fire({
+      title: "คุณแน่ใจที่จะลบ?",
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ยืนยัน",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "ลบข้อมูลพนักงานสำเร็จ!",
+          icon: "success",
+          showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+          timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+        });
+      }
+    });
+  };
   const [searchFirstName, setSearchFirstName] = useState(""); // state สำหรับเก็บค่าที่กรอก
 
   const handleSearch = async () => {
@@ -107,7 +171,21 @@ function TableEmployees({ onSearch }) {
   };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className="spiner-example">
+        <div className="sk-spinner sk-spinner-wave">
+          <div className="sk-rect1"></div>
+          <div className="sk-rect2"></div>
+          <div className="sk-rect3"></div>
+          <div className="sk-rect4"></div>
+          <div className="sk-rect5"></div>
+        </div>
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
 
   // ตรวจสอบสถานะข้อผิดพลาด หากมีข้อผิดพลาด แสดงข้อความผิดพลาด
   if (error) return <p>Error: {error.message}</p>;
@@ -164,10 +242,13 @@ function TableEmployees({ onSearch }) {
                         {employee.Doctor_Code})
                       </td>
                       <td>
-                        <Button variant="primary">
+                        <Button
+                          variant="primary"
+                          onClick={() => handleEditModal()}
+                        >
                           <h4>จัดการ</h4>
                         </Button>{" "}
-                        <Button variant="danger">
+                        <Button variant="danger" onClick={() => handleDelete()}>
                           <h4>ลบ</h4>
                         </Button>
                       </td>
@@ -181,6 +262,21 @@ function TableEmployees({ onSearch }) {
                   </tr>
                 )}
               </tbody>
+              {/* <tbody>
+                <tr className="text-center">
+                  <td>
+                    <h3>test</h3>
+                  </td>
+                  <td>
+                    <Button variant="primary" onClick={() => handleEditModal()}>
+                      <h4>จัดการ</h4>
+                    </Button>{" "}
+                    <Button variant="danger" onClick={() => handleDelete()}>
+                      <h4>ลบ</h4>
+                    </Button>
+                  </td>
+                </tr>
+              </tbody> */}
             </table>
 
             <ReactPaginate
@@ -203,7 +299,7 @@ function TableEmployees({ onSearch }) {
               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
           </div>
-          
+
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>เพิ่มข้อมูลพนักงาน</Modal.Title>
@@ -243,7 +339,8 @@ function TableEmployees({ onSearch }) {
                   <Form.Control as="select" aria-label="Default select example">
                     <option>เลือกประเภท</option>
 
-                    <option></option>
+                    <option value="0">active</option>
+                    <option value="1">inactive</option>
                   </Form.Control>
                 </Form.Group>
               </Form>
@@ -253,7 +350,62 @@ function TableEmployees({ onSearch }) {
               <Button variant="secondary" onClick={handleClose}>
                 ยกเลิก
               </Button>
-              <Button variant="primary" onClick={handleSubmit}>
+              <Button variant="primary" onClick={handleSubmitInsert}>
+                บันทึก
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Modal show={showEdite} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>เพิ่มข้อมูลพนักงาน</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+              <Form>
+                <Form.Group controlId="userCode">
+                  <Form.Label>รหัสพนักงาน</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="ป้อนรหัสพนักงาน"
+                    value={userCode}
+                    onChange={(e) => setUserCode(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group controlId="userPassword">
+                  <Form.Label>รหัสผ่านพนักงาน</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="ป้อนรหัสผ่านพนักงาน"
+                    value={userPassword}
+                    onChange={(e) => setUserPassword(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group controlId="userName">
+                  <Form.Label>ชื่อพนักงาน</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="ป้อนชื่อพนักงาน"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>สถานะ</Form.Label>
+                  <Form.Control as="select" aria-label="Default select example">
+                    <option>เลือกประเภท</option>
+
+                    <option value="0">active</option>
+                    <option value="1">inactive</option>
+                  </Form.Control>
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                ยกเลิก
+              </Button>
+              <Button variant="primary" onClick={handleSubmitEdite}>
                 บันทึก
               </Button>
             </Modal.Footer>
