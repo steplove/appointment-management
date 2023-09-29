@@ -169,14 +169,14 @@ thead {
   background-size: 100% 100%;
 }
 
-.status-guest {
+.status-1 {
   color: white;
   border-radius: 5px;
   background: linear-gradient(135deg, yellowgreen, limegreen);
   background-size: 100% 100%;
 }
 
-.status-member {
+.status-2 {
   color: white;
   background: linear-gradient(135deg, green, darkgreen);
   border-radius: 5px;
@@ -195,4 +195,19 @@ thead {
   background: linear-gradient(135deg, red, darkred);
   border-radius: 5px;
   background-size: 100% 100%;
+}
+.greenDot {
+  height: 15px;
+  width: 15px;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.redDot {
+  height: 15px;
+  width: 15px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
 }

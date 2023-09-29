@@ -3,16 +3,14 @@ import { BASE_URL } from "../constants/constants";
 
 function useTokenCheck() {
   const [userData, setUserData] = useState({
-    identificationNumber: "",
-    firstName:"",
-    lastname: "",
-    hospitalNumber:""
-
+    User_Code: "",
+    User_Name: "",
+    User_Status: "",
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch(BASE_URL + "/authen", {
+    fetch(BASE_URL + "/api/authenEmployee", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,13 +21,11 @@ function useTokenCheck() {
       .then((data) => {
         if (data.status === "ok") {
           setUserData({
-            identificationNumber: data.decoded.identificationNumber,
-            firstName: data.decoded.firstName,
-            lastname: data.decoded.lastName,
-            hospitalNumber: data.decoded.hospitalNumber,
+            User_Code: data.decoded.User_Code,
+            User_Name: data.decoded.User_Name,
+            User_Status: data.decoded.User_Status,
           });
           console.log(data);
-
         } else {
           console.log(data.status);
           alert("Token หมดอายุ");
@@ -41,6 +37,10 @@ function useTokenCheck() {
         console.log("Error", error);
       });
   }, []);
-  return [userData.identificationNumber, userData.firstName,userData.lastname,userData.hospitalNumber];
+  return [
+    userData.User_Code,
+    userData.User_Name,
+    userData.User_Status,
+  ];
 }
 export default useTokenCheck;

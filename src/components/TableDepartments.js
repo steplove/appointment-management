@@ -1,76 +1,101 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-// import useTokenCheck from "../hooks/useTokenCheck";
+import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
-import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-function TableCustomer({ onSearch }) {
-  // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
-  const dataPerPage = 10;
-
-  // สถานะสำหรับการจัดการหน้าปัจจุบันที่แสดง
-  const [currentPage, setCurrentPage] = useState(0);
-
-  // สถานะสำหรับจำนวนหน้าทั้งหมดที่สามารถแสดงได้
-  const [pageCount, setPageCount] = useState(0);
-
-  // สถานะสำหรับเก็บข้อมูลแผนกที่จะแสดงในหน้าปัจจุบัน
-  const [displayedEmployees, setDisplayedEmployees] = useState([]);
-
+import Swal from "sweetalert2";
+function TableDepartments({ onSearch }) {
+  useTokenCheck();
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลแผนก, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
+  const [department, setDepartment] = useState([]);
   const {
-    data: employees = [],
+    data: departments = [],
     loading,
     error,
-  } = useFetch(BASE_URL + "/api/doctors");
+    refetch,
+  } = useFetch(BASE_URL + "/api/clinic");
 
-  // เมื่อข้อมูลแผนกมีการเปลี่ยนแปลง หรือหน้าปัจจุบันเปลี่ยน ให้ปรับปรุงข้อมูลที่จะแสดงในหน้านั้น
   useEffect(() => {
-    if (employees && employees.length) {
-      // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า
-      setDisplayedEmployees(
-        employees.slice(
-          currentPage * dataPerPage,
-          (currentPage + 1) * dataPerPage
-        )
-      );
-      // คำนวณจำนวนหน้าทั้งหมด
-      const totalPageCount = Math.ceil(employees.length / dataPerPage);
-      setPageCount(totalPageCount);
+    if (departments && departments.length > 0) {
+      setDepartment(departments);
     }
-  }, [employees, currentPage]);
+    console.log(departments, "departments");
+  }, [departments]);
 
-  // ฟังก์ชั่นสำหรับการจัดการเมื่อมีการเปลี่ยนหน้าผ่าน ReactPaginate
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
+  const [perPage] = useState(10);
+  // ฟังก์ชันสำหรับการเปลี่ยนหน้า
+
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected);
   };
+  // คำนวณ offset และข้อมูลที่จะแสดงในหน้าปัจจุบัน
+
+  const offset = currentPage * perPage;
+  department.slice(offset, offset + perPage);
+  // state รับค่าการค้นหา
+  const [searchResult, setSearchResult] = useState(null);
+  const shouldShowAllData = !searchResult && departments && departments.length > 0;
+  const [ClinicCodeSearch, setClinicCodeSearch] = useState("");
+  useEffect(() => {
+    const totalPageCount = Math.ceil(department.length / perPage);
+    setPageCount(totalPageCount);
+  }, [department, perPage]);
   //-------------------------------------------------------------------------------------//
   // สถานะสำหรับแสดงหรือซ่อน modal
   const [show, setShow] = useState(false);
   const [showEdite, setShowEdite] = useState(false);
 
   // สถานะสำหรับเก็บชื่อและรหัสแผนก
-  const [userName, setUserName] = useState("");
-  const [userCode, setUserCode] = useState("");
-  const [userPassword, setUserPassword] = useState("");
-  const [userStatus, setUserStatus] = useState("");
+  const [clinicName, setClinicName] = useState("");
+  const [clinicCode, setClinicCode] = useState("");
+  const [selectedClinics, setSelectedClinics] = useState(null);
 
   // ฟังก์ชั่นสำหรับแสดง modal
-  const handleShow = () => setShow(true);
-  const handleShowEdite = () => setShow(true);
+  const handleShow = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/getLastClinicCode`);
+      const data = await response.json();
 
+      if (data && data.lastClinicCode) {
+        const newCodeNumber = parseInt(data.lastClinicCode, 10) + 1;
+        const newCodeString = newCodeNumber.toString().padStart(3, "0"); // format to have leading zeros
+        setClinicCode(newCodeString);
+      } else {
+        console.error("ไม่สามารถดึงข้อมูลรหัสแผนกล่าสุดได้");
+      }
+    } catch (error) {
+      console.error("Error fetching last clinic code:", error);
+    }
+    setShow(true);
+  };
+  const handleShowEdite = () => setShowEdite(true);
   // ฟังก์ชั่นสำหรับซ่อน modal
   const handleClose = () => setShow(false);
-  const handleCloseEdite = () => setShow(false);
-  const handleEditModal = () => {
+  const handleCloseEdite = () => setShowEdite(false);
+
+  //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
+  const handleEditModal = (ClinicID) => {
+    const clinics = departments.find((p) => p.Clinic_ID === ClinicID);
+    console.log("Selected clinic:", clinics); // ตรวจสอบข้อมูล clinic ที่เลือก
+    setSelectedClinics(clinics);
     handleShowEdite();
   };
-  const handleSubmitInsert = () => {
-    // ใช้การจำลองการบันทึกข้อมูล
-    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
-
-    if (isSavedSuccessfully) {
+  //ฟังก์ชั่น API ตอนกด insert แผนก
+  const handleSubmitInsert = async () => {
+    const response = await fetch(BASE_URL + "/api/clinic", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clinicCode: clinicCode,
+        clinicName: clinicName,
+      }),
+    });
+    if (response.status === 201) {
       // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแผนกสำเร็จ
       Swal.fire({
         title: "เพิ่มข้อมูลแผนกสำเร็จ!",
@@ -79,6 +104,9 @@ function TableCustomer({ onSearch }) {
         timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
       });
 
+      // ตั้งค่า state ของ clinicCode และ clinicName เป็นค่าว่าง
+      setClinicCode("");
+      setClinicName("");
       // หลังจากการบันทึกข้อมูล ปิด modal
       handleClose();
     } else {
@@ -89,15 +117,13 @@ function TableCustomer({ onSearch }) {
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+      handleClose();
     }
   };
-  //ปุ่มยืนยันใน modal ของการแก้ไข
-  const handleSubmitEdite = () => {
-    // ใช้การจำลองการบันทึกข้อมูล
-    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
-
-    if (isSavedSuccessfully) {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
+  //ฟังก์ชั่น API ตอนแก้ไขแผนก
+  const handleSave = async () => {
+    try {
+      setShowEdite(false);
       Swal.fire({
         title: "คุณแน่ใจที่จะแก้ไข?",
         text: "",
@@ -107,67 +133,93 @@ function TableCustomer({ onSearch }) {
         cancelButtonColor: "#d33",
         confirmButtonText: "ยืนยัน",
         cancelButtonText: "ยกเลิก",
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          Swal.fire({
-            title: "แก้ข้อมูลแผนกสำเร็จ!",
-            icon: "success",
-            showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-            timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-          });
+          const response = await fetch(
+            `${BASE_URL}/api/clinic/${selectedClinics.Clinic_ID}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                Clinic_Code: selectedClinics.Clinic_Code,
+                Clinic_Name: selectedClinics.Clinic_Name,
+              }),
+            }
+          );
+
+          if (response.ok) {
+            Swal.fire({
+              title: "แก้ข้อมูลแผนกสำเร็จ!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            refetch(); // รีเฟรชข้อมูล
+            handleCloseEdite(); // ปิด modal
+          } else {
+            Swal.fire({
+              title: "มีข้อผิดพลาด!",
+              text: "ไม่สามารถแก้ข้อมูลแผนกได้",
+              icon: "error",
+              confirmButtonText: "ตกลง",
+            });
+          }
         }
       });
-      // หลังจากการบันทึกข้อมูล ปิด modal
-      handleCloseEdite();
-    } else {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
+    } catch (error) {
       Swal.fire({
-        title: "มีข้อผิดพลาด!",
-        text: "ไม่สามารถแก้ข้อมูลแผนกได้",
+        title: "Error!",
+        text: "An unexpected error occurred.",
         icon: "error",
-        confirmButtonText: "ตกลง",
       });
+      console.error("Error updating clinic:", error);
     }
   };
+
   //ลบข้อมูลแผนก
-  const handleDelete = () => {
-    Swal.fire({
-      title: "คุณแน่ใจที่จะลบ?",
-      text: "",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "ลบข้อมูลแผนกสำเร็จ!",
-          icon: "success",
-          showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-          timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-        });
-      }
-    });
-  };
-  const [searchFirstName, setSearchFirstName] = useState(""); // state สำหรับเก็บค่าที่กรอก
+  // const handleDelete = () => {
+  //   showAlert({
+  //     title: "คุณแน่ใจที่จะลบ?",
+  //     text: "",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "ยืนยัน",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       showAlert({
+  //         title: "ลบข้อมูลแผนกสำเร็จ!",
+  //         icon: "success",
+  //         showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+  //         timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+  //       });
+  //     }
+  //   });
+  // };
 
-  const handleSearch = async () => {
-    console.log("Searching for doctor:", searchFirstName);
-
-    // ค้นหาจาก API หรือฐานข้อมูล
-    const response = await fetch(
-      `YOUR_API_ENDPOINT/search?name=${searchFirstName}`
-    );
-    const result = await response.json();
-
-    if (result.success) {
-      // ทำอะไรกับข้อมูลที่ค้นหาเจอ
-      console.log(result.data);
-    } else {
-      // แสดงข้อผิดพลาดหรือแจ้งเตือน
-      console.error("Error searching for doctor:", result.message);
-    }
+  //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
+  const handleSearchClinicAppointments = () => {
+    console.log(ClinicCodeSearch);
+    fetch(`${BASE_URL}/api/searchClinicsClinic_Name?Clinic_Name=${ClinicCodeSearch}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setSearchResult(data);
+        const newPageCount = Math.ceil(data.length / perPage);
+        setPageCount(newPageCount);
+        setCurrentPage(0);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
@@ -194,21 +246,30 @@ function TableCustomer({ onSearch }) {
         <div className="ibox ">
           <div className="ibox-content">
             <div className="row">
-              <div className="col-sm-2">
-                <Form.Group controlId="searchFirstName">
-                  <Form.Label>ชื่อแผนก</Form.Label>
-                  <Form.Control type="text" />
-                </Form.Group>
-              </div>
-              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
-                <InputGroup>
-                  <Button variant="primary">ค้นหา</Button>
-                </InputGroup>
-              </div>
               <div style={{ marginTop: "25px", marginLeft: "20px" }}>
                 <InputGroup>
                   <Button variant="primary" onClick={handleShow}>
                     เพิ่ม
+                  </Button>
+                </InputGroup>
+              </div>
+              <div className="ml-auto col-sm-2">
+                <Form.Group controlId="searchFirstName">
+                  <Form.Label>ชื่อแผนก</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={ClinicCodeSearch}
+                    onChange={(e) => setClinicCodeSearch(e.target.value)}
+                  />
+                </Form.Group>
+              </div>
+              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
+                <InputGroup>
+                  <Button
+                    onClick={handleSearchClinicAppointments}
+                    variant="primary"
+                  >
+                    ค้นหา
                   </Button>
                 </InputGroup>
               </div>
@@ -217,6 +278,9 @@ function TableCustomer({ onSearch }) {
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
+                  <th className="text-left">
+                    <h3>ลำดับ</h3>
+                  </th>
                   <th>
                     <h3>ชื่อแผนก</h3>
                   </th>
@@ -226,19 +290,78 @@ function TableCustomer({ onSearch }) {
                 </tr>
               </thead>
               <tbody>
-                <tr className="text-center">
-                  <td>
-                    <h3>ฟ</h3>
-                  </td>
-                  <td>
-                    <Button variant="primary" onClick={() => handleEditModal()}>
-                      <h4>จัดการ</h4>
-                    </Button>{" "}
-                    <Button variant="danger" onClick={() => handleDelete()}>
-                      <h4>ลบ</h4>
-                    </Button>
-                  </td>
-                </tr>
+                {shouldShowAllData ? (
+                  <>
+                    {department
+                      .slice(currentPage * perPage, (currentPage + 1) * perPage)
+
+                      .map((department, index) => (
+                        <tr key={department.Clinic_ID} className="text-center">
+                          <td className="text-left">{index + 1}</td>{" "}
+                          {/* แสดงลำดับ */}
+                          <td>
+                            <h3>{department.Clinic_Name}</h3>
+                          </td>
+                          <td>
+                            <Button
+                              variant="primary"
+                              onClick={() =>
+                                handleEditModal(department.Clinic_ID)
+                              }
+                            >
+                              <h4>จัดการ</h4>
+                            </Button>{" "}
+                            {/* <Button variant="danger" onClick={() => handleDelete()}>
+                                          <h4>ลบ</h4>
+                                        </Button> */}
+                          </td>
+                        </tr>
+                      ))}
+                  </>
+                ) : (
+                  <>
+                    {/* แสดงผลลัพธ์ที่ค้นหา */}
+                    {searchResult && searchResult.length > 0 ? (
+                      <>
+                        {searchResult
+                          .slice(
+                            currentPage * perPage,
+                            (currentPage + 1) * perPage
+                          )
+
+                          .map((department, index) => (
+                            <tr
+                              key={department.Clinic_ID}
+                              className="text-center"
+                            >
+                              <td className="text-left">{index + 1}</td>{" "}
+                              {/* แสดงลำดับ */}
+                              <td>
+                                <h3>{department.Clinic_Name}</h3>
+                              </td>
+                              <td>
+                                <Button
+                                  variant="primary"
+                                  onClick={() =>
+                                    handleEditModal(department.Clinic_ID)
+                                  }
+                                >
+                                  <h4>จัดการ</h4>
+                                </Button>{" "}
+                                {/* <Button variant="danger" onClick={() => handleDelete()}>
+                                          <h4>ลบ</h4>
+                                        </Button> */}
+                              </td>
+                            </tr>
+                          ))}
+                      </>
+                    ) : (
+                      <div>
+                        <h1>No results found.</h1>
+                      </div>
+                    )}
+                  </>
+                )}
               </tbody>
             </table>
 
@@ -252,6 +375,7 @@ function TableCustomer({ onSearch }) {
               pageRangeDisplayed={5}
               onPageChange={handlePageChange}
               containerClassName={"pagination"}
+              forcePage={currentPage} // ใช้ forcePage เพื่อบังคับให้แสดงหน้าปัจจุบัน
               pageClassName={"page-item"} // เพิ่มคลาสสำหรับแต่ละหน้า
               pageLinkClassName={"page-link"} // เพิ่มคลาสสำหรับลิงค์แต่ละหน้า
               previousClassName={"page-item"} // เพิ่มคลาสสำหรับหน้าก่อนหน้า
@@ -273,46 +397,76 @@ function TableCustomer({ onSearch }) {
                     <Form.Label>
                       <h4>รหัสแผนก</h4>
                     </Form.Label>
-                    <Form.Control placeholder="รหัสแผนก" />
+                    <Form.Control
+                      value={clinicCode}
+                      onChange={(e) => setClinicCode(e.target.value)}
+                      placeholder="รหัสแผนก"
+                      disabled
+                    />
                   </Form.Group>
                   <br />
                   <Form.Group>
                     <Form.Label>
                       <h4>ชื่อแผนก</h4>
                     </Form.Label>
-                    <Form.Control placeholder="ชื่อแผนก" />
+                    <Form.Control
+                      value={clinicName}
+                      onChange={(e) => setClinicName(e.target.value)}
+                      placeholder="ชื่อแผนก"
+                    />
                   </Form.Group>
                   <br />
                 </Card.Body>
               </Card>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary">ปิด</Button>
+              <Button variant="secondary" onClick={handleClose}>
+                ยกเลิก
+              </Button>
               <Button variant="primary" onClick={handleSubmitInsert}>
                 บันทึก
               </Button>
             </Modal.Footer>
           </Modal>
-          {/* <Modal show={showEdite} onHide={handleClose}>
+          <Modal show={showEdite} onHide={handleCloseEdite}>
             <Modal.Header>
               <Modal.Title className="font">จัดการแผนก </Modal.Title>{" "}
             </Modal.Header>
             <Modal.Body>
-              {selectedEmployees && (
+              {selectedClinics && (
                 <Card>
                   <Card.Body>
-                    <Form.Group>
+                    <Form.Group controlId="Clinic_Code">
                       <Form.Label>
                         <h4>รหัสแผนก</h4>
                       </Form.Label>
-                      <Form.Control placeholder="รหัสแผนก" />
+                      <Form.Control
+                        placeholder="รหัสแผนก"
+                        value={selectedClinics.Clinic_Code}
+                        onChange={(e) =>
+                          setSelectedClinics({
+                            ...selectedClinics,
+                            Clinic_Code: e.target.value,
+                          })
+                        }
+                        disabled
+                      />
                     </Form.Group>
                     <br />
                     <Form.Group>
                       <Form.Label>
                         <h4>ชื่อแผนก</h4>
                       </Form.Label>
-                      <Form.Control placeholder="ชื่อแผนก" />
+                      <Form.Control
+                        placeholder="ชื่อแผนก"
+                        value={selectedClinics.Clinic_Name}
+                        onChange={(e) =>
+                          setSelectedClinics({
+                            ...selectedClinics,
+                            Clinic_Name: e.target.value,
+                          })
+                        }
+                      />
                     </Form.Group>
                     <br />
                   </Card.Body>
@@ -320,22 +474,18 @@ function TableCustomer({ onSearch }) {
               )}
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModal}>
+              <Button variant="secondary" onClick={handleCloseEdite}>
                 ปิด
               </Button>
-              <Button
-                variant="success"
-                onClick={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? "กำลังบันทึก..." : "บันทึก"}
+              <Button variant="success" onClick={handleSave}>
+                บันทึก
               </Button>
             </Modal.Footer>
-          </Modal> */}
+          </Modal>
         </div>
       </div>
     </div>
   );
 }
 
-export default TableCustomer;
+export default TableDepartments;

@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../constants/constants";
-import { Spinner } from "react-bootstrap";
 
 function Dashboard() {
-  const { data, isLoading } = useFetch(BASE_URL + "/api/CountStatus");
+  const { data: countData, isLoading } = useFetch(
+    BASE_URL + "/api/AllCountCustomer"
+  );
   if (isLoading) {
     return (
       <div className="spiner-example">
-        <div class="sk-spinner sk-spinner-three-bounce">
-          <div class="sk-bounce1"></div>
-          <div class="sk-bounce2"></div>
-          <div class="sk-bounce3"></div>
+        <div className="sk-spinner sk-spinner-three-bounce">
+          <div className="sk-bounce1"></div>
+          <div className="sk-bounce2"></div>
+          <div className="sk-bounce3"></div>
         </div>
         <div className="text-center">
           <p>Loading...</p>
@@ -19,10 +20,10 @@ function Dashboard() {
       </div>
     );
   }
-  if (data && data.error) {
-    return <p>Error: {data.error}</p>;
+  if (countData && countData.error) {
+    return <p>Error: {countData.error}</p>;
   }
-  const { totalAppointment, confirmedCount, pendingCount } = data;
+  const { count } = countData[0];
   return (
     <div className="card">
       <div className="card-title ml-4">
@@ -35,7 +36,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 claclassNamess="font-bold" style={{ fontSize: "3rem" }}>
-                    {pendingCount}
+                    0
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -49,7 +50,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    {confirmedCount}
+                    0
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -63,7 +64,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    {totalAppointment}
+                    0
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -77,7 +78,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    01
+                    {count}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">

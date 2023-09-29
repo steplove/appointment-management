@@ -1,63 +1,67 @@
 import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Button,
-  Card,
-  Modal,
-  InputGroup,
-} from "react-bootstrap";
+import { Form, Button, Card, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
-import Swal from "sweetalert2";
-function TableEmployee({ onSearch }) {
-  const [hospitalNumber] = useTokenCheck();
-  const [employees, setEmployees] = useState([]);
+import { useAlert } from "../hooks/useAlert";
+function TableApppointments({ onSearch }) {
+    const { showAlert } = useAlert();
+  // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
+  const [HN] = useTokenCheck();
+  // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
+  const [customers, setCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage] = useState(10);
+  // ฟังก์ชันสำหรับการเปลี่ยนหน้า
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
   };
+  // คำนวณ offset และข้อมูลที่จะแสดงในหน้าปัจจุบัน
   const offset = currentPage * perPage;
-  const currentPageData = employees.slice(offset, offset + perPage);
-
+  const currentPageData = customers.slice(offset, offset + perPage);
+  // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
   useEffect(() => {
     fetch(BASE_URL + "/api/readAppointmentALL")
       .then((response) => response.json())
       .then((data) => {
-        setEmployees(data);
+        setCustomers(data);
         console.log(data, "data");
       })
       .catch((error) => console.error(error));
   }, []);
+  // ใช้ useEffect เพื่อคำนวณจำนวนหน้าทั้งหมดเมื่อข้อมูลการนัดหมายเปลี่ยนแปลง
   useEffect(() => {
-    const totalPageCount = Math.ceil(employees.length / perPage);
+    const totalPageCount = Math.ceil(customers.length / perPage);
     setPageCount(totalPageCount);
-  }, [employees, perPage]);
-  const fetchEmployees = () => {
+  }, [customers, perPage]);
+  //ดึงข้อมูลการนัดหมาย
+  const fetchCustomers = () => {
     fetch(BASE_URL + "/api/readAppointmentALL")
       .then((response) => response.json())
       .then((data) => {
-        setEmployees(data);
+        setCustomers(data);
       })
       .catch((error) => console.error(error));
   };
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  const [selectedEmployees, setSelectedEmployees] = useState(null);
-  const handleEditModal = (employeeId) => {
-    console.log(employeeId, "employeeId");
-    const employee = employees.find((p) => p.id === employeeId);
-    setSelectedEmployees(employee);
-    console.log(employee, "employee");
+  const [selectedCustomers, setSelectedCustomers] = useState(null);
+
+  //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
+  const handleEditModal = (customerId) => {
+    const customer = customers.find((p) => p.id === customerId);
+    setSelectedCustomers(customer);
+    console.log(customer, "customer");
     handleShowModal();
   };
+  // กำหนด state สำหรับการบันทึกข้อมูล
   const [isSaving, setIsSaving] = useState(false);
+  // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = () => {
     setShowModal(false);
     setIsSaving(true);
-    Swal.fire({
+    showAlert({
       title: "คุณแน่ใจที่จะบันทึก?",
       icon: "warning",
       showCancelButton: true,
@@ -67,19 +71,19 @@ function TableEmployee({ onSearch }) {
       cancelButtonText: "ยกเลิก",
     }).then((result) => {
       if (result.isConfirmed) {
-        if (selectedEmployees && selectedEmployees.id) {
+        if (selectedCustomers && selectedCustomers.id) {
           const updatedEmployee = {
-            HN: hospitalNumber,
-            FirstName: selectedEmployees.FirstName,
-            LastName: selectedEmployees.LastName,
-            Appointment_Date: selectedEmployees.Appointment_Date,
-            Appointment_Time: selectedEmployees.Appointment_Time,
-            Clinic: selectedEmployees.Clinic,
-            Doctor: selectedEmployees.Doctor,
-            status: selectedEmployees.status,
+            HN: HN,
+            FirstName: selectedCustomers.FirstName,
+            LastName: selectedCustomers.LastName,
+            Appointment_Date: selectedCustomers.Appointment_Date,
+            Appointment_Time: selectedCustomers.Appointment_Time,
+            Clinic: selectedCustomers.Clinic,
+            Doctor: selectedCustomers.Doctor,
+            status: selectedCustomers.status,
           };
 
-          fetch(BASE_URL + `/api/updateAppointment/${selectedEmployees.id}`, {
+          fetch(BASE_URL + `/api/updateAppointment/${selectedCustomers.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -89,18 +93,18 @@ function TableEmployee({ onSearch }) {
             .then((response) => response.json())
             .then((data) => {
               setIsSaving(false);
-              Swal.fire({
+              showAlert({
                 icon: "success",
                 title: "บันทึกสำเร็จ",
                 showConfirmButton: false, // ทำให้ปุ่ม "OK" ไม่ปรากฏ
                 timer: 1500, // ปิดหน้าต่างในระยะเวลาที่กำหนด (มิลลิวินาท)
               });
-              fetchEmployees();
+              fetchCustomers();
               handleCloseModal();
             })
             .catch((error) => {
               setIsSaving(false);
-              Swal.fire({
+              showAlert({
                 icon: "error",
                 title: "แก้ข้อผิดพลาด",
                 text: "การบันทึกผิดพลาดกรุณาติดต่อ ICT!",
@@ -114,6 +118,7 @@ function TableEmployee({ onSearch }) {
     });
   };
   const [readStatus, setReadStatus] = useState([]);
+  // กำหนด state และฟังก์ชันสำหรับดึงข้อมูล status จากเซิร์ฟเวอร์
   const fetchTypeData = () => {
     fetch(BASE_URL + "/api/readStatus")
       .then((response) => response.json())
@@ -124,6 +129,7 @@ function TableEmployee({ onSearch }) {
   useEffect(() => {
     fetchTypeData();
   }, []);
+  // กำหนด state สำหรับการค้นหา
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [searchHN, setSearchHN] = useState("");
@@ -132,13 +138,16 @@ function TableEmployee({ onSearch }) {
   const [searchStatus, setSearchStatus] = useState("");
 
   const [searchResult, setSearchResult] = useState(null);
-  const shouldShowAllData = !searchResult && employees && employees.length > 0;
-  const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
+  const shouldShowAllData = !searchResult && customers && customers.length > 0;
+  // ตั้งค่าเริ่มต้นของจำนวนหน้า
+  const [pageCount, setPageCount] = useState(1);
+
+  //ฟังก์ชั่นค้นหา
   const handleSearch = () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     console.log(searchHN);
     const searchParams = {
-      hospitalNumber: searchHN,
+      HN: searchHN,
       firstName: searchFirstName,
       lastName: searchLastName,
       startDate,
@@ -171,6 +180,7 @@ function TableEmployee({ onSearch }) {
           <div className="ibox ">
             <div className="ibox-content">
               <div className="row">
+                {/* ส่วนของค้นหา */}
                 <div className="col-sm-2">
                   <Form.Group controlId="searchHN">
                     <Form.Label>
@@ -259,6 +269,7 @@ function TableEmployee({ onSearch }) {
                 </div>
               </div>
               <br />
+              {/* ตารางข้อมูล */}
               <table className="table table-striped text-center">
                 <thead>
                   <tr>
@@ -285,41 +296,41 @@ function TableEmployee({ onSearch }) {
                 <tbody>
                   {shouldShowAllData ? (
                     <>
-                      {employees
+                      {customers
                         .slice(
                           currentPage * perPage,
                           (currentPage + 1) * perPage
                         )
-                        .map((employee) => (
-                          <tr key={employee.id}>
+                        .map((customer) => (
+                          <tr key={customer.id}>
                             <td>
-                              <h3>{employee.hospitalNumber}</h3>
+                              <h3>{customer.HN}</h3>
                             </td>
                             <td>
                               <h3>
-                                {employee.firstName} {employee.lastName}
+                                {customer.firstName} {customer.lastName}
                               </h3>
                             </td>
                             <td>
                               <h3>
                                 {" "}
                                 {new Date(
-                                  employee.date_appointment
+                                  customer.date_appointment
                                 ).toLocaleDateString()}
                               </h3>
                             </td>
                             <td>
-                              <h3>{employee.time_appointment} น.</h3>
+                              <h3>{customer.time_appointment} น.</h3>
                             </td>
                             <td>
-                              <h3 className={`status-${employee.status}`}>
-                                {employee.status}
+                              <h3 className={`status-${customer.status}`}>
+                                {customer.status}
                               </h3>
                             </td>
                             <td>
                               <Button
                                 variant="primary"
-                                onClick={() => handleEditModal(employee.id)}
+                                onClick={() => handleEditModal(customer.id)}
                               >
                                 จัดการ
                               </Button>{" "}
@@ -337,36 +348,36 @@ function TableEmployee({ onSearch }) {
                               currentPage * perPage,
                               (currentPage + 1) * perPage
                             )
-                            .map((employee) => (
-                              <tr key={employee.id}>
+                            .map((customer) => (
+                              <tr key={customer.id}>
                                 <td>
-                                  <h3>{employee.HN}</h3>
+                                  <h3>{customer.HN}</h3>
                                 </td>
                                 <td>
                                   <h3>
-                                    {employee.FirstName} {employee.LastName}
+                                    {customer.FirstName} {customer.LastName}
                                   </h3>
                                 </td>
                                 <td>
                                   <h3>
                                     {" "}
                                     {new Date(
-                                      employee.Appointment_Date
+                                      customer.Appointment_Date
                                     ).toLocaleDateString()}
                                   </h3>
                                 </td>
                                 <td>
-                                  <h3>{employee.Appointment_Time} น.</h3>
+                                  <h3>{customer.Appointment_Time} น.</h3>
                                 </td>
                                 <td>
-                                  <h3 className={`status-${employee.status}`}>
-                                    {employee.status}
+                                  <h3 className={`status-${customer.status}`}>
+                                    {customer.status}
                                   </h3>
                                 </td>
                                 <td>
                                   <Button
                                     variant="primary"
-                                    onClick={() => handleEditModal(employee.id)}
+                                    onClick={() => handleEditModal(customer.id)}
                                   >
                                     จัดการ
                                   </Button>{" "}
@@ -383,6 +394,7 @@ function TableEmployee({ onSearch }) {
                   )}
                 </tbody>
               </table>
+              {/* เลขหน้า */}
               <ReactPaginate
                 previousLabel={"ก่อนหน้า"}
                 nextLabel={"ถัดไป"}
@@ -403,22 +415,23 @@ function TableEmployee({ onSearch }) {
                 disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
               />
             </div>
+            {/* modal  */}
             <Modal show={showModal} onHide={handleCloseModal}>
               <Modal.Header>
                 <Modal.Title className="font">จัดการนัดหมาย </Modal.Title>{" "}
               </Modal.Header>
               <Modal.Body>
-                {selectedEmployees && (
+                {selectedCustomers && (
                   <Card>
                     <Card.Body>
                       <InputGroup>
                         <InputGroup.Text>ชื่อ</InputGroup.Text>
                         <Form.Control
                           placeholder="ชื่อ"
-                          value={selectedEmployees.FirstName}
+                          value={selectedCustomers.FirstName}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               FirstName: e.target.value,
                             })
                           }
@@ -429,10 +442,10 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>นามสกุล</InputGroup.Text>
                         <Form.Control
                           placeholder="นามสกุล"
-                          value={selectedEmployees.LastName}
+                          value={selectedCustomers.LastName}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               LastName: e.target.value,
                             })
                           }
@@ -445,13 +458,13 @@ function TableEmployee({ onSearch }) {
                         <Form.Control
                           type="date"
                           placeholder="วันที่นัด"
-                          value={selectedEmployees.Appointment_Date.substring(
+                          value={selectedCustomers.Appointment_Date.substring(
                             0,
                             10
                           )}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               Appointment_Date: e.target.value,
                             })
                           }
@@ -463,13 +476,13 @@ function TableEmployee({ onSearch }) {
                         <Form.Control
                           type="time"
                           placeholder="เวลา"
-                          value={selectedEmployees.Appointment_Time.substring(
+                          value={selectedCustomers.Appointment_Time.substring(
                             0,
                             5
                           )}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               Appointment_Time: e.target.value,
                             })
                           }
@@ -480,10 +493,10 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>คลินิก</InputGroup.Text>
                         <Form.Control
                           placeholder="คลินิก"
-                          value={selectedEmployees.Clinic}
+                          value={selectedCustomers.Clinic}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               Clinic: e.target.value,
                             })
                           }
@@ -494,10 +507,10 @@ function TableEmployee({ onSearch }) {
                         <InputGroup.Text>หมอ</InputGroup.Text>
                         <Form.Control
                           placeholder="หมอ"
-                          value={selectedEmployees.Doctor}
+                          value={selectedCustomers.Doctor}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               Doctor: e.target.value,
                             })
                           }
@@ -510,10 +523,10 @@ function TableEmployee({ onSearch }) {
                         <Form.Control
                           as="select"
                           aria-label="Default select example"
-                          value={selectedEmployees.status}
+                          value={selectedCustomers.status}
                           onChange={(e) =>
-                            setSelectedEmployees({
-                              ...selectedEmployees,
+                            setSelectedCustomers({
+                              ...selectedCustomers,
                               status: e.target.value,
                             })
                           }
@@ -551,4 +564,4 @@ function TableEmployee({ onSearch }) {
   );
 }
 
-export default TableEmployee;
+export default TableApppointments;

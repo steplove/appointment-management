@@ -3,9 +3,10 @@ import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 // import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
-import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
+import { useAlert } from "../hooks/useAlert";
 function TableEmployees({ onSearch }) {
+  const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
 
@@ -20,26 +21,28 @@ function TableEmployees({ onSearch }) {
 
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลพนักงาน, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
   const {
-    data: employees = [],
+    data: users = [],
     loading,
     error,
-  } = useFetch(BASE_URL + "/api/doctors");
+    refetch,
+  } = useFetch(BASE_URL + "/api/User");
 
+  // state รับค่าการค้นหา
+  const [searchResult, setSearchResult] = useState(null);
+  const shouldShowAllData = !searchResult && users && users.length > 0;
+  const [usersCode, setUsersCode] = useState("");
   // เมื่อข้อมูลพนักงานมีการเปลี่ยนแปลง หรือหน้าปัจจุบันเปลี่ยน ให้ปรับปรุงข้อมูลที่จะแสดงในหน้านั้น
   useEffect(() => {
-    if (employees && employees.length) {
+    if (users && users.length) {
       // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า
       setDisplayedEmployees(
-        employees.slice(
-          currentPage * dataPerPage,
-          (currentPage + 1) * dataPerPage
-        )
+        users.slice(currentPage * dataPerPage, (currentPage + 1) * dataPerPage)
       );
       // คำนวณจำนวนหน้าทั้งหมด
-      const totalPageCount = Math.ceil(employees.length / dataPerPage);
+      const totalPageCount = Math.ceil(users.length / dataPerPage);
       setPageCount(totalPageCount);
     }
-  }, [employees, currentPage]);
+  }, [users, currentPage]);
 
   // ฟังก์ชั่นสำหรับการจัดการเมื่อมีการเปลี่ยนหน้าผ่าน ReactPaginate
   const handlePageChange = ({ selected }) => {
@@ -52,121 +55,200 @@ function TableEmployees({ onSearch }) {
 
   // สถานะสำหรับเก็บชื่อและรหัสพนักงาน
   const [userName, setUserName] = useState("");
-  const [userCode, setUserCode] = useState("");
+  // const [userCode, setUserCode] = useState("");
   const [userPassword, setUserPassword] = useState("");
-  // const [userStatus, setUserStatus] = useState("");
+  const [userStatus, setUserStatus] = useState("");
 
   // ฟังก์ชั่นสำหรับแสดง modal
   const handleShow = () => setShow(true);
-  const handleShowEdite = () => setShow(true);
+  const handleShowEdite = () => setShowEdite(true);
 
   // ฟังก์ชั่นสำหรับซ่อน modal
   const handleClose = () => setShow(false);
-  const handleCloseEdite = () => setShow(false);
-  const handleEditModal = () => {
+  const handleCloseEdite = () => setShowEdite(false);
+  const [selectedUsers, setSelectedUsers] = useState(null);
+
+  //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
+  const handleEditModal = (userCode) => {
+    const usersID = users.find((p) => p.User_Code === userCode);
+    setSelectedUsers(usersID);
+    console.log(usersID, "customer");
     handleShowEdite();
   };
-  const handleSubmitInsert = () => {
-    // ใช้การจำลองการบันทึกข้อมูล
-    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
-
-    if (isSavedSuccessfully) {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลพนักงานสำเร็จ
-      Swal.fire({
-        title: "เพิ่มข้อมูลพนักงานสำเร็จ!",
-        icon: "success",
-        showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-        timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+  const handleSubmitInsert = async () => {
+    try {
+      // ทำการส่งข้อมูลที่ป้อนจาก form เข้าไปใน APIrefetch
+      const response = await fetch(BASE_URL + "/api/registerUsers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          User_Code: searchPayrollNo,
+          User_Name: userName,
+          User_Password: userPassword, // คุณต้องมี state สำหรับรหัสผ่าน
+          User_Status: userStatus, // คุณต้องมี state สำหรับสถานะของผู้ใช้
+        }),
       });
 
-      // หลังจากการบันทึกข้อมูล ปิด modal
-      handleClose();
-    } else {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
-      Swal.fire({
-        title: "มีข้อผิดพลาด!",
-        text: "ไม่สามารถเพิ่มข้อมูลพนักงานได้",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-      });
-    }
-  };
-  //ปุ่มยืนยันใน modal ของการแก้ไข
-  const handleSubmitEdite = () => {
-    // ใช้การจำลองการบันทึกข้อมูล
-    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
-
-    if (isSavedSuccessfully) {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
-      Swal.fire({
-        title: "คุณแน่ใจที่จะแก้ไข?",
-        text: "",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "ยืนยัน",
-        cancelButtonText: "ยกเลิก",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: "แก้ข้อมูลพนักงานสำเร็จ!",
-            icon: "success",
-            showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-            timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-          });
-        }
-      });
-      // หลังจากการบันทึกข้อมูล ปิด modal
-      handleCloseEdite();
-    } else {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
-      Swal.fire({
-        title: "มีข้อผิดพลาด!",
-        text: "ไม่สามารถแก้ข้อมูลพนักงานได้",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-      });
-    }
-  };
-  //ลบข้อมูลแพทย์
-  const handleDelete = () => {
-    Swal.fire({
-      title: "คุณแน่ใจที่จะลบ?",
-      text: "",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "ลบข้อมูลพนักงานสำเร็จ!",
+      if (response.status === 201) {
+        // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลพนักงานสำเร็จ
+        showAlert({
+          title: "เพิ่มข้อมูลพนักงานสำเร็จ!",
           icon: "success",
-          showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-          timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        refetch();
+        // ปิด modal
+        handleClose();
+      } else {
+        const data = await response.json();
+        throw new Error(data);
+      }
+    } catch (error) {
+      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
+      showAlert({
+        title: "มีข้อผิดพลาด!",
+        text: error.message,
+        icon: "error",
+        confirmButtonText: "ตกลง",
+      });
+    }
+  };
+
+  //ปุ่มยืนยันใน modal ของการแก้ไข
+  const handleSubmitEdite = async () => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/user/${selectedUsers.User_Code}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            User_Code: selectedUsers.User_Code,
+            User_Name: selectedUsers.User_Name,
+            User_Status: selectedUsers.User_Status,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.message === "User updated successfully!") {
+        showAlert({
+          title: "การอัปเดตสำเร็จ!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        refetch();
+        handleCloseEdite(); // ปิด modal
+      } else {
+        showAlert({
+          title: "เกิดข้อผิดพลาด!",
+          text: data.message,
+          icon: "error",
+          confirmButtonText: "ตกลง",
         });
       }
-    });
+    } catch (error) {
+      showAlert({
+        title: "เกิดข้อผิดพลาด!",
+        text: "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้",
+        icon: "error",
+        confirmButtonText: "ตกลง",
+      });
+    }
   };
-  const [searchFirstName, setSearchFirstName] = useState(""); // state สำหรับเก็บค่าที่กรอก
 
+  //ลบข้อมูลแพทย์
+  // const handleDelete = () => {
+  //   showAlert({
+  //     title: "คุณแน่ใจที่จะลบ?",
+  //     text: "",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "ยืนยัน",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       showAlert({
+  //         title: "ลบข้อมูลพนักงานสำเร็จ!",
+  //         icon: "success",
+  //         showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
+  //         timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+  //       });
+  //     }
+  //   });
+  // };
+
+  //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
+  const handleSearchUsersAppointments = () => {
+    console.log(usersCode);
+    fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setSearchResult(data);
+        const newPageCount = Math.ceil(data.length / dataPerPage);
+        setPageCount(newPageCount);
+        setCurrentPage(0);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  //ค้นหาจาก SH จากฐานข้อมูล SSB (ไฟล์ Json)(ในModal เพิ่ม inputแรก )
+  const [searchPayrollNo, setSearchPayrollNo] = useState(""); // state สำหรับเก็บค่าที่กรอก
   const handleSearch = async () => {
-    console.log("Searching for doctor:", searchFirstName);
+    console.log("Searching for PayrollNo:", searchPayrollNo);
+    console.log("host:", BASE_URL);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
+      );
 
-    // ค้นหาจาก API หรือฐานข้อมูล
-    const response = await fetch(
-      `YOUR_API_ENDPOINT/search?name=${searchFirstName}`
-    );
-    const result = await response.json();
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-    if (result.success) {
-      // ทำอะไรกับข้อมูลที่ค้นหาเจอ
-      console.log(result.data);
-    } else {
-      // แสดงข้อผิดพลาดหรือแจ้งเตือน
-      console.error("Error searching for doctor:", result.message);
+      const data = await response.json();
+
+      if (data.length > 0) {
+        console.log(data);
+        setUserName(data[0].FirstName + " " + data[0].LastName); // แสดงชื่อพนักงานในช่องกรอก
+      } else {
+        handleClose();
+        showAlert({
+          title: "ไม่พบข้อมูลพนักงาน",
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
+    } catch (error) {
+      handleClose();
+      showAlert({
+        title: "เกิดข้อผิดพลาดในการค้นหา",
+        text: error.message,
+        icon: "error",
+        showConfirmButton: true,
+      });
+    }
+  };
+  // ฟังก์ชั่นEnter แล้วให้ไปทำงานตามฟังก์ชั่นที่กำหนด
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
   //------------------------------------------------------------------------------------//
@@ -196,23 +278,6 @@ function TableEmployees({ onSearch }) {
         <div className="ibox ">
           <div className="ibox-content">
             <div className="row">
-              <div className="col-sm-2">
-                <Form.Group controlId="searchFirstName">
-                  <Form.Label>ชื่อพนักงาน</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={searchFirstName}
-                    onChange={(e) => setSearchFirstName(e.target.value)}
-                  />
-                </Form.Group>
-              </div>
-              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
-                <InputGroup>
-                  <Button onClick={handleSearch} variant="primary">
-                    ค้นหา
-                  </Button>
-                </InputGroup>
-              </div>
               <div style={{ marginTop: "25px", marginLeft: "20px" }}>
                 <InputGroup>
                   <Button variant="primary" onClick={handleShow}>
@@ -220,65 +285,138 @@ function TableEmployees({ onSearch }) {
                   </Button>
                 </InputGroup>
               </div>
+              <div className="ml-auto col-sm-2">
+                <Form.Group controlId="searchFirstName">
+                  <Form.Label>รหัสพนักงาน</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={usersCode}
+                    onChange={(e) => setUsersCode(e.target.value)}
+                  />
+                </Form.Group>
+              </div>
+              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
+                <InputGroup>
+                  <Button
+                    onClick={handleSearchUsersAppointments}
+                    variant="primary"
+                  >
+                    ค้นหา
+                  </Button>
+                </InputGroup>
+              </div>
             </div>
+
             <br />
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
+                  <th className="text-left">
+                    <h3>ลำดับ</h3>
+                  </th>
+                  <th>
+                    <h3>รหัสพนักงาน</h3>
+                  </th>
                   <th>
                     <h3>ชื่อพนักงาน</h3>
                   </th>
+                  <th>สถานะ</th>
                   <th>
                     <h3>เครื่องมือ</h3>
                   </th>
                 </tr>
               </thead>
+
               <tbody>
-                {displayedEmployees && displayedEmployees.length > 0 ? (
-                  displayedEmployees.map((employee) => (
-                    <tr key={employee.Docdor_ID} className="text-center">
-                      <td>
-                        <strong>{employee.Doctor_Name}</strong> (Code:{" "}
-                        {employee.Doctor_Code})
-                      </td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          onClick={() => handleEditModal()}
-                        >
-                          <h4>จัดการ</h4>
-                        </Button>{" "}
-                        <Button variant="danger" onClick={() => handleDelete()}>
-                          <h4>ลบ</h4>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                {shouldShowAllData ? (
+                  <>
+                    {displayedEmployees
+                      .slice(
+                        currentPage * dataPerPage,
+                        (currentPage + 1) * dataPerPage
+                      )
+                      .map((employee, index) => (
+                        <tr key={employee.User_ID} className="text-center">
+                          <td className="text-left">{index + 1}</td>{" "}
+                          {/* แสดงลำดับ */}
+                          <td>{employee.User_Code}</td>
+                          <td>
+                            <h3>{employee.User_Name}</h3>
+                          </td>
+                          <td>
+                            {employee.User_Status === 0 ? (
+                              <span className="greenDot"></span>
+                            ) : (
+                              <span className="redDot"></span>
+                            )}
+                          </td>
+                          <td>
+                            <Button
+                              variant="primary"
+                              onClick={() =>
+                                handleEditModal(employee.User_Code)
+                              }
+                            >
+                              <h4>จัดการ</h4>
+                            </Button>{" "}
+                            {/* <Button variant="danger" onClick={() => handleDelete()}>
+                                          <h4>ลบ</h4>
+                                        </Button> */}
+                          </td>
+                        </tr>
+                      ))}
+                  </>
                 ) : (
-                  <tr className="text-center">
-                    <td colSpan={2}>
-                      <h2>ไม่มีข้อมูล</h2>
-                    </td>
-                  </tr>
+                  <>
+                    {/* แสดงผลลัพธ์ที่ค้นหา */}
+                    {searchResult && searchResult.length > 0 ? (
+                      <>
+                        {searchResult
+                          .slice(
+                            currentPage * dataPerPage,
+                            (currentPage + 1) * dataPerPage
+                          )
+                          .map((employee, index) => (
+                            <tr key={employee.User_ID} className="text-center">
+                              <td className="text-left">{index + 1}</td>{" "}
+                              {/* แสดงลำดับ */}
+                              <td>{employee.User_Code}</td>
+                              <td>
+                                <h3>{employee.User_Name}</h3>
+                              </td>
+                              <td>
+                                {employee.User_Status === 0 ? (
+                                  <span className="greenDot"></span>
+                                ) : (
+                                  <span className="redDot"></span>
+                                )}
+                              </td>
+                              <td>
+                                <Button
+                                  variant="primary"
+                                  onClick={() =>
+                                    handleEditModal(employee.User_Code)
+                                  }
+                                >
+                                  <h4>จัดการ</h4>
+                                </Button>{" "}
+                                {/* <Button variant="danger" onClick={() => handleDelete()}>
+                                            <h4>ลบ</h4>
+                                          </Button> */}
+                              </td>
+                            </tr>
+                          ))}
+                      </>
+                    ) : (
+                      <div>
+                        <h1>No results found.</h1>
+                      </div>
+                    )}
+                  </>
                 )}
               </tbody>
-              {/* <tbody>
-                <tr className="text-center">
-                  <td>
-                    <h3>test</h3>
-                  </td>
-                  <td>
-                    <Button variant="primary" onClick={() => handleEditModal()}>
-                      <h4>จัดการ</h4>
-                    </Button>{" "}
-                    <Button variant="danger" onClick={() => handleDelete()}>
-                      <h4>ลบ</h4>
-                    </Button>
-                  </td>
-                </tr>
-              </tbody> */}
             </table>
-
+            {/* เลขหน้า  */}
             <ReactPaginate
               previousLabel={"ก่อนหน้า"}
               nextLabel={"ถัดไป"}
@@ -300,6 +438,7 @@ function TableEmployees({ onSearch }) {
             />
           </div>
 
+          {/* modal เพิ่มข้อมูลพนักงาน */}
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>เพิ่มข้อมูลพนักงาน</Modal.Title>
@@ -312,33 +451,39 @@ function TableEmployees({ onSearch }) {
                   <Form.Control
                     type="text"
                     placeholder="ป้อนรหัสพนักงาน"
-                    value={userCode}
-                    onChange={(e) => setUserCode(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group controlId="userPassword">
-                  <Form.Label>รหัสผ่านพนักงาน</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนรหัสผ่านพนักงาน"
-                    value={userPassword}
-                    onChange={(e) => setUserPassword(e.target.value)}
+                    value={searchPayrollNo}
+                    onChange={(e) => setSearchPayrollNo(e.target.value)}
+                    onKeyPress={handleKeyPress}
                   />
                 </Form.Group>
                 <Form.Group controlId="userName">
                   <Form.Label>ชื่อพนักงาน</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="ป้อนชื่อพนักงาน"
-                    value={userName}
+                    placeholder="ชื่อพนักงาน"
+                    value={userName} // ใช้ state userName สำหรับแสดงข้อมูล
                     onChange={(e) => setUserName(e.target.value)}
+                    disabled
+                  />
+                </Form.Group>
+                <Form.Group controlId="userPassword">
+                  <Form.Label>รหัสผ่านพนักงาน</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="ป้อนรหัสผ่านพนักงาน"
+                    value={userPassword}
+                    onChange={(e) => setUserPassword(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>สถานะ</Form.Label>
-                  <Form.Control as="select" aria-label="Default select example">
-                    <option>เลือกประเภท</option>
-
+                  <Form.Control
+                    as="select"
+                    aria-label="Default select example"
+                    value={userStatus}
+                    onChange={(e) => setUserStatus(e.target.value)}
+                  >
+                    <option value="">เลือกประเภท</option>
                     <option value="0">active</option>
                     <option value="1">inactive</option>
                   </Form.Control>
@@ -355,54 +500,69 @@ function TableEmployees({ onSearch }) {
               </Button>
             </Modal.Footer>
           </Modal>
+          {/* modal จัดการข้อมูลพนักงาน */}
           <Modal show={showEdite} onHide={handleClose}>
             <Modal.Header closeButton>
-              <Modal.Title>เพิ่มข้อมูลพนักงาน</Modal.Title>
+              <Modal.Title>จัดการข้อมูลพนักงาน</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
-              <Form>
-                <Form.Group controlId="userCode">
-                  <Form.Label>รหัสพนักงาน</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนรหัสพนักงาน"
-                    value={userCode}
-                    onChange={(e) => setUserCode(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group controlId="userPassword">
-                  <Form.Label>รหัสผ่านพนักงาน</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนรหัสผ่านพนักงาน"
-                    value={userPassword}
-                    onChange={(e) => setUserPassword(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group controlId="userName">
-                  <Form.Label>ชื่อพนักงาน</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนชื่อพนักงาน"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>สถานะ</Form.Label>
-                  <Form.Control as="select" aria-label="Default select example">
-                    <option>เลือกประเภท</option>
-
-                    <option value="0">active</option>
-                    <option value="1">inactive</option>
-                  </Form.Control>
-                </Form.Group>
-              </Form>
+              {selectedUsers && (
+                <Form>
+                  <Form.Group controlId="userCode">
+                    <Form.Label>รหัสพนักงาน</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนรหัสพนักงาน"
+                      value={selectedUsers.User_Code}
+                      onChange={(e) =>
+                        setSelectedUsers({
+                          ...selectedUsers,
+                          User_Code: e.target.value,
+                        })
+                      }
+                      disabled
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="userName">
+                    <Form.Label>ชื่อพนักงาน</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนชื่อพนักงาน"
+                      value={selectedUsers.User_Name}
+                      onChange={(e) =>
+                        setSelectedUsers({
+                          ...selectedUsers,
+                          User_Name: e.target.value,
+                        })
+                      }
+                      disabled
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>สถานะ</Form.Label>
+                    <Form.Control
+                      as="select"
+                      aria-label="Default select example"
+                      value={selectedUsers.User_Status}
+                      onChange={(e) =>
+                        setSelectedUsers((prevState) => ({
+                          ...prevState,
+                          User_Status: e.target.value,
+                        }))
+                      }
+                    >
+                      <option>เลือกประเภท</option>
+                      <option value="0">active</option>
+                      <option value="1">inactive</option>
+                    </Form.Control>
+                  </Form.Group>
+                </Form>
+              )}
             </Modal.Body>
 
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
+              <Button variant="secondary" onClick={handleCloseEdite}>
                 ยกเลิก
               </Button>
               <Button variant="primary" onClick={handleSubmitEdite}>

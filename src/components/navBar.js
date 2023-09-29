@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import Swal from "sweetalert2";
-import { NavLink } from "react-router-dom";
-
+import Swl from "sweetalert2";
 function NavBar() {
   const initialLoggedInState = localStorage.getItem("token") ? true : false;
   const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedInState);
+
   const handleLogout = () => {
-    Swal.fire({
+    Swl.fire({
       icon: "warning",
       title: "ยืนยันการออกจากระบบ",
       text: "คุณแน่ใจว่าคุณต้องการที่จะออกจากระบบ?",
@@ -18,7 +17,7 @@ function NavBar() {
     }).then((result) => {
       if (result.isConfirmed) {
         setIsLoggedIn(false);
-        Swal.fire({
+        Swl.fire({
           icon: "success",
           title: "ออกจากระบบสำเร็จ",
           text: "คุณได้ออกจากระบบเรียบร้อยแล้ว",
@@ -42,22 +41,12 @@ function NavBar() {
       role="navigation"
       style={{ marginBottom: "0" }}
     >
-      <div className="navbar-header">
-        <a
-          className="navbar-minimalize minimalize-styl-2 btn btn-primary"
-          href={"/"}
-        >
-          <i className="fa fa-bars"></i>{" "}
-        </a>
-      </div>
+      <div className="navbar-header"></div>
       <ul className="nav navbar-top-links navbar-right">
         <li>
-          <NavLink className="nav-link" onClick={handleLogout}>
-            <div>ออกระบบ</div>
-          </NavLink>
-          {/* <a href={'/login'}>
-            <i className="fa fa-sign-out"></i> Log out
-          </a> */}
+          <div className="nav-link" onClick={handleLogout}>
+            ออกระบบ
+          </div>
         </li>
       </ul>
     </nav>

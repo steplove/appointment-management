@@ -3,9 +3,11 @@ import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 // import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
-import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
+import { useAlert } from "../hooks/useAlert";
+import Swal from "sweetalert2";
 function TableDoctors({ onSearch }) {
+  const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
 
@@ -23,6 +25,7 @@ function TableDoctors({ onSearch }) {
     data: doctors = [],
     loading,
     error,
+    refetch,
   } = useFetch(BASE_URL + "/api/doctors");
 
   // เมื่อข้อมูลแพทย์มีการเปลี่ยนแปลง หรือหน้าปัจจุบันเปลี่ยน ให้ปรับปรุงข้อมูลที่จะแสดงในหน้านั้น
@@ -52,7 +55,11 @@ function TableDoctors({ onSearch }) {
 
   // สถานะสำหรับเก็บชื่อและรหัสแพทย์
   const [doctorName, setDoctorName] = useState("");
+  const [doctorNameEng, setDoctorNameEng] = useState("");
   const [doctorCode, setDoctorCode] = useState("");
+  const [doctorImage, setDoctorImage] = useState(null);
+  const [clinicId, setClinicId] = useState("");
+  const [preview, setPreview] = useState(null);
 
   // ฟังก์ชั่นสำหรับแสดง modal
   const handleShow = () => setShow(true);
@@ -65,31 +72,56 @@ function TableDoctors({ onSearch }) {
     handleShowEdite();
   };
   //ปุ่มยืนยันใน modal ของการเพิ่ม
-  const handleSubmitInsert = () => {
-    // ใช้การจำลองการบันทึกข้อมูล
-    const isSavedSuccessfully = true; // ตั้งค่าเป็น false เมื่อมีข้อผิดพลาด
-
-    if (isSavedSuccessfully) {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
-      Swal.fire({
-        title: "เพิ่มข้อมูลแพทย์สำเร็จ!",
-        icon: "success",
-        showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-        timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
+  const handleSubmit = async () => {
+    handleClose();
+    const formData = new FormData();
+    formData.append("Doctor_Name", doctorName);
+    formData.append("Doctor_NameEng", doctorNameEng);
+    formData.append("Doctor_Code", doctorCode);
+    formData.append("Clinic_ID", clinicId);
+    if (doctorImage) {
+      formData.append("Doctor_Image", doctorImage);
+    }
+    console.log(formData, "formData");
+    try {
+      const response = await fetch(`${BASE_URL}/api/doctorsInsert`, {
+        method: "POST",
+        body: formData,
       });
 
-      // หลังจากการบันทึกข้อมูล ปิด modal
-      handleClose();
-    } else {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          title: "บันทึกสำเร็จ!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        refetch();
+        // รีเซ็ตฟอร์มหลังจากบันทึกสำเร็จ
+        setDoctorName("");
+        setDoctorNameEng("");
+        setDoctorCode("");
+        setDoctorImage(null);
+        setPreview(null);
+        setClinicId("");
+      } else {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: data.message,
+          icon: "error",
+        });
+      }
+    } catch (error) {
       Swal.fire({
-        title: "มีข้อผิดพลาด!",
-        text: "ไม่สามารถเพิ่มข้อมูลแพทย์ได้",
+        title: "เกิดข้อผิดพลาด!",
+        text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
         icon: "error",
-        confirmButtonText: "ตกลง",
       });
     }
   };
+
   //ปุ่มยืนยันใน modal ของการแก้ไข
   const handleSubmitEdite = () => {
     // ใช้การจำลองการบันทึกข้อมูล
@@ -97,7 +129,7 @@ function TableDoctors({ onSearch }) {
 
     if (isSavedSuccessfully) {
       // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแพทย์สำเร็จ
-      Swal.fire({
+      showAlert({
         title: "คุณแน่ใจที่จะแก้ไข?",
         text: "",
         icon: "warning",
@@ -108,7 +140,7 @@ function TableDoctors({ onSearch }) {
         cancelButtonText: "ยกเลิก",
       }).then((result) => {
         if (result.isConfirmed) {
-          Swal.fire({
+          showAlert({
             title: "แก้ข้อมูลแพทย์สำเร็จ!",
             icon: "success",
             showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
@@ -120,7 +152,7 @@ function TableDoctors({ onSearch }) {
       handleCloseEdite();
     } else {
       // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
-      Swal.fire({
+      showAlert({
         title: "มีข้อผิดพลาด!",
         text: "ไม่สามารถแก้ข้อมูลแพทย์ได้",
         icon: "error",
@@ -129,23 +161,47 @@ function TableDoctors({ onSearch }) {
     }
   };
   //ลบข้อมูลแพทย์
-  const handleDelete = () => {
+
+  const handleDelete = async (DoctorID) => {
     Swal.fire({
-      title: "คุณแน่ใจที่จะลบ?",
-      text: "",
+      title: "คุณแน่ใจหรือว่าต้องการลบ?",
+      text: "คุณไม่สามารถย้อนกลับได้หลังจากนี้!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-    }).then((result) => {
+      confirmButtonText: "ใช่, ลบเลย!",
+      cancelButtonText: "ยกเลิก",
+      reverseButtons: true,
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: "ลบข้อมูลแพทย์สำเร็จ!",
-          icon: "success",
-          showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-          timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-        });
+        try {
+          const response = await fetch(`${BASE_URL}/api/doctors/${DoctorID}`, {
+            method: "DELETE",
+          });
+          if (response.ok) {
+            Swal.fire({
+              title: "ลบสำเร็จ!",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            refetch();
+          } else {
+            const data = await response.json();
+            Swal.fire({
+              title: "เกิดข้อผิดพลาด!",
+              text: data.message,
+              icon: "error",
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+            icon: "error",
+          });
+        }
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire("ยกเลิก", "ข้อมูลของคุณยังคงอยู่", "error");
       }
     });
   };
@@ -170,20 +226,33 @@ function TableDoctors({ onSearch }) {
     }
   };
   //แสดงตัวอย่างรูปเมื่อมีการเลือกรูป
-  const [preview, setPreview] = useState(null);
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setDoctorImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
       };
       reader.readAsDataURL(file);
     } else {
+      setDoctorImage(null);
       setPreview(null);
     }
   };
+  const [ClinicShow, setClinicShow] = useState([]);
+  useEffect(() => {
+    console.log("9999999999999");
+
+    fetch(BASE_URL + "/api/showClinics")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setClinicShow(data);
+      });
+  }, []);
+
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading) return <p>Loading...</p>;
@@ -197,7 +266,14 @@ function TableDoctors({ onSearch }) {
         <div className="ibox ">
           <div className="ibox-content">
             <div className="row">
-              <div className="col-sm-2">
+              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
+                <InputGroup>
+                  <Button variant="primary" onClick={handleShow}>
+                    เพิ่ม
+                  </Button>
+                </InputGroup>
+              </div>
+              <div className="ml-auto col-sm-2">
                 <Form.Group controlId="searchFirstName">
                   <Form.Label>ชื่อแพทย์</Form.Label>
                   <Form.Control
@@ -214,20 +290,20 @@ function TableDoctors({ onSearch }) {
                   </Button>
                 </InputGroup>
               </div>
-              <div style={{ marginTop: "25px", marginLeft: "20px" }}>
-                <InputGroup>
-                  <Button variant="primary" onClick={handleShow}>
-                    เพิ่ม
-                  </Button>
-                </InputGroup>
-              </div>
             </div>
+
             <br />
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
                   <th>
+                    <h3>ลำดับ</h3>
+                  </th>
+                  <th>
                     <h3>ชื่อแพทย์</h3>
+                  </th>
+                  <th>
+                    <h3>คลินิก</h3>
                   </th>
                   <th>
                     <h3>เครื่องมือ</h3>
@@ -236,11 +312,17 @@ function TableDoctors({ onSearch }) {
               </thead>
               <tbody>
                 {displayedDoctors && displayedDoctors.length > 0 ? (
-                  displayedDoctors.map((doctor) => (
+                  displayedDoctors.map((doctor, index) => (
                     <tr key={doctor.Docdor_ID} className="text-center">
                       <td>
-                        <strong>{doctor.Doctor_Name}</strong> (Code:{" "}
-                        {doctor.Doctor_Code})
+                        {" "}
+                        <h3>{index + 1}</h3>
+                      </td>{" "}
+                      <td>
+                        <h3>{doctor.Doctor_Name}</h3>
+                      </td>
+                      <td>
+                        <h3>{doctor.Clinic_Name}</h3>
                       </td>
                       <td>
                         <Button
@@ -249,7 +331,10 @@ function TableDoctors({ onSearch }) {
                         >
                           <h4>จัดการ</h4>
                         </Button>{" "}
-                        <Button variant="danger" onClick={() => handleDelete()}>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleDelete(doctor.DoctorID)}
+                        >
                           <h4>ลบ</h4>
                         </Button>
                       </td>
@@ -299,100 +384,166 @@ function TableDoctors({ onSearch }) {
               activeClassName={"active"} // เพิ่มคลาสสำหรับหน้าที่เลือก
               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
-          </div>
-          <Modal show={showEdite} onHide={handleCloseEdite}>
-            <Modal.Header closeButton>
-              <Modal.Title>จัดการข้อมูลแพทย์</Modal.Title>
-            </Modal.Header>
+            {/* แก้ไขแพทย์ */}
+            <Modal show={showEdite} onHide={handleCloseEdite}>
+              <Modal.Header closeButton>
+                <Modal.Title>จัดการข้อมูลแพทย์</Modal.Title>
+              </Modal.Header>
 
-            <Modal.Body>
-              <Form>
-                <Form.Group controlId="doctorName">
-                  <Form.Label>ชื่อแพทย์</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนชื่อแพทย์"
-                    value={doctorName}
-                    onChange={(e) => setDoctorName(e.target.value)}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="doctorCode">
-                  <Form.Label>รหัสแพทย์</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนรหัสแพทย์"
-                    value={doctorCode}
-                    onChange={(e) => setDoctorCode(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group controlId="doctorImage">
-                  <Form.Label>รูปแพทย์</Form.Label>
-                  <div class="custom-file">
-                    <input
-                      id="logo"
-                      type="file"
-                      class="custom-file-input"
-                      onChange={handleImageChange}
+              <Modal.Body>
+                <Form>
+                  <Form.Group controlId="doctorName">
+                    <Form.Label>ชื่อแพทย์</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนชื่อแพทย์"
+                      value={doctorName}
+                      onChange={(e) => setDoctorName(e.target.value)}
                     />
-                    <label for="logo" class="custom-file-label">
-                      Choose file...
-                    </label>
-                  </div>
-                  {preview && (
-                    <div style={{ marginTop: "20px" }}>
-                      <img
-                        src={preview}
-                        alt="Preview"
-                        style={{ maxWidth: "300px" }}
+                  </Form.Group>
+
+                  <Form.Group controlId="doctorCode">
+                    <Form.Label>รหัสแพทย์</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนรหัสแพทย์"
+                      value={doctorCode}
+                      onChange={(e) => setDoctorCode(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="doctorImage">
+                    <Form.Label>รูปแพทย์</Form.Label>
+                    <div class="custom-file">
+                      <input
+                        id="logo"
+                        type="file"
+                        class="custom-file-input"
+                        onChange={handleImageChange}
                       />
+                      <label for="logo" class="custom-file-label">
+                        Choose file...
+                      </label>
                     </div>
-                  )}
-                </Form.Group>
-              </Form>
-            </Modal.Body>
+                    {preview && (
+                      <div style={{ marginTop: "20px" }}>
+                        <img
+                          src={preview}
+                          alt="Preview"
+                          style={{ maxWidth: "300px" }}
+                        />
+                      </div>
+                    )}
+                  </Form.Group>
+                </Form>
+              </Modal.Body>
 
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleSubmitEdite}>
-                บันทึก
-              </Button>
-            </Modal.Footer>
-          </Modal>
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>เพิ่มข้อมูลแพทย์</Modal.Title>
-            </Modal.Header>
+              <Modal.Footer>
+                <Button variant="primary" onClick={handleSubmitEdite}>
+                  บันทึก
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            {/* //modal เพิ่มแพทย์ */}
+            <Modal show={show} onHide={handleClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>เพิ่มข้อมูลแพทย์</Modal.Title>
+              </Modal.Header>
 
-            <Modal.Body>
-              <Form>
-                <Form.Group controlId="doctorName">
-                  <Form.Label>ชื่อแพทย์</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนชื่อแพทย์"
-                    value={doctorName}
-                    onChange={(e) => setDoctorName(e.target.value)}
-                  />
-                </Form.Group>
+              <Modal.Body>
+                <Form>
+                  <Form.Group controlId="doctorName">
+                    <Form.Label>ชื่อแพทย์</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนชื่อแพทย์"
+                      value={doctorName}
+                      onChange={(e) => setDoctorName(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="doctorName_en">
+                    <Form.Label>ชื่อแพทย์(ENG)</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนชื่อแพทย์(ENG)"
+                      value={doctorNameEng}
+                      onChange={(e) => setDoctorNameEng(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="doctorCode">
+                    <Form.Label>รหัสแพทย์</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="ป้อนรหัสแพทย์"
+                      value={doctorCode}
+                      onChange={(e) => setDoctorCode(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>ชื่อคลินิก</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={clinicId}
+                      onChange={(e) => setClinicId(e.target.value)}
+                    >
+                      <option value="">คลินิก...</option>
+                      {ClinicShow.map((ClinicShow) => (
+                        <option
+                          key={ClinicShow.Clinic_ID}
+                          value={ClinicShow.Clinic_ID}
+                        >
+                          {ClinicShow.Clinic_Name}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+                  {/* <Form.Group controlId="ClinicsName">
+                    <Form.Label>สถานะ</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={ClinicsNames}
+                      onChange={(e) => setClinicsNames(e.target.value)}
+                    >
+                      <option value="">คลินิก...</option>
+                      {ClinicShow.map((ClinicShow) => (
+                        <option key={ClinicShow.Clinic_ID} value={ClinicShow.Clinic_ID}>
+                          {ClinicShow.Clinic_Name}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group> */}
+                  <Form.Group controlId="doctorImage">
+                    <Form.Label>รูปแพทย์</Form.Label>
+                    <div class="custom-file">
+                      <input
+                        id="logo"
+                        type="file"
+                        class="custom-file-input"
+                        onChange={handleImageChange}
+                      />
+                      <label for="logo" class="custom-file-label">
+                        Choose file...
+                      </label>
+                    </div>
+                    {preview && (
+                      <div style={{ marginTop: "20px" }}>
+                        <img
+                          src={preview}
+                          alt="Preview"
+                          style={{ maxWidth: "300px" }}
+                        />
+                      </div>
+                    )}
+                  </Form.Group>
+                </Form>
+              </Modal.Body>
 
-                <Form.Group controlId="doctorCode">
-                  <Form.Label>รหัสแพทย์</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="ป้อนรหัสแพทย์"
-                    value={doctorCode}
-                    onChange={(e) => setDoctorCode(e.target.value)}
-                  />
-                </Form.Group>
-              </Form>
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Button variant="primary" onClick={handleSubmitInsert}>
-                บันทึก
-              </Button>
-            </Modal.Footer>
-          </Modal>
+              <Modal.Footer>
+                <Button variant="primary" onClick={handleSubmit}>
+                  บันทึก
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
         </div>
       </div>
     </div>

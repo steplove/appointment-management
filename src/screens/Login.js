@@ -26,8 +26,8 @@ function Copyright(props) {
       {...props}
     >
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="#">
+        Smart Appointments Management
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -43,10 +43,10 @@ export default function Login() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const jsonData = {
-      identificationNumber: data.get("identificationNumber"),
-      password: data.get("password"),
+      User_Code: data.get("UserCode"),
+      User_Password: data.get("UserPassword"),
     };
-    fetch(BASE_URL + "/login", {
+    fetch(BASE_URL + "/api/loginEmployee", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,29 +55,43 @@ export default function Login() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.status === "ok") {
-          Swal.fire({
-            title: "เข้าสู่ระบบสำเร็จ",
-            text: "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย",
-            icon: "success",
-            showConfirmButton: false, // ไม่แสดงปุ่ม OK
-          });
+        console.log(data.User_Status);
+        if (data.User_Status === 0) {
+          if (data.status === "ok") {
+            Swal.fire({
+              title: "เข้าสู่ระบบสำเร็จ",
+              text: "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย",
+              icon: "success",
+              showConfirmButton: false, // ไม่แสดงปุ่ม OK
+            });
 
-          // รอเวลา 2 วินาทีก่อนที่จะเปลี่ยนหน้า
-          setTimeout(() => {
-            localStorage.setItem("token", data.token);
-            window.location = "/Home"; // เปลี่ยนหน้าไปยัง "/Home"
-          }, 2000);
+            // รอเวลา 2 วินาทีก่อนที่จะเปลี่ยนหน้า
+            setTimeout(() => {
+              localStorage.setItem("token", data.token);
+              window.location = "/Home"; // เปลี่ยนหน้าไปยัง "/Home"
+            }, 2000);
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "ชื่อผู้ใช้หรือรหัสพาสเวิร์ดไม่ถูกต้อง",
+              text: "กรุณากรอกข้อมูลใหม่อีกครั้ง",
+            });
+          }
         } else {
           Swal.fire({
             icon: "error",
-            title: "ชื่อผู้ใช้หรือรหัสพาสเวิร์ดไม่ถูกต้อง",
-            text: "กรุณากรอกข้อมูลใหม่อีกครั้ง",
+            title: "รหัสของคุณถูกระงับ",
+            text: "",
           });
         }
       })
       .catch((error) => {
         console.log("Error", error);
+        Swal.fire({
+          icon: "error",
+          title: "ชื่อผู้ใช้หรือรหัสพาสเวิร์ดไม่ถูกต้อง",
+          text: "กรุณากรอกข้อมูลใหม่อีกครั้ง",
+        });
       });
   };
   return (
@@ -119,7 +133,7 @@ export default function Login() {
               />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Smart Appointments Management
             </Typography>
             <Box
               component="form"
@@ -131,20 +145,20 @@ export default function Login() {
                 margin="normal"
                 required
                 fullWidth
-                id="identificationNumber"
-                label="Username"
-                name="identificationNumber"
-                autoComplete="identificationNumber"
+                id="UserCode"
+                label="รหัสพนักงาน"
+                name="UserCode"
+                autoComplete="UserCode"
                 autoFocus
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="password"
-                label="Password"
+                name="UserPassword"
+                label="รหัสผ่าน"
                 type="password"
-                id="password"
+                id="UserPassword"
                 autoComplete="current-password"
               />
               <FormControlLabel

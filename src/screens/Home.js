@@ -12,21 +12,21 @@ function Home() {
           <div className="row border-bottom">
             <NavBar />
           </div>
-          <div class="row wrapper border-bottom white-bg page-heading">
-            <div class="col-lg-10">
+          <div className="row wrapper border-bottom white-bg page-heading">
+            <div className="col-lg-10">
               <h2>จัดการนัดหมาย</h2>
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item">
                   <a href="/">หน้าแรก</a>
                 </li>
-                <li class="breadcrumb-item">
+                <li className="breadcrumb-item">
                   <a href={"/"}>Dashboard</a>
                 </li>
               </ol>
             </div>
-            <div class="col-lg-2"></div>
+            <div className="col-lg-2"></div>
           </div>
-          <div class="wrapper wrapper-content animated fadeInRight">
+          <div className="wrapper wrapper-content animated fadeInRight">
             <Dashboard />
             <TableAppointments />
           </div>{" "}
