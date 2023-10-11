@@ -211,8 +211,6 @@ function TableEmployees({ onSearch }) {
   //ค้นหาจาก SH จากฐานข้อมูล SSB (ไฟล์ Json)(ในModal เพิ่ม inputแรก )
   const [searchPayrollNo, setSearchPayrollNo] = useState(""); // state สำหรับเก็บค่าที่กรอก
   const handleSearch = async () => {
-    console.log("Searching for PayrollNo:", searchPayrollNo);
-    console.log("host:", BASE_URL);
     try {
       const response = await fetch(
         `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
@@ -311,7 +309,7 @@ function TableEmployees({ onSearch }) {
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
-                  <th className="text-left">
+                  <th>
                     <h3>ลำดับ</h3>
                   </th>
                   <th>
@@ -337,9 +335,9 @@ function TableEmployees({ onSearch }) {
                       )
                       .map((employee, index) => (
                         <tr key={employee.User_ID} className="text-center">
-                          <td className="text-left">{index + 1}</td>{" "}
+                          <td > <h3>{index + 1} </h3></td>{" "}
                           {/* แสดงลำดับ */}
-                          <td>{employee.User_Code}</td>
+                          <td> <h3>{employee.User_Code} </h3></td>
                           <td>
                             <h3>{employee.User_Name}</h3>
                           </td>
@@ -378,9 +376,9 @@ function TableEmployees({ onSearch }) {
                           )
                           .map((employee, index) => (
                             <tr key={employee.User_ID} className="text-center">
-                              <td className="text-left">{index + 1}</td>{" "}
+                              <td ><h3>{index + 1}</h3></td>{" "}
                               {/* แสดงลำดับ */}
-                              <td>{employee.User_Code}</td>
+                              <td><h3>{employee.User_Code}</h3></td>
                               <td>
                                 <h3>{employee.User_Name}</h3>
                               </td>

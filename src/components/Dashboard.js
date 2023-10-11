@@ -3,10 +3,15 @@ import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../constants/constants";
 
 function Dashboard() {
-  const { data: countData, isLoading } = useFetch(
+  const { data: countData, isLoading: countDataLoad } = useFetch(
     BASE_URL + "/api/AllCountCustomer"
   );
-  if (isLoading) {
+
+  const { data: metrics, isLoading: metricsLoad } = useFetch(
+    BASE_URL + "/api/metrics"
+  );
+
+  if (countDataLoad || metricsLoad) {
     return (
       <div className="spiner-example">
         <div className="sk-spinner sk-spinner-three-bounce">
@@ -24,6 +29,13 @@ function Dashboard() {
     return <p>Error: {countData.error}</p>;
   }
   const { count } = countData[0];
+  const {
+    Status_1_Count,
+    Status_3_Count,
+    Status_Date_Today,
+    Status_Appointments_Count,
+  } = metrics[0];
+
   return (
     <div className="card">
       <div className="card-title ml-4">
@@ -36,7 +48,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 claclassNamess="font-bold" style={{ fontSize: "3rem" }}>
-                    0
+                    {Status_3_Count}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -50,7 +62,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    0
+                    {Status_Date_Today}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -64,7 +76,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    0
+                    {Status_Appointments_Count}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">
@@ -92,7 +104,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    01
+                    {Status_1_Count}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">

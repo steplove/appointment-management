@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Card, Modal, InputGroup, Table } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Modal,
+  InputGroup,
+  Table,
+  Row,
+  Col,
+} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
@@ -26,27 +35,12 @@ function TableCustomer({ onSearch }) {
   //สถานะของผู้ใช้ guest member
   const [customerStatus, setCustomerStatusShow] = useState([]);
   useEffect(() => {
-    console.log("9999999999999");
-
     fetch(BASE_URL + "/api/CustomerStatus")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         setCustomerStatusShow(data);
-      });
-  }, []);
-
-  const [customerRefNoStatus, setCustomerRefNoShow] = useState([]);
-  useEffect(() => {
-    console.log("9999999999999");
-
-    fetch(BASE_URL + "/api/staffRefNo")
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setCustomerRefNoShow(data);
       });
   }, []);
 
@@ -82,6 +76,7 @@ function TableCustomer({ onSearch }) {
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
+    console.log(fetchAmphures(province_id), "fetchAmphures(province_id)");
     fetchSubDistricts(amphure_id);
     fetchPostCodes(amphure_id);
   };
@@ -126,7 +121,7 @@ function TableCustomer({ onSearch }) {
         setMapHN(null);
         Swal.fire({
           title: "เกิดข้อผิดพลาด!",
-          text: `ไม่พบข้อมูลผู้ใช้ในระบบ เลข: ${IdenNumber}`,
+          text: `ไม่พบข้อมูลผู้ใช้ในระบบ`,
           icon: "error",
           confirmButtonText: "ปิด",
         });
@@ -167,7 +162,7 @@ function TableCustomer({ onSearch }) {
               },
               body: JSON.stringify({
                 Customer_Status: 2,
-                HN: mapHN.HN,
+                HN: mapHN[0].HN,
               }),
             }
           );
@@ -208,13 +203,10 @@ function TableCustomer({ onSearch }) {
     });
   };
 
-  // กำหนด state สำหรับการบันทึกข้อมูล
-  const [isSaving, setIsSaving] = useState(false);
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
     try {
       setShowModal(false);
-      setIsSaving(true);
 
       const response = await fetch(
         `${BASE_URL}/api/updateCustomer/${selectedCustomers.UID}`,
@@ -239,14 +231,14 @@ function TableCustomer({ onSearch }) {
             Moo: selectedCustomers.Moo,
             Address: selectedCustomers.Address,
             MobileNo: selectedCustomers.MobileNo,
-            Mail: selectedCustomers.Mail,
+            Email: selectedCustomers.Email,
           }),
         }
       );
 
       const data = await response.json();
 
-      if (data.message === "Update successful!") {
+      if (data.message === "Customer updated successfully!") {
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",
@@ -373,6 +365,56 @@ function TableCustomer({ onSearch }) {
   // const handleClose = () => {
   //   setShowModalMapHN(false);
   // };
+  const handleProvinceChange = (selectedProvince) => {
+    console.log("Selected Province:", selectedProvince);
+    // สร้างอ็อบเจ็กต์ใหม่ที่มีจังหวัดเป็นค่าที่เลือก
+    setSelectedCustomers({
+      ...selectedCustomers,
+      Provinces: selectedProvince,
+      Districts: "",
+      Amphures: "",
+      PostCode: "",
+    });
+    // เรียกใช้ฟังก์ชันอื่น ๆ ที่คุณต้องการที่นี่
+    // เช่น fetch ข้อมูลอำเภอ, ตำบล หรือทำอย่างอื่น ๆ
+    fetchAmphures(selectedProvince);
+  };
+  const handleAmphureChange = (selectedAmphure) => {
+    console.log("Selected Amphure:", selectedAmphure);
+    // สร้างอ็อบเจ็กต์ใหม่ที่มีอำเภอเป็นค่าที่เลือก
+    setSelectedCustomers({
+      ...selectedCustomers,
+      Amphures: selectedAmphure,
+      Districts: "",
+      PostCode: "",
+    });
+    // เรียกใช้ฟังก์ชันอื่น ๆ ที่คุณต้องการที่นี่
+    // เช่น fetch ข้อมูลตำบล, รหัสไปรษณีย์ หรือทำอย่างอื่น ๆ
+    fetchSubDistricts(selectedAmphure);
+  };
+  const handleDistrictChange = (selectedDistrict) => {
+    // ค้นหารหัสไปรษณีย์ของตำบลที่เลือก
+    const selectedSubDistrict = subDistricts.find(
+      (subDistrict) => subDistrict.id === selectedDistrict
+    );
+    console.log("Selected District:", selectedDistrict);
+
+    // อัปเดตค่ารหัสไปรษณีย์
+    if (selectedSubDistrict) {
+      setSelectedCustomers({
+        ...selectedCustomers,
+        Districts: selectedDistrict,
+        PostCode: selectedSubDistrict.zip_code, // ใช้รหัสไปรษณีย์จากตำบลที่เลือก
+      });
+    } else {
+      setSelectedCustomers({
+        ...selectedCustomers,
+        Districts: selectedDistrict,
+        PostCode: "", // หากไม่พบรหัสไปรษณีย์ ให้เป็นค่าว่าง
+      });
+    }
+  };
+
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
@@ -645,7 +687,7 @@ function TableCustomer({ onSearch }) {
                   <tr className="text-center">
                     <th>ลำดับ</th>
                     <th>ประเภทบัตร</th>
-                    <th>เลขที่โรงพยาบาล</th>
+                    <th>HN</th>
                     <th>ชื่อ</th>
                     <th>นามสกุล</th>
                     <th>เพศ</th>
@@ -709,7 +751,7 @@ function TableCustomer({ onSearch }) {
             </Modal.Footer>
           </Modal>
           {/* modal edite  */}
-          <Modal show={showModal} onHide={handleCloseModal}>
+          <Modal show={showModal} onHide={handleCloseModal} size="lg">
             <Modal.Header>
               <Modal.Title className="font">จัดการลูกค้า </Modal.Title>{" "}
             </Modal.Header>
@@ -717,306 +759,311 @@ function TableCustomer({ onSearch }) {
               {selectedCustomers && (
                 <Card>
                   <Card.Body>
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ประเภทบัตร</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="ประเภทบัตร"
-                        value={selectedCustomers.IdenType}
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group controlId="IdenNumber">
-                      >
-                      <Form.Label>
-                        <h4>เลขบัตร</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="เลขบัตร"
-                        value={selectedCustomers.IdenNumber}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            IdenNumber: e.target.value,
-                          })
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group controlId="HN">
-                      >
-                      <Form.Label>
-                        <h4>เลขที่โรงพยาบาล</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="เลขที่โรงพยาบาล"
-                        value={selectedCustomers.HN}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            HN: e.target.value,
-                          })
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>เพศ</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="เพศ"
-                        defaultValue={
-                          selectedCustomers.Gender === "2"
-                            ? "ชาย"
-                            : selectedCustomers.Gender === "1"
-                            ? "หญิง"
-                            : ""
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>คำนำหน้า</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="คำนำหน้า"
-                        defaultValue={selectedCustomers.Prefix}
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ชื่อ</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="ชื่อ"
-                        value={selectedCustomers.FirstName}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            FirstName: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>นามสกุล</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="นามสกุล"
-                        value={selectedCustomers.LastName}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            LastName: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ว/ด/ปีเกิด</h4>
-                      </Form.Label>
-                      <Form.Control
-                        type="date"
-                        placeholder="ว/ด/ปีเกิด"
-                        value={selectedCustomers.BirthDate.substring(0, 10)}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            BirthDate: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>จังหวัด:</h4>
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={selectedCustomers.Provinces}
-                        onChange={(e) => {
-                          const selectedProvince = e.target.value;
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Provinces: selectedProvince,
-                            Districts: "",
-                            Amphures: "",
-                            PostCode: "",
-                          });
-                        }}
-                      >
-                        <option value="">เลือกจังหวัด...</option>
-                        {readProvince.map((readProvinces) => (
-                          <option
-                            key={readProvinces.id}
-                            value={readProvinces.id}
+                    <Row>
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>ประเภทบัตร</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="ประเภทบัตร"
+                            value={selectedCustomers.IdenType}
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group controlId="IdenNumber">
                           >
-                            {readProvinces.name_th}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>อำเภอ:</h4>
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={selectedCustomers.Amphures}
-                        onChange={(e) => {
-                          const selectedDistrict = e.target.value;
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Amphures: selectedDistrict,
-                            Districts: "",
-                            PostCode: "",
-                          });
-                        }}
-                      >
-                        <option value="">เลือกอำเภอ...</option>
-                        {amphures.map((amphur) => (
-                          <option key={amphur.id} value={amphur.id}>
-                            {amphur.name_th}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ตำบล</h4>
-                      </Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={selectedCustomers.Districts}
-                        onChange={(e) => {
-                          const selectedSubDistrict = e.target.value;
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Districts: selectedSubDistrict,
-                            PostCode: "",
-                          });
-                        }}
-                      >
-                        <option value="">เลือกตำบล...</option>
-                        {subDistricts.map((subDistrict) => (
-                          <option key={subDistrict.id} value={subDistrict.id}>
-                            {subDistrict.name_th}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>รหัสไปรษณีย์</h4>
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={selectedCustomers.PostCode}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            PostCode: e.target.value,
-                          })
-                        }
-                        placeholder="กรอกรหัสไปรษณีย์..."
-                      />
-                    </Form.Group>
-
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>หมู่</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="หมู่"
-                        value={selectedCustomers.Moo}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Moo: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ที่อยู่</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="ที่อยู่"
-                        value={selectedCustomers.Address}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Address: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>เบอร์</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="เบอร์"
-                        value={selectedCustomers.MobileNo}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            MobileNo: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                    {/* <Form.Group>
-                      <Form.Label>
-                        <h4>เบอร์โทรศัพท์บ้าน</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="เบอร์โทรศัพท์บ้าน"
-                        value={selectedCustomers.homePhone}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            homePhone: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group> */}
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>E-Mail</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="E-Mail"
-                        value={selectedCustomers.Email}
-                        onChange={(e) =>
-                          setSelectedCustomers({
-                            ...selectedCustomers,
-                            Email: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
+                          <Form.Label>
+                            <h4>เลขบัตร</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="เลขบัตร"
+                            value={selectedCustomers.IdenNumber}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                IdenNumber: e.target.value,
+                              })
+                            }
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group controlId="HN">
+                          >
+                          <Form.Label>
+                            <h4>HN</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="HN"
+                            value={selectedCustomers.HN}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                HN: e.target.value,
+                              })
+                            }
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>เพศ</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="เพศ"
+                            defaultValue={
+                              selectedCustomers.Gender === "2"
+                                ? "ชาย"
+                                : selectedCustomers.Gender === "1"
+                                ? "หญิง"
+                                : ""
+                            }
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>คำนำหน้า</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="คำนำหน้า"
+                            defaultValue={selectedCustomers.Prefix}
+                            disabled
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>ชื่อ</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="ชื่อ"
+                            value={selectedCustomers.FirstName}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                FirstName: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>นามสกุล</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="นามสกุล"
+                            value={selectedCustomers.LastName}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                LastName: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>ว/ด/ปีเกิด</h4>
+                          </Form.Label>
+                          <Form.Control
+                            type="date"
+                            placeholder="ว/ด/ปีเกิด"
+                            value={selectedCustomers.BirthDate.substring(0, 10)}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                BirthDate: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>จังหวัด:</h4>
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={selectedCustomers.Provinces}
+                            onChange={(e) =>
+                              handleProvinceChange(e.target.value)
+                            }
+                          >
+                            <option value="">เลือกจังหวัด...</option>
+                            {readProvince.map((readProvinces) => (
+                              <option
+                                key={readProvinces.id}
+                                value={readProvinces.id}
+                              >
+                                {readProvinces.name_th}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>อำเภอ:</h4>
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={selectedCustomers.Amphures}
+                            onChange={(e) =>
+                              handleAmphureChange(e.target.value)
+                            }
+                          >
+                            <option value="">เลือกอำเภอ...</option>
+                            {amphures.map((amphur) => (
+                              <option key={amphur.id} value={amphur.id}>
+                                {amphur.name_th}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>ตำบล</h4>
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={selectedCustomers.Districts}
+                            onChange={(e) =>
+                              handleDistrictChange(e.target.value)
+                            }
+                          >
+                            <option value="">เลือกตำบล...</option>
+                            {subDistricts.map((subDistrict) => (
+                              <option
+                                key={subDistrict.id}
+                                value={subDistrict.id}
+                              >
+                                {subDistrict.name_th}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>รหัสไปรษณีย์</h4>
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={selectedCustomers.PostCode}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                PostCode: e.target.value,
+                              })
+                            }
+                            placeholder="กรอกรหัสไปรษณีย์..."
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>หมู่</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="หมู่"
+                            value={selectedCustomers.Moo}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                Moo: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>ที่อยู่</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="ที่อยู่"
+                            value={selectedCustomers.Address}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                Address: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>เบอร์</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="เบอร์"
+                            value={selectedCustomers.MobileNo}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                MobileNo: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>
+                            <h4>E-Mail</h4>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="E-Mail"
+                            value={selectedCustomers.Email}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                Email: e.target.value,
+                              })
+                            }
+                          />
+                        </Form.Group>
+                      </Col>
+                      <br />
+                    </Row>
                   </Card.Body>
                 </Card>
               )}

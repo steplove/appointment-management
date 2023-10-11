@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Card, Modal, InputGroup } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Modal,
+  InputGroup,
+  Col,
+  Row,
+} from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
-import { useAlert } from "../hooks/useAlert";
+import useFetch from "../hooks/useFetch";
+import Swal from "sweetalert2";
 function TableApppointments({ onSearch }) {
-    const { showAlert } = useAlert();
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
   const [HN] = useTokenCheck();
   // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
-  const [customers, setCustomers] = useState([]);
+  const [appointmentsCustomers, setAppointmentsCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage] = useState(10);
   // ฟังก์ชันสำหรับการเปลี่ยนหน้า
@@ -18,117 +26,131 @@ function TableApppointments({ onSearch }) {
   };
   // คำนวณ offset และข้อมูลที่จะแสดงในหน้าปัจจุบัน
   const offset = currentPage * perPage;
-  const currentPageData = customers.slice(offset, offset + perPage);
+  const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
   // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
+  const { data: fetchedClinics = [] } = useFetch(`${BASE_URL}/api/showClinics`);
+  const { data: fetchedAppointments, refetch = [] } = useFetch(
+    `${BASE_URL}/api/AllAppointmentsAmin`
+  );
+  const [clinics, setClinics] = useState([]);
+  const [doctor, setDoctor] = useState([]);
+
+  const [formData, setFormData] = useState({
+    Clinic_ID: "",
+    DoctorID: "",
+    Date: null, // เริ่มต้นเป็น null
+    timeSlot: "",
+    symptoms: "",
+  });
   useEffect(() => {
-    fetch(BASE_URL + "/api/readAppointmentALL")
-      .then((response) => response.json())
-      .then((data) => {
-        setCustomers(data);
-        console.log(data, "data");
-      })
-      .catch((error) => console.error(error));
-  }, []);
+    console.log("fetchedClinics", fetchedClinics);
+    if (
+      fetchedClinics &&
+      Array.isArray(fetchedClinics) &&
+      fetchedAppointments
+    ) {
+      setClinics(fetchedClinics);
+      setAppointmentsCustomers(fetchedAppointments);
+    }
+  }, [fetchedClinics, fetchedAppointments]);
+  const fetchDoctors = async (ClinicID) => {
+    try {
+      console.log(ClinicID, "ClinicID");
+      const response = await fetch(
+        `${BASE_URL}/api/searchDoctorClinic/${ClinicID}`
+      );
+      const data = await response.json();
+      setDoctor(data);
+      console.log(data, "data");
+    } catch (error) {
+      console.error("Error fetching Doctors:", error);
+    }
+  };
   // ใช้ useEffect เพื่อคำนวณจำนวนหน้าทั้งหมดเมื่อข้อมูลการนัดหมายเปลี่ยนแปลง
   useEffect(() => {
-    const totalPageCount = Math.ceil(customers.length / perPage);
+    const totalPageCount = Math.ceil(appointmentsCustomers.length / perPage);
     setPageCount(totalPageCount);
-  }, [customers, perPage]);
-  //ดึงข้อมูลการนัดหมาย
-  const fetchCustomers = () => {
-    fetch(BASE_URL + "/api/readAppointmentALL")
-      .then((response) => response.json())
-      .then((data) => {
-        setCustomers(data);
-      })
-      .catch((error) => console.error(error));
-  };
+  }, [appointmentsCustomers, perPage]);
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const [selectedCustomers, setSelectedCustomers] = useState(null);
-
   //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
   const handleEditModal = (customerId) => {
-    const customer = customers.find((p) => p.id === customerId);
+    const customer = appointmentsCustomers.find(
+      (p) => p.APM_UID === customerId
+    );
     setSelectedCustomers(customer);
-    console.log(customer, "customer");
+    fetchDoctors(customer.Clinic_ID);
     handleShowModal();
   };
-  // กำหนด state สำหรับการบันทึกข้อมูล
-  const [isSaving, setIsSaving] = useState(false);
+
   // ฟังก์ชั่นบันทึกข้อมูล
-  const handleSave = () => {
-    setShowModal(false);
-    setIsSaving(true);
-    showAlert({
-      title: "คุณแน่ใจที่จะบันทึก?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-      cancelButtonText: "ยกเลิก",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        if (selectedCustomers && selectedCustomers.id) {
-          const updatedEmployee = {
-            HN: HN,
-            FirstName: selectedCustomers.FirstName,
-            LastName: selectedCustomers.LastName,
-            Appointment_Date: selectedCustomers.Appointment_Date,
-            Appointment_Time: selectedCustomers.Appointment_Time,
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            UID: selectedCustomers.UID,
+            Appointment_Date: new Date(selectedCustomers.Appointment_Date)
+              .toISOString()
+              .substring(0, 10),
+            Appointment_Time: new Date(selectedCustomers.Appointment_Time)
+              .toISOString()
+              .substring(11, 16),
             Clinic: selectedCustomers.Clinic,
             Doctor: selectedCustomers.Doctor,
-            status: selectedCustomers.status,
-          };
-
-          fetch(BASE_URL + `/api/updateAppointment/${selectedCustomers.id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedEmployee),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              setIsSaving(false);
-              showAlert({
-                icon: "success",
-                title: "บันทึกสำเร็จ",
-                showConfirmButton: false, // ทำให้ปุ่ม "OK" ไม่ปรากฏ
-                timer: 1500, // ปิดหน้าต่างในระยะเวลาที่กำหนด (มิลลิวินาท)
-              });
-              fetchCustomers();
-              handleCloseModal();
-            })
-            .catch((error) => {
-              setIsSaving(false);
-              showAlert({
-                icon: "error",
-                title: "แก้ข้อผิดพลาด",
-                text: "การบันทึกผิดพลาดกรุณาติดต่อ ICT!",
-              });
-              console.error("Error saving product:", error);
-            });
-        } else {
-          setIsSaving(false);
+            APM_No: selectedCustomers.APM_No,
+            Entryby: HN,
+            EntryDatetime: new Date(),
+          }),
         }
+      );
+      const responseStatus = await fetch(
+        `${BASE_URL}/api/UpdateAppointmentStatus/${selectedCustomers.APM_UID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            APM_UID: selectedCustomers.APM_UID,
+            StatusFlag: selectedCustomers.StatusFlag,
+          }),
+        }
+      );
+      const data = (await response.json()) || (await responseStatus.json());
+      if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
+        Swal.fire({
+          title: "การอัปเดตสำเร็จ!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        refetch();
+        handleCloseModal();
+      } else {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: data.message,
+          icon: "error",
+          confirmButtonText: "ตกลง",
+        });
       }
-    });
-  };
-  const [readStatus, setReadStatus] = useState([]);
-  // กำหนด state และฟังก์ชันสำหรับดึงข้อมูล status จากเซิร์ฟเวอร์
-  const fetchTypeData = () => {
-    fetch(BASE_URL + "/api/readStatus")
-      .then((response) => response.json())
-      .then((data) => {
-        setReadStatus(data);
+    } catch (error) {
+      Swal.fire({
+        title: "เกิดข้อผิดพลาด!",
+        text: "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้",
+        icon: "error",
+        confirmButtonText: "ตกลง",
       });
+    }
   };
-  useEffect(() => {
-    fetchTypeData();
-  }, []);
   // กำหนด state สำหรับการค้นหา
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -138,7 +160,8 @@ function TableApppointments({ onSearch }) {
   const [searchStatus, setSearchStatus] = useState("");
 
   const [searchResult, setSearchResult] = useState(null);
-  const shouldShowAllData = !searchResult && customers && customers.length > 0;
+  const shouldShowAllData =
+    !searchResult && appointmentsCustomers && appointmentsCustomers.length > 0;
   // ตั้งค่าเริ่มต้นของจำนวนหน้า
   const [pageCount, setPageCount] = useState(1);
 
@@ -148,13 +171,13 @@ function TableApppointments({ onSearch }) {
     console.log(searchHN);
     const searchParams = {
       HN: searchHN,
-      firstName: searchFirstName,
-      lastName: searchLastName,
+      FirstName: searchFirstName,
+      LastName: searchLastName,
       startDate,
       endDate,
-      status: searchStatus,
+      StatusFlag: searchStatus,
     };
-    fetch(BASE_URL + "/api/search", {
+    fetch(BASE_URL + "/api/searchAppointments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -171,6 +194,26 @@ function TableApppointments({ onSearch }) {
       .catch((error) => {
         console.error(error);
       });
+  };
+  const handleInputChange = async (event) => {
+    const { name, value } = event.target;
+
+    // แก้ไขตรงนี้: รีเฟรชรายการหมอเมื่อคลินิกเปลี่ยน
+    if (name === "Clinic") {
+      // กำหนดค่าให้ formData หลังจากเรียก fetchDoctors เสร็จสิ้น
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        Doctor: "", // ล้างค่าหมอเมื่อคลินิกเปลี่ยน
+      }));
+
+      // เรียกใช้งาน fetchDoctors เพื่อดึงรายการหมอ
+      await fetchDoctors(value);
+      console.log(value, "value");
+    } else {
+      // ถ้าไม่ใช่คลินิก ให้เปลี่ยนค่าเฉพาะ name
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   return (
@@ -252,11 +295,10 @@ function TableApppointments({ onSearch }) {
                       onChange={(e) => setSearchStatus(e.target.value)}
                     >
                       <option value="">เลือกสถานะ...</option>
-                      {readStatus.map((readStatu) => (
-                        <option key={readStatu.id} value={readStatu.status}>
-                          {readStatu.status}
-                        </option>
-                      ))}
+                      <option value="3">รอยืนยัน</option>
+                      <option value="4">ยืนยันนัดหมาย</option>
+                      <option value="5">ยกเลิกการนัด</option>
+                      <option value="6">เสร็จสมบูรณ์</option>
                     </Form.Control>
                   </Form.Group>
                 </div>
@@ -296,41 +338,53 @@ function TableApppointments({ onSearch }) {
                 <tbody>
                   {shouldShowAllData ? (
                     <>
-                      {customers
+                      {appointmentsCustomers
                         .slice(
                           currentPage * perPage,
                           (currentPage + 1) * perPage
                         )
                         .map((customer) => (
-                          <tr key={customer.id}>
+                          <tr key={customer.APM_UID}>
                             <td>
                               <h3>{customer.HN}</h3>
                             </td>
                             <td>
                               <h3>
-                                {customer.firstName} {customer.lastName}
+                                {customer.FirstName} {customer.LastName}
                               </h3>
                             </td>
                             <td>
                               <h3>
                                 {" "}
                                 {new Date(
-                                  customer.date_appointment
+                                  customer.Appointment_Date
                                 ).toLocaleDateString()}
                               </h3>
                             </td>
                             <td>
-                              <h3>{customer.time_appointment} น.</h3>
+                              <h3>
+                                {customer.Appointment_Time.substring(11, 16)} น.
+                              </h3>
                             </td>
                             <td>
-                              <h3 className={`status-${customer.status}`}>
-                                {customer.status}
+                              <h3 className={`status-${customer.StatusFlag}`}>
+                                {customer.StatusFlag === "3"
+                                  ? "pending"
+                                  : customer.StatusFlag === "4"
+                                  ? "confirmed"
+                                  : customer.StatusFlag === "5"
+                                  ? "cancelled"
+                                  : customer.StatusFlag === "6"
+                                  ? "complete"
+                                  : "unknown"}{" "}
                               </h3>
                             </td>
                             <td>
                               <Button
                                 variant="primary"
-                                onClick={() => handleEditModal(customer.id)}
+                                onClick={() =>
+                                  handleEditModal(customer.APM_UID)
+                                }
                               >
                                 จัดการ
                               </Button>{" "}
@@ -349,7 +403,7 @@ function TableApppointments({ onSearch }) {
                               (currentPage + 1) * perPage
                             )
                             .map((customer) => (
-                              <tr key={customer.id}>
+                              <tr key={customer.APM_UID}>
                                 <td>
                                   <h3>{customer.HN}</h3>
                                 </td>
@@ -367,17 +421,35 @@ function TableApppointments({ onSearch }) {
                                   </h3>
                                 </td>
                                 <td>
-                                  <h3>{customer.Appointment_Time} น.</h3>
+                                  <h3>
+                                    {customer.Appointment_Time.substring(
+                                      11,
+                                      16
+                                    )}{" "}
+                                    น.
+                                  </h3>
                                 </td>
                                 <td>
-                                  <h3 className={`status-${customer.status}`}>
-                                    {customer.status}
+                                  <h3
+                                    className={`status-${customer.StatusFlag}`}
+                                  >
+                                    {customer.StatusFlag === "3"
+                                      ? "pending"
+                                      : customer.StatusFlag === "4"
+                                      ? "confirmed"
+                                      : customer.StatusFlag === "5"
+                                      ? "cancelled"
+                                      : customer.StatusFlag === "6"
+                                      ? "complete"
+                                      : "unknown"}{" "}
                                   </h3>
                                 </td>
                                 <td>
                                   <Button
                                     variant="primary"
-                                    onClick={() => handleEditModal(customer.id)}
+                                    onClick={() =>
+                                      handleEditModal(customer.APM_UID)
+                                    }
                                   >
                                     จัดการ
                                   </Button>{" "}
@@ -416,7 +488,7 @@ function TableApppointments({ onSearch }) {
               />
             </div>
             {/* modal  */}
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showModal} onHide={handleCloseModal} size="lg">
               <Modal.Header>
                 <Modal.Title className="font">จัดการนัดหมาย </Modal.Title>{" "}
               </Modal.Header>
@@ -424,122 +496,169 @@ function TableApppointments({ onSearch }) {
                 {selectedCustomers && (
                   <Card>
                     <Card.Body>
-                      <InputGroup>
-                        <InputGroup.Text>ชื่อ</InputGroup.Text>
-                        <Form.Control
-                          placeholder="ชื่อ"
-                          value={selectedCustomers.FirstName}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              FirstName: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-                      <InputGroup>
-                        <InputGroup.Text>นามสกุล</InputGroup.Text>
-                        <Form.Control
-                          placeholder="นามสกุล"
-                          value={selectedCustomers.LastName}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              LastName: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-
-                      <InputGroup controlId="datePicker">
-                        <InputGroup.Text>วันที่นัด</InputGroup.Text>
-                        <Form.Control
-                          type="date"
-                          placeholder="วันที่นัด"
-                          value={selectedCustomers.Appointment_Date.substring(
-                            0,
-                            10
-                          )}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              Appointment_Date: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-                      <InputGroup>
-                        <InputGroup.Text>เวลา</InputGroup.Text>
-                        <Form.Control
-                          type="time"
-                          placeholder="เวลา"
-                          value={selectedCustomers.Appointment_Time.substring(
-                            0,
-                            5
-                          )}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              Appointment_Time: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-                      <InputGroup>
-                        <InputGroup.Text>คลินิก</InputGroup.Text>
-                        <Form.Control
-                          placeholder="คลินิก"
-                          value={selectedCustomers.Clinic}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              Clinic: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-                      <InputGroup>
-                        <InputGroup.Text>หมอ</InputGroup.Text>
-                        <Form.Control
-                          placeholder="หมอ"
-                          value={selectedCustomers.Doctor}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              Doctor: e.target.value,
-                            })
-                          }
-                        />
-                      </InputGroup>
-                      <br />
-
-                      <InputGroup>
-                        <InputGroup.Text>สถานะ</InputGroup.Text>
-                        <Form.Control
-                          as="select"
-                          aria-label="Default select example"
-                          value={selectedCustomers.status}
-                          onChange={(e) =>
-                            setSelectedCustomers({
-                              ...selectedCustomers,
-                              status: e.target.value,
-                            })
-                          }
-                        >
-                          <option>เลือกประเภท</option>
-                          {readStatus.map((readStatu) => (
-                            <option key={readStatu.id} value={readStatu.status}>
-                              {readStatu.status}
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </InputGroup>
-                      <br />
+                      <Row>
+                        <Col xs={6}>
+                          <Form.Group>
+                            <Form.Label>ชื่อ</Form.Label>
+                            <Form.Control
+                              placeholder="ชื่อ"
+                              value={selectedCustomers.FirstName}
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  FirstName: e.target.value,
+                                })
+                              }
+                              disabled
+                            />
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group>
+                            <Form.Label>นามสกุล</Form.Label>
+                            <Form.Control
+                              placeholder="นามสกุล"
+                              value={selectedCustomers.LastName}
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  LastName: e.target.value,
+                                })
+                              }
+                              disabled
+                            />
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group controlId="datePicker">
+                            <Form.Label>วันที่นัด</Form.Label>
+                            <Form.Control
+                              type="date"
+                              placeholder="วันที่นัด"
+                              value={selectedCustomers.Appointment_Date.substring(
+                                0,
+                                10
+                              )}
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  Appointment_Date: e.target.value,
+                                })
+                              }
+                            />
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group>
+                            <Form.Label>เวลา</Form.Label>
+                            <Form.Control
+                              type="time"
+                              placeholder="เวลา"
+                              value={selectedCustomers.Appointment_Time.substring(
+                                11,
+                                16
+                              )} // ตัดข้อมูลเวลาเพื่อแสดงเฉพาะ HH:mm
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  Appointment_Time: `1970-01-01T${e.target.value}:00.000Z`, // เพิ่มข้อมูลส่วนที่ขาดหาย
+                                })
+                              }
+                            />
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group controlId="clinic">
+                            <Form.Label>คลินิก</Form.Label>
+                            <Form.Control
+                              as="select"
+                              name="Clinic"
+                              value={selectedCustomers.Clinic_ID}
+                              style={{ height: "40px" }}
+                              onChange={handleInputChange}
+                            >
+                              {clinics &&
+                                clinics.length > 0 &&
+                                clinics.map((clinicName) => (
+                                  <option
+                                    key={clinicName.Clinic_ID}
+                                    value={clinicName.Clinic_ID}
+                                  >
+                                    {clinicName.Clinic_Name}
+                                  </option>
+                                ))}
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group controlId="doctor">
+                            <Form.Label>แพทย์</Form.Label>
+                            <Form.Control
+                              as="select"
+                              name="Doctor"
+                              value={selectedCustomers.Doctor}
+                              style={{ height: "40px" }}
+                              onChange={handleInputChange}
+                            >
+                              {doctor &&
+                                doctor.length > 0 &&
+                                doctor.map((doctors) => (
+                                  <option
+                                    key={doctors.DoctorID}
+                                    value={doctors.DoctorID}
+                                  >
+                                    {doctors.Doctor_Name}
+                                  </option>
+                                ))}
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group>
+                            <Form.Label>หมายเลขนัดหมาย</Form.Label>
+                            <Form.Control
+                              placeholder="หมายเลขนัดหมาย"
+                              value={selectedCustomers.APM_No}
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  APM_No: e.target.value,
+                                })
+                              }
+                            />
+                          </Form.Group>
+                        </Col>
+                        <br />
+                        <Col xs={6}>
+                          <Form.Group>
+                            <Form.Label>สถานะ</Form.Label>
+                            <Form.Control
+                              as="select"
+                              aria-label="Default select example"
+                              value={selectedCustomers.StatusFlag}
+                              onChange={(e) =>
+                                setSelectedCustomers({
+                                  ...selectedCustomers,
+                                  StatusFlag: e.target.value,
+                                })
+                              }
+                            >
+                              <option>เลือกประเภท</option>
+                              <option value="3">รอยืนยัน</option>
+                              <option value="4">ยืนยันนัดหมาย</option>
+                              <option value="5">ยกเลิกการนัด</option>
+                              <option value="6">เสร็จสมบูรณ์</option>
+                            </Form.Control>
+                          </Form.Group>
+                        </Col>
+                        <br />
+                      </Row>
                     </Card.Body>
                   </Card>
                 )}
@@ -548,12 +667,8 @@ function TableApppointments({ onSearch }) {
                 <Button variant="secondary" onClick={handleCloseModal}>
                   ปิด
                 </Button>
-                <Button
-                  variant="success"
-                  onClick={handleSave}
-                  disabled={isSaving}
-                >
-                  {isSaving ? "กำลังบันทึก..." : "บันทึก"}
+                <Button variant="success" onClick={handleSave}>
+                  บันทึก
                 </Button>
               </Modal.Footer>
             </Modal>

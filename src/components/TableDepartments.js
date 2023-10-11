@@ -83,9 +83,9 @@ function TableDepartments({ onSearch }) {
     setSelectedClinics(clinics);
     handleShowEdite();
   };
-  //ฟังก์ชั่น API ตอนกด insert แผนก
+  //ฟังก์ชั่น API ตอนกด insert แผนก เพิ่มแผนก
   const handleSubmitInsert = async () => {
-    const response = await fetch(BASE_URL + "/api/clinic", {
+    const response = await fetch(BASE_URL + "/api/InsertClinic", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,7 +136,7 @@ function TableDepartments({ onSearch }) {
       }).then(async (result) => {
         if (result.isConfirmed) {
           const response = await fetch(
-            `${BASE_URL}/api/clinic/${selectedClinics.Clinic_ID}`,
+            `${BASE_URL}/api/UpdateClinic/${selectedClinics.Clinic_ID}`,
             {
               method: "PUT",
               headers: {
@@ -278,7 +278,7 @@ function TableDepartments({ onSearch }) {
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
-                  <th className="text-left">
+                  <th>
                     <h3>ลำดับ</h3>
                   </th>
                   <th>
@@ -297,7 +297,7 @@ function TableDepartments({ onSearch }) {
 
                       .map((department, index) => (
                         <tr key={department.Clinic_ID} className="text-center">
-                          <td className="text-left">{index + 1}</td>{" "}
+                          <td > <h3>{index + 1} </h3></td>{" "}
                           {/* แสดงลำดับ */}
                           <td>
                             <h3>{department.Clinic_Name}</h3>
@@ -334,7 +334,7 @@ function TableDepartments({ onSearch }) {
                               key={department.Clinic_ID}
                               className="text-center"
                             >
-                              <td className="text-left">{index + 1}</td>{" "}
+                              <td><h3>{index + 1}</h3></td>{" "}
                               {/* แสดงลำดับ */}
                               <td>
                                 <h3>{department.Clinic_Name}</h3>
@@ -386,6 +386,7 @@ function TableDepartments({ onSearch }) {
               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
           </div>
+          {/* เพิ่มแผนก  */}
           <Modal show={show} onHide={handleClose}>
             <Modal.Header>
               <Modal.Title className="font">เพิ่มแผนก </Modal.Title>{" "}
