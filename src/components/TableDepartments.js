@@ -20,7 +20,6 @@ function TableDepartments({ onSearch }) {
     if (departments && departments.length > 0) {
       setDepartment(departments);
     }
-    console.log(departments, "departments");
   }, [departments]);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -37,7 +36,8 @@ function TableDepartments({ onSearch }) {
   department.slice(offset, offset + perPage);
   // state รับค่าการค้นหา
   const [searchResult, setSearchResult] = useState(null);
-  const shouldShowAllData = !searchResult && departments && departments.length > 0;
+  const shouldShowAllData =
+    !searchResult && departments && departments.length > 0;
   const [ClinicCodeSearch, setClinicCodeSearch] = useState("");
   useEffect(() => {
     const totalPageCount = Math.ceil(department.length / perPage);
@@ -79,7 +79,6 @@ function TableDepartments({ onSearch }) {
   //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
   const handleEditModal = (ClinicID) => {
     const clinics = departments.find((p) => p.Clinic_ID === ClinicID);
-    console.log("Selected clinic:", clinics); // ตรวจสอบข้อมูล clinic ที่เลือก
     setSelectedClinics(clinics);
     handleShowEdite();
   };
@@ -202,18 +201,17 @@ function TableDepartments({ onSearch }) {
 
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
   const handleSearchClinicAppointments = () => {
-    console.log(ClinicCodeSearch);
-    fetch(`${BASE_URL}/api/searchClinicsClinic_Name?Clinic_Name=${ClinicCodeSearch}`, {
-      method: "GET",
+    fetch(`${BASE_URL}/api/searchClinicsClinic_Name`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ Clinic_Name: ClinicCodeSearch }),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        setSearchResult(data);
-        const newPageCount = Math.ceil(data.length / perPage);
+        setSearchResult(data.result);
+        const newPageCount = Math.ceil(data.result.length / perPage);
         setPageCount(newPageCount);
         setCurrentPage(0);
       })
@@ -221,6 +219,7 @@ function TableDepartments({ onSearch }) {
         console.error(error);
       });
   };
+
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
@@ -297,7 +296,10 @@ function TableDepartments({ onSearch }) {
 
                       .map((department, index) => (
                         <tr key={department.Clinic_ID} className="text-center">
-                          <td > <h3>{index + 1} </h3></td>{" "}
+                          <td>
+                            {" "}
+                            <h3>{index + 1} </h3>
+                          </td>{" "}
                           {/* แสดงลำดับ */}
                           <td>
                             <h3>{department.Clinic_Name}</h3>
@@ -334,7 +336,9 @@ function TableDepartments({ onSearch }) {
                               key={department.Clinic_ID}
                               className="text-center"
                             >
-                              <td><h3>{index + 1}</h3></td>{" "}
+                              <td>
+                                <h3>{index + 1}</h3>
+                              </td>{" "}
                               {/* แสดงลำดับ */}
                               <td>
                                 <h3>{department.Clinic_Name}</h3>

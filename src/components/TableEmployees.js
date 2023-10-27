@@ -72,7 +72,6 @@ function TableEmployees({ onSearch }) {
   const handleEditModal = (userCode) => {
     const usersID = users.find((p) => p.User_Code === userCode);
     setSelectedUsers(usersID);
-    console.log(usersID, "customer");
     handleShowEdite();
   };
   const handleSubmitInsert = async () => {
@@ -185,20 +184,40 @@ function TableEmployees({ onSearch }) {
   //     }
   //   });
   // };
+  // ฟังก์ชันสำหรับเช็คว่ามีข้อมูลรหัสนี้ในฐานข้อมูลหรือไม่
+  const checkUserExistence = async (userCode) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/searchUsersUser_Code?User_Code=${userCode}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      return data.result.length > 0;
+    } catch (error) {
+      throw error;
+    }
+  };
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
   const handleSearchUsersAppointments = () => {
-    console.log(usersCode);
     fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        setSearchResult(data);
+        setSearchResult(data.result);
         const newPageCount = Math.ceil(data.length / dataPerPage);
         setPageCount(newPageCount);
         setCurrentPage(0);
@@ -212,25 +231,38 @@ function TableEmployees({ onSearch }) {
   const [searchPayrollNo, setSearchPayrollNo] = useState(""); // state สำหรับเก็บค่าที่กรอก
   const handleSearch = async () => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
-      );
+      const userExists = await checkUserExistence(searchPayrollNo);
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      if (!userExists) {
+        // ถ้าไม่มีข้อมูลรหัสนี้ในฐานข้อมูล
+        const response = await fetch(
+          `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-      const data = await response.json();
+        const payrollData = await response.json();
 
-      if (data.length > 0) {
-        console.log(data);
-        setUserName(data[0].FirstName + " " + data[0].LastName); // แสดงชื่อพนักงานในช่องกรอก
+        if (payrollData.length > 0) {
+          setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
+        } else {
+          handleClose();
+          showAlert({
+            title: "ไม่พบข้อมูลพนักงาน",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
       } else {
         handleClose();
         showAlert({
-          title: "ไม่พบข้อมูลพนักงาน",
+          title: "รหัสพนักงานได้ลงทะเบียนแล้ว",
+          text: "",
           icon: "error",
-          showConfirmButton: true,
+          showConfirmButton: false,
+          timer: 1500,
         });
       }
     } catch (error) {
@@ -239,7 +271,8 @@ function TableEmployees({ onSearch }) {
         title: "เกิดข้อผิดพลาดในการค้นหา",
         text: error.message,
         icon: "error",
-        showConfirmButton: true,
+        showConfirmButton: false,
+        timer: 1500,
       });
     }
   };
@@ -335,9 +368,15 @@ function TableEmployees({ onSearch }) {
                       )
                       .map((employee, index) => (
                         <tr key={employee.User_ID} className="text-center">
-                          <td > <h3>{index + 1} </h3></td>{" "}
+                          <td>
+                            {" "}
+                            <h3>{index + 1} </h3>
+                          </td>{" "}
                           {/* แสดงลำดับ */}
-                          <td> <h3>{employee.User_Code} </h3></td>
+                          <td>
+                            {" "}
+                            <h3>{employee.User_Code} </h3>
+                          </td>
                           <td>
                             <h3>{employee.User_Name}</h3>
                           </td>
@@ -376,9 +415,15 @@ function TableEmployees({ onSearch }) {
                           )
                           .map((employee, index) => (
                             <tr key={employee.User_ID} className="text-center">
-                              <td ><h3>{index + 1}</h3></td>{" "}
+                              <td>
+                                {" "}
+                                <h3>{index + 1} </h3>
+                              </td>{" "}
                               {/* แสดงลำดับ */}
-                              <td><h3>{employee.User_Code}</h3></td>
+                              <td>
+                                {" "}
+                                <h3>{employee.User_Code} </h3>
+                              </td>
                               <td>
                                 <h3>{employee.User_Name}</h3>
                               </td>
@@ -406,9 +451,7 @@ function TableEmployees({ onSearch }) {
                           ))}
                       </>
                     ) : (
-                      <div>
-                        <h1>No results found.</h1>
-                      </div>
+                      <h1>No results found.</h1>
                     )}
                   </>
                 )}

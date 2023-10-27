@@ -55,7 +55,6 @@ export default function Login() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.User_Status);
         if (data.User_Status === 0) {
           if (data.status === "ok") {
             Swal.fire({
@@ -161,10 +160,10 @@ export default function Login() {
                 id="UserPassword"
                 autoComplete="current-password"
               />
-              <FormControlLabel
+              {/* <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
-              />
+              /> */}
               <Button
                 type="submit"
                 fullWidth
@@ -173,7 +172,7 @@ export default function Login() {
               >
                 Sign In
               </Button>
-              <Grid container>
+              {/* <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">
                     Forgot password?
@@ -184,7 +183,7 @@ export default function Login() {
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
-              </Grid>
+              </Grid> */}
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>

@@ -33,7 +33,7 @@ function Dashboard() {
     Status_1_Count,
     Status_3_Count,
     Status_Date_Today,
-    Status_Appointments_Count,
+    All_Appointments_Count,
   } = metrics[0];
 
   return (
@@ -47,7 +47,7 @@ function Dashboard() {
             <div className="widget style1 red-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 claclassNamess="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
                     {Status_3_Count}
                   </h1>
                 </div>
@@ -76,7 +76,7 @@ function Dashboard() {
               <div className="row">
                 <div className="col-4 text-center">
                   <h1 className="font-bold" style={{ fontSize: "3rem" }}>
-                    {Status_Appointments_Count}
+                    {All_Appointments_Count}
                   </h1>
                 </div>
                 <div className="col-8 text-center d-flex align-items-center justify-content-center">

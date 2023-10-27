@@ -71,12 +71,11 @@ function TableCustomer({ onSearch }) {
   const handleCloseModal = () => setShowModal(false);
   const handleShowMapHNModal = () => setShowModalMapHN(true);
   const handleCloseMapHNModal = () => setShowModalMapHN(false);
-  const [selectedCustomers, setSelectedCustomers] = useState(null);
+  const [selectedCustomers, setSelectedCustomers] = useState("");
   const [mapHN, setMapHN] = useState([]);
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
-    console.log(fetchAmphures(province_id), "fetchAmphures(province_id)");
     fetchSubDistricts(amphure_id);
     fetchPostCodes(amphure_id);
   };
@@ -84,22 +83,14 @@ function TableCustomer({ onSearch }) {
   const handleEditModal = (IdenNumber) => {
     const customer = customers.find((p) => p.IdenNumber === IdenNumber);
     setSelectedCustomers(customer);
-    console.log("Fetching HN:", customer);
 
     if (customer.Provinces && customer.Amphures) {
-      console.log(
-        "Fetching address data:",
-        customer.Provinces,
-        customer.Amphures
-      );
       fetchAddressData(customer.Provinces, customer.Amphures);
     } else if (customer.Provinces) {
-      console.log("Fetching amphures:", customer.Provinces);
       fetchAmphures(customer.Provinces);
     }
 
     if (customer.Amphures) {
-      console.log("Fetching sub-districts:", customer.Amphures);
       fetchSubDistricts(customer.Amphures);
       fetchPostCodes(customer.Amphures);
     }
@@ -207,34 +198,31 @@ function TableCustomer({ onSearch }) {
   const handleSave = async () => {
     try {
       setShowModal(false);
-
-      const response = await fetch(
-        `${BASE_URL}/api/updateCustomer/${selectedCustomers.UID}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            IdenType: selectedCustomers.IdenType,
-            IdenNumber: selectedCustomers.IdenNumber,
-            HN: selectedCustomers.HN,
-            Gender: selectedCustomers.Gender,
-            Prefix: selectedCustomers.Prefix,
-            FirstName: selectedCustomers.FirstName,
-            LastName: selectedCustomers.LastName,
-            BirthDate: selectedCustomers.BirthDate,
-            Provinces: selectedCustomers.Provinces,
-            Amphures: selectedCustomers.Amphures,
-            Districts: selectedCustomers.Districts,
-            PostCode: selectedCustomers.PostCode,
-            Moo: selectedCustomers.Moo,
-            Address: selectedCustomers.Address,
-            MobileNo: selectedCustomers.MobileNo,
-            Email: selectedCustomers.Email,
-          }),
-        }
-      );
+      const UID = selectedCustomers.UID;
+      const response = await fetch(`${BASE_URL}/api/updateCustomer/${UID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          IdenType: selectedCustomers.IdenType,
+          IdenNumber: selectedCustomers.IdenNumber,
+          HN: selectedCustomers.HN,
+          Gender: selectedCustomers.Gender,
+          Prefix: selectedCustomers.Prefix,
+          FirstName: selectedCustomers.FirstName,
+          LastName: selectedCustomers.LastName,
+          BirthDate: selectedCustomers.BirthDate,
+          Provinces: selectedCustomers.Provinces,
+          Amphures: selectedCustomers.Amphures,
+          Districts: selectedCustomers.Districts,
+          PostCode: selectedCustomers.PostCode,
+          Moo: selectedCustomers.Moo,
+          Address: selectedCustomers.Address,
+          MobileNo: selectedCustomers.MobileNo,
+          Email: selectedCustomers.Email,
+        }),
+      });
 
       const data = await response.json();
 
@@ -311,8 +299,6 @@ function TableCustomer({ onSearch }) {
   // ดึงข้อมูลจังหวัด
   const [readProvince, setReadProvince] = useState([]);
   const fetchReadProvinceData = () => {
-    console.log("province:");
-
     fetch(BASE_URL + "/api/provinces")
       .then((response) => {
         return response.json();
@@ -324,49 +310,52 @@ function TableCustomer({ onSearch }) {
   // ดึงข้อมูลอำเภอ
   const [amphures, setAmphures] = useState([]);
   const fetchAmphures = (province_id) => {
-    console.log("Fetching amphures for province:", province_id);
-
-    fetch(BASE_URL + `/api/amphurs/${province_id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setAmphures(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching amphures:", error);
-      });
+    if (province_id !== undefined) {
+      // เพิ่มการตรวจสอบ
+      fetch(BASE_URL + `/api/amphurs/${province_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setAmphures(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching amphures:", error);
+        });
+    }
   };
+
   // ดึงข้อมูลรหัสตำบล
   const [subDistricts, setSubDistricts] = useState([]);
   const fetchSubDistricts = (amphure_id) => {
-    fetch(BASE_URL + `/api/subdistricts/${amphure_id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched sub-districts:", data); // แสดงข้อมูลในคอนโซล
-        setSubDistricts(data); // ตั้งค่า subDistricts ให้เท่ากับข้อมูลที่ได้
-      })
-      .catch((error) => {
-        console.error("Error fetching sub-districts:", error);
-      });
+    if (amphure_id !== undefined) {
+      fetch(BASE_URL + `/api/subdistricts/${amphure_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setSubDistricts(data); // ตั้งค่า subDistricts ให้เท่ากับข้อมูลที่ได้
+        })
+        .catch((error) => {
+          console.error("Error fetching sub-districts:", error);
+        });
+    }
   };
   // ดึงข้อมูลรหัสไปรษณีย์
   const [postCodes, setPostCodes] = useState([]);
   const fetchPostCodes = (amphure_id) => {
-    console.log(amphure_id, "post");
-    fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setPostCodes(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching postal codes:", error);
-      });
+    if (amphure_id !== undefined) {
+      fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setPostCodes(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching postal codes:", error);
+        });
+    }
   };
 
   // const handleClose = () => {
   //   setShowModalMapHN(false);
   // };
   const handleProvinceChange = (selectedProvince) => {
-    console.log("Selected Province:", selectedProvince);
     // สร้างอ็อบเจ็กต์ใหม่ที่มีจังหวัดเป็นค่าที่เลือก
     setSelectedCustomers({
       ...selectedCustomers,
@@ -380,7 +369,6 @@ function TableCustomer({ onSearch }) {
     fetchAmphures(selectedProvince);
   };
   const handleAmphureChange = (selectedAmphure) => {
-    console.log("Selected Amphure:", selectedAmphure);
     // สร้างอ็อบเจ็กต์ใหม่ที่มีอำเภอเป็นค่าที่เลือก
     setSelectedCustomers({
       ...selectedCustomers,
@@ -397,7 +385,6 @@ function TableCustomer({ onSearch }) {
     const selectedSubDistrict = subDistricts.find(
       (subDistrict) => subDistrict.id === selectedDistrict
     );
-    console.log("Selected District:", selectedDistrict);
 
     // อัปเดตค่ารหัสไปรษณีย์
     if (selectedSubDistrict) {
@@ -523,6 +510,7 @@ function TableCustomer({ onSearch }) {
                 </tr>
               </thead>
               <tbody>
+                {/* eslint-disable react/no-children-prop */}
                 {/* แสดงข้อมูลในตารางทั้งหมด  */}
                 {shouldShowAllData ? (
                   <>
@@ -547,9 +535,9 @@ function TableCustomer({ onSearch }) {
                               className={`status-${customer.Customer_Status}`}
                             >
                               {customer.Customer_Status === 1
-                                ? "guest"
+                                ? "ผู้ใช้ทั่วไป"
                                 : customer.Customer_Status === 2
-                                ? "member"
+                                ? "สมาชิก"
                                 : ""}
                             </h3>
                           </td>
@@ -608,9 +596,9 @@ function TableCustomer({ onSearch }) {
                                   className={`status-${customer.Customer_Status}`}
                                 >
                                   {customer.Customer_Status === 1
-                                    ? "guest"
+                                    ? "ผู้ใช้ทั่วไป"
                                     : customer.Customer_Status === 2
-                                    ? "member"
+                                    ? "สมาชิก"
                                     : ""}
                                 </h3>
                               </td>

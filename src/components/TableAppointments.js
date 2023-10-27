@@ -29,39 +29,31 @@ function TableApppointments({ onSearch }) {
   const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
   // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
   const { data: fetchedClinics = [] } = useFetch(`${BASE_URL}/api/showClinics`);
+  const { data: fetchedShowDoctors = [] } = useFetch(`${BASE_URL}/api/doctors`);
   const { data: fetchedAppointments, refetch = [] } = useFetch(
     `${BASE_URL}/api/AllAppointmentsAmin`
   );
   const [clinics, setClinics] = useState([]);
   const [doctor, setDoctor] = useState([]);
-
-  const [formData, setFormData] = useState({
-    Clinic_ID: "",
-    DoctorID: "",
-    Date: null, // เริ่มต้นเป็น null
-    timeSlot: "",
-    symptoms: "",
-  });
   useEffect(() => {
-    console.log("fetchedClinics", fetchedClinics);
-    if (
-      fetchedClinics &&
-      Array.isArray(fetchedClinics) &&
-      fetchedAppointments
-    ) {
+    if (fetchedClinics && Array.isArray(fetchedClinics)) {
       setClinics(fetchedClinics);
+    }
+    if (fetchedAppointments && Array.isArray(fetchedAppointments)) {
       setAppointmentsCustomers(fetchedAppointments);
     }
-  }, [fetchedClinics, fetchedAppointments]);
+    if (fetchedShowDoctors && Array.isArray(fetchedShowDoctors)) {
+      setDoctor(fetchedShowDoctors);
+    }
+  }, [fetchedClinics, fetchedAppointments, fetchedShowDoctors]);
+
   const fetchDoctors = async (ClinicID) => {
     try {
-      console.log(ClinicID, "ClinicID");
       const response = await fetch(
         `${BASE_URL}/api/searchDoctorClinic/${ClinicID}`
       );
       const data = await response.json();
       setDoctor(data);
-      console.log(data, "data");
     } catch (error) {
       console.error("Error fetching Doctors:", error);
     }
@@ -81,13 +73,36 @@ function TableApppointments({ onSearch }) {
       (p) => p.APM_UID === customerId
     );
     setSelectedCustomers(customer);
-    fetchDoctors(customer.Clinic_ID);
+    // fetchDoctors(customer.Clinic_ID);
     handleShowModal();
   };
-
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
     try {
+      // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
+      console.log(selectedCustomers.StatusFlag);
+      if (
+        selectedCustomers.StatusFlag > "3" &&
+        selectedCustomers.StatusFlag !== "5"
+      ) {
+        // เช็คว่ามีการกรอกช่องหรือไม่
+        if (
+          !selectedCustomers.Appointment_Date ||
+          !selectedCustomers.Appointment_Time ||
+          !selectedCustomers.Clinic ||
+          !selectedCustomers.DoctorID ||
+          !selectedCustomers.APM_No ||
+          !HN
+        ) {
+          Swal.fire({
+            title: "กรุณากรอกข้อมูลทุกช่อง!",
+            icon: "error",
+            confirmButtonText: "ตกลง",
+          });
+          handleCloseModal();
+          return;
+        }
+      }
       const response = await fetch(
         `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
         {
@@ -104,44 +119,62 @@ function TableApppointments({ onSearch }) {
               .toISOString()
               .substring(11, 16),
             Clinic: selectedCustomers.Clinic,
-            Doctor: selectedCustomers.Doctor,
+            DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
             Entryby: HN,
             EntryDatetime: new Date(),
           }),
         }
       );
-      const responseStatus = await fetch(
-        `${BASE_URL}/api/UpdateAppointmentStatus/${selectedCustomers.APM_UID}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            APM_UID: selectedCustomers.APM_UID,
-            StatusFlag: selectedCustomers.StatusFlag,
-          }),
+      if (response.status === 200) {
+        const responseStatus = await fetch(
+          `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              APM_UID: selectedCustomers.APM_UID,
+              StatusFlag: selectedCustomers.StatusFlag,
+              EntryDatetime: selectedCustomers.EntryDatetime,
+            }),
+          }
+        );
+        const data = (await response.json()) || (await responseStatus.json());
+        if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
+          Swal.fire({
+            title: "การอัปเดตสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          refetch();
+          handleCloseModal();
+        } else {
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: data.message,
+            icon: "error",
+            confirmButtonText: "ตกลง",
+          });
+          handleCloseModal();
         }
-      );
-      const data = (await response.json()) || (await responseStatus.json());
-      if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
-        Swal.fire({
-          title: "การอัปเดตสำเร็จ!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        refetch();
-        handleCloseModal();
-      } else {
-        Swal.fire({
-          title: "เกิดข้อผิดพลาด!",
-          text: data.message,
-          icon: "error",
-          confirmButtonText: "ตกลง",
-        });
       }
+      refetch();
+      setSearchResult((prevResult) =>
+        prevResult.map((customer) => {
+          if (customer.APM_UID === selectedCustomers.APM_UID) {
+            return {
+              ...customer,
+              StatusFlag: selectedCustomers.StatusFlag,
+            };
+          }
+          return customer;
+        })
+      );
+
+      handleCloseModal();
     } catch (error) {
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
@@ -149,6 +182,7 @@ function TableApppointments({ onSearch }) {
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+      handleCloseModal();
     }
   };
   // กำหนด state สำหรับการค้นหา
@@ -158,17 +192,15 @@ function TableApppointments({ onSearch }) {
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
-
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData =
     !searchResult && appointmentsCustomers && appointmentsCustomers.length > 0;
   // ตั้งค่าเริ่มต้นของจำนวนหน้า
-  const [pageCount, setPageCount] = useState(1);
 
+  const [pageCount, setPageCount] = useState(1);
   //ฟังก์ชั่นค้นหา
   const handleSearch = () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
-    console.log(searchHN);
     const searchParams = {
       HN: searchHN,
       FirstName: searchFirstName,
@@ -198,21 +230,24 @@ function TableApppointments({ onSearch }) {
   const handleInputChange = async (event) => {
     const { name, value } = event.target;
 
-    // แก้ไขตรงนี้: รีเฟรชรายการหมอเมื่อคลินิกเปลี่ยน
     if (name === "Clinic") {
-      // กำหนดค่าให้ formData หลังจากเรียก fetchDoctors เสร็จสิ้น
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        Doctor: "", // ล้างค่าหมอเมื่อคลินิกเปลี่ยน
-      }));
-
-      // เรียกใช้งาน fetchDoctors เพื่อดึงรายการหมอ
+      // รีเฟรชรายการหมอเมื่อคลินิกเปลี่ยน
       await fetchDoctors(value);
-      console.log(value, "value");
+
+      // กำหนดค่าคลินิกและหมอที่เลือกให้ selectedCustomers
+      setSelectedCustomers((prev) => ({
+        ...prev,
+        Clinic: value,
+        DoctorID: "", // ล้างค่าแพทย์เมื่อคลินิกเปลี่ยน
+      }));
+    } else if (name === "Doctor") {
+      // กำหนดค่าแพทย์ที่เลือกให้ selectedCustomers
+      setSelectedCustomers((prev) => ({
+        ...prev,
+        DoctorID: value,
+      }));
     } else {
-      // ถ้าไม่ใช่คลินิก ให้เปลี่ยนค่าเฉพาะ name
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setSelectedCustomers((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -369,13 +404,13 @@ function TableApppointments({ onSearch }) {
                             <td>
                               <h3 className={`status-${customer.StatusFlag}`}>
                                 {customer.StatusFlag === "3"
-                                  ? "pending"
+                                  ? "รอยืนยัน"
                                   : customer.StatusFlag === "4"
-                                  ? "confirmed"
+                                  ? "ยืนยันนัดหมาย"
                                   : customer.StatusFlag === "5"
-                                  ? "cancelled"
+                                  ? "ยกเลิกนัดหมาย"
                                   : customer.StatusFlag === "6"
-                                  ? "complete"
+                                  ? "เสร็จสมบูรณ์"
                                   : "unknown"}{" "}
                               </h3>
                             </td>
@@ -434,13 +469,13 @@ function TableApppointments({ onSearch }) {
                                     className={`status-${customer.StatusFlag}`}
                                   >
                                     {customer.StatusFlag === "3"
-                                      ? "pending"
+                                      ? "รอยืนยัน"
                                       : customer.StatusFlag === "4"
-                                      ? "confirmed"
+                                      ? "ยืนยันนัดหมาย"
                                       : customer.StatusFlag === "5"
-                                      ? "cancelled"
+                                      ? "ยกเลิกนัดหมาย"
                                       : customer.StatusFlag === "6"
-                                      ? "complete"
+                                      ? "เสร็จสมบูรณ์"
                                       : "unknown"}{" "}
                                   </h3>
                                 </td>
@@ -577,8 +612,7 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               name="Clinic"
-                              value={selectedCustomers.Clinic_ID}
-                              style={{ height: "40px" }}
+                              value={selectedCustomers.Clinic}
                               onChange={handleInputChange}
                             >
                               {clinics &&
@@ -601,8 +635,7 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               name="Doctor"
-                              value={selectedCustomers.Doctor}
-                              style={{ height: "40px" }}
+                              value={selectedCustomers.DoctorID}
                               onChange={handleInputChange}
                             >
                               {doctor &&

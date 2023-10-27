@@ -25,9 +25,7 @@ function useTokenCheck() {
             User_Name: data.decoded.User_Name,
             User_Status: data.decoded.User_Status,
           });
-          console.log(data);
         } else {
-          console.log(data.status);
           alert("Token หมดอายุ");
           localStorage.removeItem("token");
           window.location = "/login";

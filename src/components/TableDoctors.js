@@ -60,7 +60,7 @@ function TableDoctors({ onSearch }) {
   // const [selectedDoctorImage, setSelectedDoctorImage] = useState(null);
 
   const [searchDoctorName, setSearchDoctorName] = useState(""); // state สำหรับเก็บค่าที่กรอก
-  const [clinicsSearch, setClinicsSearch] = useState([]);
+  const [clinicsSearch, setClinicsSearch] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData =
     !searchResult && displayedDoctors && displayedDoctors.length > 0;
@@ -103,10 +103,8 @@ function TableDoctors({ onSearch }) {
       });
   }, []);
   const handleEditModal = (DoctorID) => {
-    console.log(DoctorID);
     const doctorToEdit = displayedDoctors.find((p) => p.DoctorID === DoctorID);
     setSelectedDoctor(doctorToEdit);
-    console.log(doctorToEdit, "setSelectedDoctor(doctorToEdit)");
     handleShowEdite();
   };
 
@@ -121,7 +119,6 @@ function TableDoctors({ onSearch }) {
     if (doctorImage) {
       formData.append("Doctor_Image", doctorImage);
     }
-    console.log(formData, "formData");
     try {
       const response = await fetch(`${BASE_URL}/api/doctorsInsert`, {
         method: "POST",
@@ -183,7 +180,6 @@ function TableDoctors({ onSearch }) {
       );
 
       const data = await response.json();
-      console.log(data);
       if (data.message === "Doctor updated successfully!") {
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
@@ -269,7 +265,6 @@ function TableDoctors({ onSearch }) {
       Doctor_Name: searchDoctorName,
       Clinic_ID: clinicsSearch,
     };
-    console.log(searchParams);
     fetch(BASE_URL + "/api/searchDoctor", {
       method: "POST",
       headers: {
@@ -279,8 +274,8 @@ function TableDoctors({ onSearch }) {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data, "data");
         setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
-        console.log(setSearchResult(data.result), "data.result");
         const newPageCount = Math.ceil(data.result.length / perPage);
         setPageCount(newPageCount);
         setCurrentPage(0);
@@ -306,8 +301,6 @@ function TableDoctors({ onSearch }) {
   };
   const [ClinicShow, setClinicShow] = useState([]);
   useEffect(() => {
-    console.log("9999999999999");
-
     fetch(BASE_URL + "/api/showClinics")
       .then((response) => {
         return response.json();
