@@ -297,9 +297,8 @@ function TableDepartments({ onSearch }) {
                       .map((department, index) => (
                         <tr key={department.Clinic_ID} className="text-center">
                           <td>
-                            {" "}
                             <h3>{index + 1} </h3>
-                          </td>{" "}
+                          </td>
                           {/* แสดงลำดับ */}
                           <td>
                             <h3>{department.Clinic_Name}</h3>
@@ -312,7 +311,7 @@ function TableDepartments({ onSearch }) {
                               }
                             >
                               <h4>จัดการ</h4>
-                            </Button>{" "}
+                            </Button>
                             {/* <Button variant="danger" onClick={() => handleDelete()}>
                                           <h4>ลบ</h4>
                                         </Button> */}
@@ -338,7 +337,7 @@ function TableDepartments({ onSearch }) {
                             >
                               <td>
                                 <h3>{index + 1}</h3>
-                              </td>{" "}
+                              </td>
                               {/* แสดงลำดับ */}
                               <td>
                                 <h3>{department.Clinic_Name}</h3>
@@ -351,7 +350,7 @@ function TableDepartments({ onSearch }) {
                                   }
                                 >
                                   <h4>จัดการ</h4>
-                                </Button>{" "}
+                                </Button>
                                 {/* <Button variant="danger" onClick={() => handleDelete()}>
                                           <h4>ลบ</h4>
                                         </Button> */}
@@ -360,9 +359,11 @@ function TableDepartments({ onSearch }) {
                           ))}
                       </>
                     ) : (
-                      <div>
-                        <h1>No results found.</h1>
-                      </div>
+                      <tr className="text-center">
+                        <td colSpan={4}>
+                          <h2>ไม่มีข้อมูล</h2>
+                        </td>
+                      </tr>
                     )}
                   </>
                 )}
@@ -393,7 +394,7 @@ function TableDepartments({ onSearch }) {
           {/* เพิ่มแผนก  */}
           <Modal show={show} onHide={handleClose}>
             <Modal.Header>
-              <Modal.Title className="font">เพิ่มแผนก </Modal.Title>{" "}
+              <Modal.Title className="font">เพิ่มแผนก </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Card>
@@ -435,7 +436,7 @@ function TableDepartments({ onSearch }) {
           </Modal>
           <Modal show={showEdite} onHide={handleCloseEdite}>
             <Modal.Header>
-              <Modal.Title className="font">จัดการแผนก </Modal.Title>{" "}
+              <Modal.Title className="font">จัดการแผนก </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               {selectedClinics && (

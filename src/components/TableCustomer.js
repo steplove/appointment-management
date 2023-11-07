@@ -295,7 +295,7 @@ function TableCustomer({ onSearch }) {
     fetchAmphures();
     fetchSubDistricts();
     fetchPostCodes();
-  }, []);
+  });
   // ดึงข้อมูลจังหวัด
   const [readProvince, setReadProvince] = useState([]);
   const fetchReadProvinceData = () => {
@@ -338,7 +338,7 @@ function TableCustomer({ onSearch }) {
     }
   };
   // ดึงข้อมูลรหัสไปรษณีย์
-  const [postCodes, setPostCodes] = useState([]);
+  const [setPostCodes] = useState([]);
   const fetchPostCodes = (amphure_id) => {
     if (amphure_id !== undefined) {
       fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
@@ -519,9 +519,9 @@ function TableCustomer({ onSearch }) {
                       .map((customer, index) => (
                         <tr key={customer.UID} className="text-center">
                           <td className="text-center">
-                            {" "}
+                            
                             <h3>{index + 1}</h3>
-                          </td>{" "}
+                          </td>
                           <td>
                             <h3>
                               {customer.FirstName} {customer.LastName}
@@ -549,7 +549,7 @@ function TableCustomer({ onSearch }) {
                               }
                             >
                               <h4>จัดการ</h4>
-                            </Button>{" "}
+                            </Button>
                             {customer.Customer_Status === 1 ? (
                               <Button
                                 variant="danger"
@@ -580,9 +580,8 @@ function TableCustomer({ onSearch }) {
                           .map((customer, index) => (
                             <tr key={customer.UID} className="text-center">
                               <td className="text-center">
-                                {" "}
                                 <h3>{index + 1}</h3>
-                              </td>{" "}
+                              </td>
                               <td>
                                 <h3>
                                   {customer.FirstName} {customer.LastName}
@@ -610,7 +609,7 @@ function TableCustomer({ onSearch }) {
                                   }
                                 >
                                   <h4>จัดการ</h4>
-                                </Button>{" "}
+                                </Button>
                                 {customer.Customer_Status === 1 ? (
                                   <Button
                                     variant="danger"
@@ -629,9 +628,11 @@ function TableCustomer({ onSearch }) {
                           ))}
                       </>
                     ) : (
-                      <div>
-                        <h1>No results found.</h1>
-                      </div>
+                      <tr className="text-center">
+                        <td colSpan={4}>
+                          <h2>ไม่มีข้อมูล</h2>
+                        </td>
+                      </tr>
                     )}
                   </>
                 )}
@@ -687,9 +688,9 @@ function TableCustomer({ onSearch }) {
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
-                          {" "}
+                          
                           <h4>{index + 1}</h4>
-                        </td>{" "}
+                        </td>
                         <td>
                           <h4> {hnData.TypeRefno} </h4>
                         </td>
@@ -741,7 +742,7 @@ function TableCustomer({ onSearch }) {
           {/* modal edite  */}
           <Modal show={showModal} onHide={handleCloseModal} size="lg">
             <Modal.Header>
-              <Modal.Title className="font">จัดการลูกค้า </Modal.Title>{" "}
+              <Modal.Title className="font">จัดการลูกค้า </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               {selectedCustomers && (

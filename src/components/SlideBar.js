@@ -2,7 +2,7 @@ import React from "react";
 import useTokenCheck from "../hooks/useTokenCheck";
 
 function SlideBar() {
-  const [firstName] = useTokenCheck();
+  const [User_Code, , User_Status] = useTokenCheck();
   const currentPath = window.location.pathname;
   return (
     <div>
@@ -11,13 +11,23 @@ function SlideBar() {
           <ul className="nav metismenu" id="side-menu">
             <li className="nav-header">
               <div className="dropdown profile-element">
-                <a
-                  data-toggle="dropdown"
-                  className="dropdown-toggle"
-                  href={"/"}
+                <span
+                  className="block m-t-xs font-bold"
+                  style={{ color: "white" }}
                 >
-                  <span className="block m-t-xs font-bold">{firstName}</span>
-                </a>
+                  ผู้ใช้ : {User_Code}
+                </span>
+                <span
+                  className="block m-t-xs font-bold"
+                  style={{ color: "white" }}
+                >
+                  สถานะ :{" "}
+                  {User_Status === 1
+                    ? "admin"
+                    : User_Status === 2
+                    ? "member"
+                    : "unknow"}
+                </span>
               </div>
               <div className="logo-element">IN+</div>
             </li>
@@ -27,29 +37,61 @@ function SlideBar() {
                 <span className="nav-label">จัดการนัดหมาย</span>{" "}
               </a>
             </li>
-            <li className={currentPath === "/Customers" ? "active" : ""}>
-              <a href="/Customers">
-                <i className="fa fa-user"></i>{" "}
-                <span className="nav-label">จัดการผู้ใช้</span>{" "}
-              </a>
+            <li
+              className={
+                currentPath === "/Customers" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Customers">
+                  <i className="fa fa-user"></i>{" "}
+                  <span className="nav-label">จัดการผู้ใช้</span>{" "}
+                </a>
+              )}
             </li>
-            <li className={currentPath === "/Departments" ? "active" : ""}>
-              <a href="/Departments">
-                <i className="fa fa-user"></i>{" "}
-                <span className="nav-label">จัดการแผนก</span>{" "}
-              </a>
+            <li
+              className={
+                currentPath === "/Departments" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Departments">
+                  <i className="fa fa-user"></i>{" "}
+                  <span className="nav-label">จัดการแผนก</span>{" "}
+                </a>
+              )}
             </li>
-            <li className={currentPath === "/Doctors" ? "active" : ""}>
-              <a href="/Doctors">
-                <i className="fa fa-user"></i>{" "}
-                <span className="nav-label">จัดการแพทย์</span>{" "}
-              </a>
+            <li
+              className={
+                currentPath === "/Doctors" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Doctors">
+                  <i className="fa fa-user"></i>{" "}
+                  <span className="nav-label">จัดการแพทย์</span>{" "}
+                </a>
+              )}
             </li>
-            <li className={currentPath === "/Employees" ? "active" : ""}>
-              <a href="/Employees">
-                <i className="fa fa-user"></i>{" "}
-                <span className="nav-label">จัดการพนักงาน</span>{" "}
-              </a>
+            <li
+              className={
+                currentPath === "/Employees" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Employees">
+                  <i className="fa fa-user"></i>{" "}
+                  <span className="nav-label">จัดการพนักงาน</span>{" "}
+                </a>
+              )}
             </li>
           </ul>
         </div>

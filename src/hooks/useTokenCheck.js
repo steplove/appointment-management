@@ -8,17 +8,19 @@ function useTokenCheck() {
     User_Status: "",
   });
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(BASE_URL + "/api/authenEmployee", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
+  async function fetchData() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(BASE_URL + "/api/authenEmployee", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
         if (data.status === "ok") {
           setUserData({
             User_Code: data.decoded.User_Code,
@@ -30,15 +32,17 @@ function useTokenCheck() {
           localStorage.removeItem("token");
           window.location = "/login";
         }
-      })
-      .catch((error) => {
-        console.log("Error", error);
-      });
+      } else {
+        throw new Error("ไม่สามารถดึงข้อมูลได้");
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาด", error);
+    }
+  }
+  useEffect(() => {
+    fetchData();
   }, []);
-  return [
-    userData.User_Code,
-    userData.User_Name,
-    userData.User_Status,
-  ];
+  return [userData.User_Code, userData.User_Name, userData.User_Status];
 }
+
 export default useTokenCheck;

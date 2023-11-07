@@ -47,7 +47,7 @@ function Dashboard() {
             <div className="widget style1 red-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "1.5rem" }}>
                     {Status_3_Count}
                   </h1>
                 </div>
@@ -61,7 +61,7 @@ function Dashboard() {
             <div className="widget style1 lazur-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "1.5rem" }}>
                     {Status_Date_Today}
                   </h1>
                 </div>
@@ -75,7 +75,7 @@ function Dashboard() {
             <div className="widget style1 yellow-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "1.5rem" }}>
                     {All_Appointments_Count}
                   </h1>
                 </div>
@@ -89,7 +89,7 @@ function Dashboard() {
             <div className="widget style1 blue-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "1.5rem" }}>
                     {count}
                   </h1>
                 </div>
@@ -103,7 +103,7 @@ function Dashboard() {
             <div className="widget style1 navy-bg">
               <div className="row">
                 <div className="col-4 text-center">
-                  <h1 className="font-bold" style={{ fontSize: "3rem" }}>
+                  <h1 className="font-bold" style={{ fontSize: "1.5rem" }}>
                     {Status_1_Count}
                   </h1>
                 </div>

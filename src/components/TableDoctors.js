@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-// import useTokenCheck from "../hooks/useTokenCheck";
+ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
 function TableDoctors({ onSearch }) {
+  useTokenCheck();
+
   const {
     data: doctors = [],
     loading,

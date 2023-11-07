@@ -7,6 +7,7 @@ import {
   InputGroup,
   Col,
   Row,
+  Table,
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
@@ -15,7 +16,17 @@ import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
 function TableApppointments({ onSearch }) {
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
-  const [HN] = useTokenCheck();
+  const [User_Code] = useTokenCheck();
+  useEffect(() => {
+    async function fetchDataAndLog() {
+      if (User_Code) {
+        // ตรวจสอบว่า User_Code มีค่าหรือไม่
+        console.log(User_Code, "SH");
+      }
+    }
+
+    fetchDataAndLog();
+  }, [User_Code]);
   // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
   const [appointmentsCustomers, setAppointmentsCustomers] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -25,8 +36,8 @@ function TableApppointments({ onSearch }) {
     setCurrentPage(selectedPage.selected);
   };
   // คำนวณ offset และข้อมูลที่จะแสดงในหน้าปัจจุบัน
-  const offset = currentPage * perPage;
-  const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
+  // const offset = currentPage * perPage;
+  // const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
   // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
   const { data: fetchedClinics = [] } = useFetch(`${BASE_URL}/api/showClinics`);
   const { data: fetchedShowDoctors = [] } = useFetch(`${BASE_URL}/api/doctors`);
@@ -66,7 +77,12 @@ function TableApppointments({ onSearch }) {
   const [showModal, setShowModal] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+  const [showModalSearchAPM_No, setShowModalSearchAPM_No] = useState(false);
+  const handleShowModalSearchAPM_No = () => setShowModalSearchAPM_No(true);
+  const handleCloseModalSearchAPM_No = () => setShowModalSearchAPM_No(false);
   const [selectedCustomers, setSelectedCustomers] = useState(null);
+  const [searchAPM_No, setSearchAPM_No] = useState([]);
+
   //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
   const handleEditModal = (customerId) => {
     const customer = appointmentsCustomers.find(
@@ -80,7 +96,15 @@ function TableApppointments({ onSearch }) {
   const handleSave = async () => {
     try {
       // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
-      console.log(selectedCustomers.StatusFlag);
+      selectedCustomers.Entryby = User_Code;
+      console.log(
+        selectedCustomers.APM_No,
+        selectedCustomers.Appointment_Date,
+        selectedCustomers.Appointment_Time,
+        selectedCustomers.Clinic,
+        selectedCustomers,
+        "selectedAppointmentNoselectedAppointmentNo"
+      );
       if (
         selectedCustomers.StatusFlag > "3" &&
         selectedCustomers.StatusFlag !== "5"
@@ -92,10 +116,29 @@ function TableApppointments({ onSearch }) {
           !selectedCustomers.Clinic ||
           !selectedCustomers.DoctorID ||
           !selectedCustomers.APM_No ||
-          !HN
+          !selectedCustomers.Entryby
         ) {
           Swal.fire({
             title: "กรุณากรอกข้อมูลทุกช่อง!",
+            icon: "error",
+            confirmButtonText: "ตกลง",
+          });
+          handleCloseModal();
+          return;
+        }
+      } else {
+        // ตรวจสอบว่ามีค่า `null` ในข้อมูลที่คุณต้องการ
+        if (
+          selectedCustomers.Appointment_Date === null ||
+          selectedCustomers.Appointment_Time === null ||
+          selectedCustomers.Clinic === null ||
+          selectedCustomers.DoctorID === null ||
+          selectedCustomers.APM_No === null ||
+          selectedCustomers.Entryby === null
+        ) {
+          // แจ้งเตือนให้ลองอีกครั้ง
+          Swal.fire({
+            title: "กรุณาลองใหม่อีกครั้ง!",
             icon: "error",
             confirmButtonText: "ตกลง",
           });
@@ -121,12 +164,13 @@ function TableApppointments({ onSearch }) {
             Clinic: selectedCustomers.Clinic,
             DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
-            Entryby: HN,
+            Entryby: selectedCustomers.Entryby,
             EntryDatetime: new Date(),
           }),
         }
       );
       if (response.status === 200) {
+        console.log("111");
         const responseStatus = await fetch(
           `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
           {
@@ -150,6 +194,18 @@ function TableApppointments({ onSearch }) {
             timer: 1500,
           });
           refetch();
+          setSearchResult((prevResult) =>
+            (prevResult || []).map((customer) => {
+              if (customer.APM_UID === selectedCustomers.APM_UID) {
+                return {
+                  ...customer,
+                  StatusFlag: selectedCustomers.StatusFlag,
+                };
+              }
+              return customer;
+            })
+          );
+
           handleCloseModal();
         } else {
           Swal.fire({
@@ -162,18 +218,6 @@ function TableApppointments({ onSearch }) {
         }
       }
       refetch();
-      setSearchResult((prevResult) =>
-        prevResult.map((customer) => {
-          if (customer.APM_UID === selectedCustomers.APM_UID) {
-            return {
-              ...customer,
-              StatusFlag: selectedCustomers.StatusFlag,
-            };
-          }
-          return customer;
-        })
-      );
-
       handleCloseModal();
     } catch (error) {
       Swal.fire({
@@ -185,6 +229,43 @@ function TableApppointments({ onSearch }) {
       handleCloseModal();
     }
   };
+
+  //ฟังก์ชั่นค้นหาหมายเลขนัด
+  const searchAppointmentsNumber = async (selectedCustomers) => {
+    handleShowModalSearchAPM_No();
+    handleCloseModal();
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/searchAllAppointment/?HN=${selectedCustomers.HN}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSearchAPM_No(data);
+      } else {
+        console.error("Failed to fetch data");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const [selectedAPM_No, setSelectedAPM_No] = useState([]);
+  // หากคุณต้องการเพิ่ม/ลบรายการจากการเลือกในสถานะการเลือก
+  const toggleSelection = (hnData) => {
+    if (selectedAPM_No.includes(hnData)) {
+      // ถ้า hnData อยู่ในรายการที่ถูกเลือกอยู่แล้ว ให้นำออกจากรายการที่เลือก
+      setSelectedAPM_No([hnData]);
+    } else {
+      // ถ้า hnData ยังไม่ได้ถูกเลือก ให้เลือกเฉพาะ hnData นี้
+      setSelectedAPM_No([hnData]);
+    }
+  };
+
+  // useEffect(() => {
+  //   // เมื่อ selectedAPM_No เปลี่ยนแปลง คุณสามารถทำสิ่งที่คุณต้องการเมื่อเรียกเลือกรายการ
+  //   console.log(selectedAPM_No[0]);
+  // }, [selectedAPM_No]);
+
   // กำหนด state สำหรับการค้นหา
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -250,7 +331,41 @@ function TableApppointments({ onSearch }) {
       setSelectedCustomers((prev) => ({ ...prev, [name]: value }));
     }
   };
+  const [selectedAppointmentNo, setSelectedAppointmentNo] = useState("");
+  // ฟังก์ชั่นเพิ่มเลขนัดหมาย
+  const handleInsertAPM_No = () => {
+    handleCloseModalSearchAPM_No();
+    handleShowModal();
+    setShowModalSearchAPM_No(false);
 
+    if (selectedAPM_No.length === 1) {
+      // ทดสอบแสดงค่าที่ถูกส่งไปที่คอนโซล
+      // console.log(selectedAPM_No[0]);
+    } else {
+      alert("โปรดเลือกรายการเพียง 1 รายการเท่านั้น");
+    }
+    const selectedAppointmentNo = selectedAPM_No[0].AppointmentNo;
+    setSelectedAppointmentNo(selectedAppointmentNo);
+
+    // อัพเดท selectedCustomers
+    setSelectedCustomers({
+      ...selectedCustomers,
+      APM_No: selectedAppointmentNo,
+    });
+  };
+  if (!User_Code)
+    return (
+      <div className="spiner-example">
+        <div className="sk-spinner sk-spinner-three-bounce">
+          <div className="sk-bounce1"></div>
+          <div className="sk-bounce2"></div>
+          <div className="sk-bounce3"></div>
+        </div>
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
   return (
     <div className="wrapper wrapper-content animated fadeInRight">
       <div className="row">
@@ -351,6 +466,9 @@ function TableApppointments({ onSearch }) {
                 <thead>
                   <tr>
                     <th>
+                      <h3>ลำดับ</h3>
+                    </th>
+                    <th>
                       <h3>HN</h3>
                     </th>
                     <th>
@@ -378,8 +496,11 @@ function TableApppointments({ onSearch }) {
                           currentPage * perPage,
                           (currentPage + 1) * perPage
                         )
-                        .map((customer) => (
+                        .map((customer, index) => (
                           <tr key={customer.APM_UID}>
+                            <td>
+                              <h3>{index + 1}</h3>
+                            </td>
                             <td>
                               <h3>{customer.HN}</h3>
                             </td>
@@ -390,7 +511,6 @@ function TableApppointments({ onSearch }) {
                             </td>
                             <td>
                               <h3>
-                                {" "}
                                 {new Date(
                                   customer.Appointment_Date
                                 ).toLocaleDateString()}
@@ -411,7 +531,7 @@ function TableApppointments({ onSearch }) {
                                   ? "ยกเลิกนัดหมาย"
                                   : customer.StatusFlag === "6"
                                   ? "เสร็จสมบูรณ์"
-                                  : "unknown"}{" "}
+                                  : "unknown"}
                               </h3>
                             </td>
                             <td>
@@ -422,7 +542,7 @@ function TableApppointments({ onSearch }) {
                                 }
                               >
                                 จัดการ
-                              </Button>{" "}
+                              </Button>
                             </td>
                           </tr>
                         ))}
@@ -437,8 +557,11 @@ function TableApppointments({ onSearch }) {
                               currentPage * perPage,
                               (currentPage + 1) * perPage
                             )
-                            .map((customer) => (
+                            .map((customer, index) => (
                               <tr key={customer.APM_UID}>
+                                <td>
+                                  <h3>{index + 1}</h3>
+                                </td>
                                 <td>
                                   <h3>{customer.HN}</h3>
                                 </td>
@@ -449,7 +572,6 @@ function TableApppointments({ onSearch }) {
                                 </td>
                                 <td>
                                   <h3>
-                                    {" "}
                                     {new Date(
                                       customer.Appointment_Date
                                     ).toLocaleDateString()}
@@ -460,7 +582,7 @@ function TableApppointments({ onSearch }) {
                                     {customer.Appointment_Time.substring(
                                       11,
                                       16
-                                    )}{" "}
+                                    )}
                                     น.
                                   </h3>
                                 </td>
@@ -476,7 +598,7 @@ function TableApppointments({ onSearch }) {
                                       ? "ยกเลิกนัดหมาย"
                                       : customer.StatusFlag === "6"
                                       ? "เสร็จสมบูรณ์"
-                                      : "unknown"}{" "}
+                                      : "unknown"}
                                   </h3>
                                 </td>
                                 <td>
@@ -487,15 +609,15 @@ function TableApppointments({ onSearch }) {
                                     }
                                   >
                                     จัดการ
-                                  </Button>{" "}
+                                  </Button>
                                 </td>
                               </tr>
                             ))}
                         </>
                       ) : (
-                        <div>
-                          <h1>No results found.</h1>
-                        </div>
+                        <tr key="no-data">
+                          <td colSpan="7">No data available</td>
+                        </tr>
                       )}
                     </>
                   )}
@@ -525,7 +647,7 @@ function TableApppointments({ onSearch }) {
             {/* modal  */}
             <Modal show={showModal} onHide={handleCloseModal} size="lg">
               <Modal.Header>
-                <Modal.Title className="font">จัดการนัดหมาย </Modal.Title>{" "}
+                <Modal.Title className="font">จัดการนัดหมาย </Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 {selectedCustomers && (
@@ -635,7 +757,7 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               name="Doctor"
-                              value={selectedCustomers.DoctorID}
+                              value={selectedCustomers.Doctor}
                               onChange={handleInputChange}
                             >
                               {doctor &&
@@ -652,12 +774,12 @@ function TableApppointments({ onSearch }) {
                           </Form.Group>
                         </Col>
                         <br />
-                        <Col xs={6}>
+                        <Col xs={4}>
                           <Form.Group>
                             <Form.Label>หมายเลขนัดหมาย</Form.Label>
                             <Form.Control
                               placeholder="หมายเลขนัดหมาย"
-                              value={selectedCustomers.APM_No}
+                              value={selectedCustomers.APM_No || ""} // กำหนดค่าเริ่มต้นเป็น ''
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -665,6 +787,20 @@ function TableApppointments({ onSearch }) {
                                 })
                               }
                             />
+                          </Form.Group>
+                        </Col>
+
+                        <br />
+                        <Col xs={2} style={{ marginTop: "27px" }}>
+                          <Form.Group>
+                            <Button
+                              variant="success"
+                              onClick={() =>
+                                searchAppointmentsNumber(selectedCustomers)
+                              }
+                            >
+                              ค้นหา
+                            </Button>
                           </Form.Group>
                         </Col>
                         <br />
@@ -702,6 +838,84 @@ function TableApppointments({ onSearch }) {
                 </Button>
                 <Button variant="success" onClick={handleSave}>
                   บันทึก
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            <Modal
+              show={showModalSearchAPM_No}
+              onHide={handleCloseModalSearchAPM_No}
+              style={{ width: "100%", height: "100%" }}
+              size="lg"
+              aria-labelledby="contained-modal-title-vcenter"
+              centered
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>นัดหมาย</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr className="text-center">
+                      <th>ลำดับ</th>
+                      <th>เลขนัด</th>
+                      <th>HN</th>
+                      <th>รหัสแพทย์</th>
+                      <th>ชื่อแพทย์</th>
+                      <th>คลินิก</th>
+                      <th>วันที่</th>
+                      <th>เวลา</th>
+                      <th>เครื่องมือ</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-center">
+                    {searchAPM_No && searchAPM_No.length > 0 ? (
+                      searchAPM_No.map((hnData, index) => (
+                        <tr key={hnData.RefNo}>
+                          <td>
+                            <h4>{index + 1}</h4>
+                          </td>
+                          <td>
+                            <h4>{hnData.AppointmentNo}</h4>
+                          </td>
+                          <td>
+                            <h4>{hnData.HN}</h4>
+                          </td>
+                          <td>
+                            <h4>{hnData.Doctor}</h4>
+                          </td>
+                          <td>
+                            <h4>{hnData.DoctorName}</h4>
+                          </td>
+                          <td>{hnData.ClinicName}</td>
+                          <td>{hnData.AppointDate}</td>
+                          <td>{hnData.AppointTime}</td>
+                          <td>
+                            <input
+                              type="checkbox"
+                              checked={selectedAPM_No.includes(hnData)}
+                              onChange={() => toggleSelection(hnData)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr key="no-data">
+                        <td colSpan="8">No data available</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+              </Modal.Body>
+
+              <Modal.Footer>
+                <Button variant="primary" onClick={handleInsertAPM_No}>
+                  ยืนยัน
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleCloseModalSearchAPM_No}
+                >
+                  Close
                 </Button>
               </Modal.Footer>
             </Modal>

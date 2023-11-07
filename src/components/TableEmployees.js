@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-// import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import { useAlert } from "../hooks/useAlert";
 function TableEmployees({ onSearch }) {
+
   const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
@@ -42,7 +42,7 @@ function TableEmployees({ onSearch }) {
       const totalPageCount = Math.ceil(users.length / dataPerPage);
       setPageCount(totalPageCount);
     }
-  }, [users, currentPage]);
+  }, [users, currentPage, searchResult]);
 
   // ฟังก์ชั่นสำหรับการจัดการเมื่อมีการเปลี่ยนหน้าผ่าน ReactPaginate
   const handlePageChange = ({ selected }) => {
@@ -144,6 +144,17 @@ function TableEmployees({ onSearch }) {
           timer: 1500,
         });
         refetch();
+        setSearchResult((prevResult) =>
+          (prevResult || []).map((employee) => {
+            if (employee.User_Code === selectedUsers.User_Code) {
+              return {
+                ...employee,
+                User_Status: selectedUsers.User_Status,
+              };
+            }
+            return employee;
+          })
+        );
         handleCloseEdite(); // ปิด modal
       } else {
         showAlert({
@@ -153,6 +164,8 @@ function TableEmployees({ onSearch }) {
           confirmButtonText: "ตกลง",
         });
       }
+      refetch();
+      handleCloseEdite(); // ปิด modal
     } catch (error) {
       showAlert({
         title: "เกิดข้อผิดพลาด!",
@@ -160,6 +173,7 @@ function TableEmployees({ onSearch }) {
         icon: "error",
         confirmButtonText: "ตกลง",
       });
+      handleCloseEdite(); // ปิด modal
     }
   };
 
@@ -218,7 +232,7 @@ function TableEmployees({ onSearch }) {
       .then((response) => response.json())
       .then((data) => {
         setSearchResult(data.result);
-        const newPageCount = Math.ceil(data.length / dataPerPage);
+        const newPageCount = Math.ceil(data.result.length / dataPerPage);
         setPageCount(newPageCount);
         setCurrentPage(0);
       })
@@ -369,19 +383,19 @@ function TableEmployees({ onSearch }) {
                       .map((employee, index) => (
                         <tr key={employee.User_ID} className="text-center">
                           <td>
-                            {" "}
                             <h3>{index + 1} </h3>
-                          </td>{" "}
+                          </td>
                           {/* แสดงลำดับ */}
                           <td>
-                            {" "}
                             <h3>{employee.User_Code} </h3>
                           </td>
                           <td>
                             <h3>{employee.User_Name}</h3>
                           </td>
                           <td>
-                            {employee.User_Status === 0 ? (
+                            {employee.User_Status === 1 ? (
+                              <span className="greenDot"></span>
+                            ) : employee.User_Status === 2 ? (
                               <span className="greenDot"></span>
                             ) : (
                               <span className="redDot"></span>
@@ -395,7 +409,7 @@ function TableEmployees({ onSearch }) {
                               }
                             >
                               <h4>จัดการ</h4>
-                            </Button>{" "}
+                            </Button>
                             {/* <Button variant="danger" onClick={() => handleDelete()}>
                                           <h4>ลบ</h4>
                                         </Button> */}
@@ -416,19 +430,19 @@ function TableEmployees({ onSearch }) {
                           .map((employee, index) => (
                             <tr key={employee.User_ID} className="text-center">
                               <td>
-                                {" "}
                                 <h3>{index + 1} </h3>
-                              </td>{" "}
+                              </td>
                               {/* แสดงลำดับ */}
                               <td>
-                                {" "}
                                 <h3>{employee.User_Code} </h3>
                               </td>
                               <td>
                                 <h3>{employee.User_Name}</h3>
                               </td>
                               <td>
-                                {employee.User_Status === 0 ? (
+                                {employee.User_Status === 1 ? (
+                                  <span className="greenDot"></span>
+                                ) : employee.User_Status === 2 ? (
                                   <span className="greenDot"></span>
                                 ) : (
                                   <span className="redDot"></span>
@@ -442,7 +456,7 @@ function TableEmployees({ onSearch }) {
                                   }
                                 >
                                   <h4>จัดการ</h4>
-                                </Button>{" "}
+                                </Button>
                                 {/* <Button variant="danger" onClick={() => handleDelete()}>
                                             <h4>ลบ</h4>
                                           </Button> */}
@@ -451,7 +465,11 @@ function TableEmployees({ onSearch }) {
                           ))}
                       </>
                     ) : (
-                      <h1>No results found.</h1>
+                      <tr className="text-center">
+                        <td colSpan={5}>
+                          <h2>ไม่มีข้อมูล</h2>
+                        </td>
+                      </tr>
                     )}
                   </>
                 )}
@@ -525,8 +543,9 @@ function TableEmployees({ onSearch }) {
                     onChange={(e) => setUserStatus(e.target.value)}
                   >
                     <option value="">เลือกประเภท</option>
-                    <option value="0">active</option>
-                    <option value="1">inactive</option>
+                    <option value="1">admin</option>
+                    <option value="2">member</option>
+                    <option value="3">inactive</option>
                   </Form.Control>
                 </Form.Group>
               </Form>
@@ -594,8 +613,9 @@ function TableEmployees({ onSearch }) {
                       }
                     >
                       <option>เลือกประเภท</option>
-                      <option value="0">active</option>
-                      <option value="1">inactive</option>
+                      <option value="1">admin</option>
+                      <option value="2">member</option>
+                      <option value="3">inactive</option>
                     </Form.Control>
                   </Form.Group>
                 </Form>
