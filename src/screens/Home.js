@@ -7,7 +7,7 @@ import SlideBar from "../components/SlideBar";
 import useTokenCheck from "../hooks/useTokenCheck";
 function Home() {
   const [, , User_Status] = useTokenCheck();
-  console.log(User_Status);
+  if(User_Status){}
   if (User_Status === 1 || User_Status === 2) {
     return (
       <>

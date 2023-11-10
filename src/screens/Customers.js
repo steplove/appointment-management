@@ -7,7 +7,7 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { Container } from "react-bootstrap";
 function Customers() {
   const [, , User_Status] = useTokenCheck();
-  console.log(User_Status);
+  if(User_Status){}
   if (User_Status === 1) {
     return (
       <>

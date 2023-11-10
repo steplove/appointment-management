@@ -294,7 +294,6 @@ function TableCustomer({ onSearch }) {
     fetchReadProvinceData();
     fetchAmphures();
     fetchSubDistricts();
-    fetchPostCodes();
   }, []);
   // ดึงข้อมูลจังหวัด
   const [readProvince, setReadProvince] = useState([]);
@@ -338,7 +337,8 @@ function TableCustomer({ onSearch }) {
     }
   };
   // ดึงข้อมูลรหัสไปรษณีย์
-  const [setPostCodes] = useState([]);
+  const [postCodes, setPostCodes] = useState([]);
+  if(postCodes){}
   const fetchPostCodes = (amphure_id) => {
     if (amphure_id !== undefined) {
       fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
@@ -471,9 +471,9 @@ function TableCustomer({ onSearch }) {
                     {customerStatus.map((status) => (
                       <option key={status.ID} value={status.ID}>
                         {status.Customer_Status === 1
-                          ? "guest"
+                          ? "ผู้ใช้ทั่วไป"
                           : status.Customer_Status === 2
-                          ? "member"
+                          ? "สมาชิก"
                           : ""}
                       </option>
                     ))}

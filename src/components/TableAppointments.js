@@ -20,8 +20,6 @@ function TableApppointments({ onSearch }) {
   useEffect(() => {
     async function fetchDataAndLog() {
       if (User_Code) {
-        // ตรวจสอบว่า User_Code มีค่าหรือไม่
-        console.log(User_Code, "SH");
       }
     }
 
@@ -332,7 +330,7 @@ function TableApppointments({ onSearch }) {
     }
   };
   const [selectedAppointmentNo, setSelectedAppointmentNo] = useState("");
-  console.log(selectedAppointmentNo);
+  if(selectedAppointmentNo){}
   // ฟังก์ชั่นเพิ่มเลขนัดหมาย
   const handleInsertAPM_No = () => {
     handleCloseModalSearchAPM_No();
