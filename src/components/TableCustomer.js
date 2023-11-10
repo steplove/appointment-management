@@ -295,7 +295,7 @@ function TableCustomer({ onSearch }) {
     fetchAmphures();
     fetchSubDistricts();
     fetchPostCodes();
-  });
+  }, []);
   // ดึงข้อมูลจังหวัด
   const [readProvince, setReadProvince] = useState([]);
   const fetchReadProvinceData = () => {
@@ -519,7 +519,6 @@ function TableCustomer({ onSearch }) {
                       .map((customer, index) => (
                         <tr key={customer.UID} className="text-center">
                           <td className="text-center">
-                            
                             <h3>{index + 1}</h3>
                           </td>
                           <td>
@@ -688,7 +687,6 @@ function TableCustomer({ onSearch }) {
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
-                          
                           <h4>{index + 1}</h4>
                         </td>
                         <td>
