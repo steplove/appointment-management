@@ -54,7 +54,6 @@ export default function Login() {
       .then((response) => response.json())
       .then((data) => {
         if (data.User_Status === 1 || data.User_Status === 2) {
-          console.log(data.User_Status);
           if (data.status === "ok") {
             Swal.fire({
               title: "เข้าสู่ระบบสำเร็จ",
