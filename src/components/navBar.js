@@ -3,7 +3,7 @@ import Swl from "sweetalert2";
 function NavBar() {
   const initialLoggedInState = localStorage.getItem("token") ? true : false;
   const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedInState);
-
+  console.log(isLoggedIn);
   const handleLogout = () => {
     Swl.fire({
       icon: "warning",

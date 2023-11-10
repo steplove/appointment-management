@@ -332,6 +332,7 @@ function TableApppointments({ onSearch }) {
     }
   };
   const [selectedAppointmentNo, setSelectedAppointmentNo] = useState("");
+  console.log(selectedAppointmentNo);
   // ฟังก์ชั่นเพิ่มเลขนัดหมาย
   const handleInsertAPM_No = () => {
     handleCloseModalSearchAPM_No();
