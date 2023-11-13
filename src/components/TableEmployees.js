@@ -5,7 +5,6 @@ import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import { useAlert } from "../hooks/useAlert";
 function TableEmployees({ onSearch }) {
-
   const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
@@ -255,7 +254,7 @@ function TableEmployees({ onSearch }) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-
+        console.log(response, "response");
         const payrollData = await response.json();
 
         if (payrollData.length > 0) {
