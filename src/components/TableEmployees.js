@@ -262,7 +262,11 @@ function TableEmployees({ onSearch }) {
 
         if (payrollData.length > 0) {
           setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
+        console.log( "4");
+
         } else {
+        console.log( "5");
+
           handleClose();
           showAlert({
             title: "ไม่พบข้อมูลพนักงาน",
