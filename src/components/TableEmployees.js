@@ -256,9 +256,8 @@ function TableEmployees({ onSearch }) {
         }
         console.log(response, "response");
         const payrollData = await response.json();
-        console.log(payrollData, "payrollData");
-
-        if (payrollData.length > 0) {
+        const keys = Object.keys(payrollData);
+        if (keys.length > 0) {
           setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
         } else {
           handleClose();
