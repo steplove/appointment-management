@@ -103,9 +103,9 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
-      console.log(data,"data");
-      console.log(typeof data,"datadata");
-      if (data && data.length > 0) {
+      console.log(data, "data");
+      console.log(typeof data, "datadata");
+      if (Array.isArray(data) && data.length > 0) {
         setMapHN(data);
         handleShowMapHNModal();
       } else {
@@ -339,7 +339,8 @@ function TableCustomer({ onSearch }) {
   };
   // ดึงข้อมูลรหัสไปรษณีย์
   const [postCodes, setPostCodes] = useState([]);
-  if(postCodes){}
+  if (postCodes) {
+  }
   const fetchPostCodes = (amphure_id) => {
     if (amphure_id !== undefined) {
       fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
