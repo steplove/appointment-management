@@ -693,9 +693,15 @@ function TableCustomer({ onSearch }) {
                     Object.keys(mapHN).map((key, index) => {
                       const hnData = mapHN[key];
 
+                      // Check if hnData is not null before accessing its properties
+                      if (!hnData) {
+                        return null; // or handle the case where hnData is null
+                      }
+
                       // Check if BirthDate is defined before accessing it
-                      const birthDate =
-                        hnData && hnData.BirthDate ? hnData.BirthDate : "";
+                      const birthDate = hnData.BirthDate
+                        ? hnData.BirthDate
+                        : "";
 
                       return (
                         <tr key={key}>
