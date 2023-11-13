@@ -73,8 +73,6 @@ function TableCustomer({ onSearch }) {
   const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
   const [mapHN, setMapHN] = useState([]);
-  console.log(mapHN, "mapHNmapHNmapHN");
-  console.log(typeof mapHN);
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
@@ -105,12 +103,7 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
-      console.log(data, "data");
-      console.log(typeof data, "datadata");
-      const keys = Object.keys(data);
-
-      if (keys.length > 0) {
-        console.log("data", data);
+      if (data && data.length > 0) {
         setMapHN(data);
         handleShowMapHNModal();
       } else {
@@ -344,8 +337,7 @@ function TableCustomer({ onSearch }) {
   };
   // ดึงข้อมูลรหัสไปรษณีย์
   const [postCodes, setPostCodes] = useState([]);
-  if (postCodes) {
-  }
+  if(postCodes){}
   const fetchPostCodes = (amphure_id) => {
     if (amphure_id !== undefined) {
       fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
@@ -690,33 +682,39 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN.map((hnData, index) => (
-                    <tr key={hnData.RefNo}>
-                      <td className="text-center">
-                        <h4>{index + 1}</h4>
-                      </td>
-                      <td>
-                        <h4> {hnData.TypeRefno} </h4>
-                      </td>
-                      <td>
-                        <h4> {hnData.HN} </h4>
-                      </td>
-                      <td>
-                        <h4> {hnData.FirstName} </h4>
-                      </td>
-                      <td>
-                        <h4> {hnData.LastName} </h4>
-                      </td>
-                      <td>
-                        {hnData.Gender === 1
-                          ? "หญิง"
-                          : hnData.Gender === 2
-                          ? "ชาย"
-                          : ""}
-                      </td>
-                      <td>{hnData.BirthDate.substring(0, 10)}</td>
+                  {mapHN && mapHN.length > 0 ? (
+                    mapHN.map((hnData, index) => (
+                      <tr key={hnData.RefNo}>
+                        <td className="text-center">
+                          <h4>{index + 1}</h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.TypeRefno} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.HN} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.FirstName} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.LastName} </h4>
+                        </td>
+                        <td>
+                          {hnData.Gender === 1
+                            ? "หญิง"
+                            : hnData.Gender === 2
+                            ? "ชาย"
+                            : ""}
+                        </td>
+                        <td>{hnData.BirthDate.substring(0, 10)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5">No data available</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </Table>
             </Modal.Body>
