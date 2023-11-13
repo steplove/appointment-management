@@ -258,7 +258,7 @@ function TableEmployees({ onSearch }) {
         const payrollData = await response.json();
         const keys = Object.keys(payrollData);
         if (keys.length > 0) {
-          setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
+          setUserName(payrollData.FirstLocalName + " " + payrollData.LastLocalName);
         } else {
           handleClose();
           showAlert({
