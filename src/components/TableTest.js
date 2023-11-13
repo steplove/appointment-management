@@ -281,12 +281,6 @@ function TableApppointments({ onSearch }) {
       setSelectedAPM_No([hnData]);
     }
   };
-
-  // useEffect(() => {
-  //   // เมื่อ selectedAPM_No เปลี่ยนแปลง คุณสามารถทำสิ่งที่คุณต้องการเมื่อเรียกเลือกรายการ
-  //   console.log(selectedAPM_No[0]);
-  // }, [selectedAPM_No]);
-
   // กำหนด state สำหรับการค้นหา
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");

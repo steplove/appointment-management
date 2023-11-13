@@ -1,7 +1,7 @@
 import React from "react";
 import NavBar from "../components/navBar";
 import { Container } from "react-bootstrap";
-import TableAppointments from "../components/TableAppointments";
+import TableTest from "../components/TableTest";
 import Dashboard from "../components/Dashboard";
 import SlideBar from "../components/SlideBar";
 import useTokenCheck from "../hooks/useTokenCheck";
@@ -33,7 +33,8 @@ function Home() {
             </div>
             <div className="wrapper wrapper-content animated fadeInRight">
               <Dashboard />
-              <TableAppointments />
+              {/* <TableAppointments /> */}
+              <TableTest/>
             </div>{" "}
           </div>
         </div>

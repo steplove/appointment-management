@@ -202,7 +202,7 @@ function TableEmployees({ onSearch }) {
   const checkUserExistence = async (userCode) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/searchUsersUser_Code?User_Code=${userCode}`,
+        `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${userCode}`,
         {
           method: "POST",
           headers: {
