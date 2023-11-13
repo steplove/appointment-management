@@ -260,6 +260,7 @@ function TableEmployees({ onSearch }) {
         const payrollData = await response.json();
         console.log(payrollData, "3");
         console.log(payrollData.length, "3.5");
+        console.log(typeof payrollData); // ตรวจสอบประเภทของ payrollData
         if (payrollData.length > 0) {
           setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
         console.log( "4");
