@@ -73,6 +73,8 @@ function TableCustomer({ onSearch }) {
   const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
   const [mapHN, setMapHN] = useState([]);
+  console.log(mapHN[0].length, "mapHNmapHNmapHN");
+  console.log(mapHN[0], "mapHNmapHNmapHN");
   console.log(mapHN, "mapHNmapHNmapHN");
   console.log(typeof mapHN);
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
@@ -690,7 +692,7 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN.data.map((hnData, index) => (
+                  {mapHN.map((hnData, index) => (
                     <tr key={hnData.RefNo}>
                       <td className="text-center">
                         <h4>{index + 1}</h4>
