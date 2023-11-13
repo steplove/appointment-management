@@ -102,6 +102,7 @@ function TableCustomer({ onSearch }) {
       const response = await fetch(
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
+      console.log(response, "response");
       const data = await response.json();
       if (data && data.length > 0) {
         setMapHN(data);
@@ -337,7 +338,8 @@ function TableCustomer({ onSearch }) {
   };
   // ดึงข้อมูลรหัสไปรษณีย์
   const [postCodes, setPostCodes] = useState([]);
-  if(postCodes){}
+  if (postCodes) {
+  }
   const fetchPostCodes = (amphure_id) => {
     if (amphure_id !== undefined) {
       fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
