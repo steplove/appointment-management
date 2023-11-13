@@ -263,7 +263,7 @@ function TableEmployees({ onSearch }) {
         const keys = Object.keys(payrollData);
         console.log(keys);
         console.log(keys.length);        
-        if (payrollData.length > 0) {
+        if (keys.length > 0) {
           setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
         console.log( "4");
         } else {
