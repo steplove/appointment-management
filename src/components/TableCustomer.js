@@ -689,48 +689,34 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN && Object.keys(mapHN).length > 0 ? (
-                    Object.keys(mapHN).map((key, index) => {
-                      const hnData = mapHN[key];
-
-                      // Check if hnData is not null before accessing its properties
-                      if (!hnData) {
-                        return null; // or handle the case where hnData is null
-                      }
-
-                      // Check if BirthDate is defined before accessing it
-                      const birthDate = hnData.BirthDate
-                        ? hnData.BirthDate
-                        : "";
-
-                      return (
-                        <tr key={key}>
-                          <td className="text-center">
-                            <h4>{index + 1}</h4>
-                          </td>
-                          <td>
-                            <h4> {hnData.TypeRefno} </h4>
-                          </td>
-                          <td>
-                            <h4> {hnData.HN} </h4>
-                          </td>
-                          <td>
-                            <h4> {hnData.FirstName} </h4>
-                          </td>
-                          <td>
-                            <h4> {hnData.LastName} </h4>
-                          </td>
-                          <td>
-                            {hnData.Gender === 1
-                              ? "หญิง"
-                              : hnData.Gender === 2
-                              ? "ชาย"
-                              : ""}
-                          </td>
-                          <td>{birthDate.substring(0, 10)}</td>
-                        </tr>
-                      );
-                    })
+                  {mapHN && mapHN.length > 0 ? (
+                    mapHN.map((hnData, index) => (
+                      <tr key={hnData.RefNo}>
+                        <td className="text-center">
+                          <h4>{index + 1}</h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.TypeRefno} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.HN} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.FirstName} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.LastName} </h4>
+                        </td>
+                        <td>
+                          {hnData.Gender === 1
+                            ? "หญิง"
+                            : hnData.Gender === 2
+                            ? "ชาย"
+                            : ""}
+                        </td>
+                        <td>{hnData.BirthDate.substring(0, 10)}</td>
+                      </tr>
+                    ))
                   ) : (
                     <tr>
                       <td colSpan="5">No data available</td>
