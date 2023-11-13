@@ -105,7 +105,9 @@ function TableCustomer({ onSearch }) {
       const data = await response.json();
       console.log(data, "data");
       console.log(typeof data, "datadata");
-      if (Array.isArray(data) && data.length > 0) {
+      const keys = Object.keys(data);
+
+      if (keys.length > 0) {
         setMapHN(data);
         handleShowMapHNModal();
       } else {
