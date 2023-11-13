@@ -5,7 +5,6 @@ import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import { useAlert } from "../hooks/useAlert";
 function TableEmployees({ onSearch }) {
-
   const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
@@ -246,17 +245,20 @@ function TableEmployees({ onSearch }) {
   const handleSearch = async () => {
     try {
       const userExists = await checkUserExistence(searchPayrollNo);
-
+      console.log("1");
       if (!userExists) {
         // ถ้าไม่มีข้อมูลรหัสนี้ในฐานข้อมูล
         const response = await fetch(
           `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
         );
+        console.log(response, "2");
+
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
 
         const payrollData = await response.json();
+        console.log(payrollData, "3");
 
         if (payrollData.length > 0) {
           setUserName(payrollData[0].FirstName + " " + payrollData[0].LastName);
