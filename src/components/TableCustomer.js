@@ -108,6 +108,7 @@ function TableCustomer({ onSearch }) {
       const keys = Object.keys(data);
 
       if (keys.length > 0) {
+        console.log("data", data);
         setMapHN(data);
         handleShowMapHNModal();
       } else {
