@@ -690,31 +690,31 @@ function TableCustomer({ onSearch }) {
                 </thead>
                 <tbody className="text-center">
                   {mapHN && Object.keys(mapHN).length > 0 ? (
-                    mapHN.map((hnData, index) => (
-                      <tr key={hnData.RefNo}>
+                    Object.keys(mapHN).map((key, index) => (
+                      <tr key={key}>
                         <td className="text-center">
                           <h4>{index + 1}</h4>
                         </td>
                         <td>
-                          <h4> {hnData.TypeRefno} </h4>
+                          <h4> {key.TypeRefno} </h4>
                         </td>
                         <td>
-                          <h4> {hnData.HN} </h4>
+                          <h4> {key.HN} </h4>
                         </td>
                         <td>
-                          <h4> {hnData.FirstName} </h4>
+                          <h4> {key.FirstName} </h4>
                         </td>
                         <td>
-                          <h4> {hnData.LastName} </h4>
+                          <h4> {key.LastName} </h4>
                         </td>
                         <td>
-                          {hnData.Gender === 1
+                          {key.Gender === 1
                             ? "หญิง"
-                            : hnData.Gender === 2
+                            : key.Gender === 2
                             ? "ชาย"
                             : ""}
                         </td>
-                        <td>{hnData.BirthDate.substring(0, 10)}</td>
+                        <td>{key.BirthDate.substring(0, 10)}</td>
                       </tr>
                     ))
                   ) : (
