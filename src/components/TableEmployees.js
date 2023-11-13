@@ -281,8 +281,8 @@ function TableEmployees({ onSearch }) {
     } catch (error) {
       handleClose();
       showAlert({
-        title: "เกิดข้อผิดพลาดในการค้นหา",
-        text: error.message,
+        title: "ไม่พบข้อมูลพนักงาน",
+        text: "error",
         icon: "error",
         showConfirmButton: false,
         timer: 1500,
