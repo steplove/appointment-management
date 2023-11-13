@@ -103,7 +103,8 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
-
+      console.log(data,"data");
+      console.log(typeof data,"datadata");
       if (data && data.length > 0) {
         setMapHN(data);
         handleShowMapHNModal();
