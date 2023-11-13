@@ -199,28 +199,28 @@ function TableEmployees({ onSearch }) {
   //   });
   // };
   // ฟังก์ชันสำหรับเช็คว่ามีข้อมูลรหัสนี้ในฐานข้อมูลหรือไม่
-  const checkUserExistence = async (userCode) => {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${userCode}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  // const checkUserExistence = async (userCode) => {
+  //   try {
+  //     const response = await fetch(
+  //       `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${userCode}`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
 
-      const data = await response.json();
-      return data.result.length > 0;
-    } catch (error) {
-      throw error;
-    }
-  };
+  //     const data = await response.json();
+  //     return data.result.length > 0;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // };
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
   const handleSearchUsersAppointments = () => {
     fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
@@ -245,9 +245,9 @@ function TableEmployees({ onSearch }) {
   const [searchPayrollNo, setSearchPayrollNo] = useState(""); // state สำหรับเก็บค่าที่กรอก
   const handleSearch = async () => {
     try {
-      const userExists = await checkUserExistence(searchPayrollNo);
+      // const userExists = await checkUserExistence(searchPayrollNo);
 
-      if (!userExists) {
+      if (true) {
         // ถ้าไม่มีข้อมูลรหัสนี้ในฐานข้อมูล
         const response = await fetch(
           `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
