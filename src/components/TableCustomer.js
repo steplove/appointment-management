@@ -102,8 +102,8 @@ function TableCustomer({ onSearch }) {
       const response = await fetch(
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
-      console.log(response, "response");
       const data = await response.json();
+      console.log(data, "response");
       if (data && data.length > 0) {
         setMapHN(data);
         handleShowMapHNModal();
