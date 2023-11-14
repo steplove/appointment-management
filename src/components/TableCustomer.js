@@ -108,15 +108,7 @@ function TableCustomer({ onSearch }) {
       console.log(data, "ข้อมูลจาก Map HN");
       // ตัวอย่าง Hardcoded Data
       const hardcodedData = [
-        {
-          RefNo: "123",
-          TypeRefno: "IDCard",
-          HN: "12345",
-          FirstName: "John",
-          LastName: "Doe",
-          Gender: 1,
-          BirthDate: "1990-01-01",
-        },
+        data,
         // เพิ่มข้อมูลอื่น ๆ ตามต้องการ
       ];
 
