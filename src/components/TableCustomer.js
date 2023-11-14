@@ -105,6 +105,7 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
+      console.log(data,"ข้อมูลจาก Map HN");
       if (data ) {
         setMapHN(data);
         handleShowMapHNModal();
