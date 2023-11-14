@@ -71,7 +71,7 @@ function TableCustomer({ onSearch }) {
   const handleShowMapHNModal = () => setShowModalMapHN(true);
   const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
-  const [mapHN, setMapHN] = useState([]);
+  const [mapHN, setMapHN] = useState("");
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
