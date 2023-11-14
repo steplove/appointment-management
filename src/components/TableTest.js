@@ -116,82 +116,82 @@ function TableApppointments({ onSearch }) {
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
     try {
-      // const response = await fetch(
-      //   `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       UID: selectedCustomers.UID,
-      //       Appointment_Date: new Date(selectedCustomers.Appointment_Date)
-      //         .toISOString()
-      //         .substring(0, 10),
-      //       Appointment_Time: new Date(selectedCustomers.Appointment_Time)
-      //         .toISOString()
-      //         .substring(11, 16),
-      //       Clinic: selectedCustomers.Clinic,
-      //       DoctorID: selectedCustomers.DoctorID,
-      //       APM_No: selectedCustomers.APM_No,
-      //       Entryby: selectedCustomers.Entryby,
-      //       EntryDatetime: new Date(),
-      //     }),
-      //   }
-      // );
-      // console.log(response, "response1");
-      // if (response.status === 200) {
-      const responseStatus = await fetch(
-        `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
+      const response = await fetch(
+        `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            APM_UID: selectedCustomers.APM_UID,
-            StatusFlag: selectedCustomers.StatusFlag,
-            EntryDatetime: selectedCustomers.EntryDatetime,
+            UID: selectedCustomers.UID,
+            Appointment_Date: new Date(selectedCustomers.Appointment_Date)
+              .toISOString()
+              .substring(0, 10),
+            Appointment_Time: new Date(selectedCustomers.Appointment_Time)
+              .toISOString()
+              .substring(11, 16),
+            Clinic: selectedCustomers.Clinic,
+            DoctorID: selectedCustomers.DoctorID,
+            APM_No: selectedCustomers.APM_No,
+            Entryby: selectedCustomers.Entryby,
+            EntryDatetime: new Date(),
           }),
         }
       );
-      console.log(responseStatus, "response2");
-
-      const data = await responseStatus.json();
-      console.log(data, "data2");
-
-      if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
-        Swal.fire({
-          title: "การอัปเดตสำเร็จ!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        refetch();
-        setSearchResult((prevResult) =>
-          (prevResult || []).map((customer) => {
-            if (customer.APM_UID === selectedCustomers.APM_UID) {
-              return {
-                ...customer,
-                StatusFlag: selectedCustomers.StatusFlag,
-              };
-            }
-            return customer;
-          })
+      console.log(response, "response1");
+      if (response.status === 200) {
+        const responseStatus = await fetch(
+          `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              APM_UID: selectedCustomers.APM_UID,
+              StatusFlag: selectedCustomers.StatusFlag,
+              EntryDatetime: selectedCustomers.EntryDatetime,
+            }),
+          }
         );
-        console.log(setSearchResult, "customer");
+        console.log(responseStatus, "response2");
 
-        handleCloseModal();
-      } else {
-        Swal.fire({
-          title: "เกิดข้อผิดพลาด!",
-          text: data.message,
-          icon: "error",
-          confirmButtonText: "ตกลง",
-        });
-        handleCloseModal();
+        const data = (await response.json()) || (await responseStatus.json());
+        console.log(data, "data2");
+
+        if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
+          Swal.fire({
+            title: "การอัปเดตสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          refetch();
+          setSearchResult((prevResult) =>
+            (prevResult || []).map((customer) => {
+              if (customer.APM_UID === selectedCustomers.APM_UID) {
+                return {
+                  ...customer,
+                  StatusFlag: selectedCustomers.StatusFlag,
+                };
+              }
+              return customer;
+            })
+          );
+          console.log(setSearchResult, "customer");
+
+          handleCloseModal();
+        } else {
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: data.message,
+            icon: "error",
+            confirmButtonText: "ตกลง",
+          });
+          handleCloseModal();
+        }
       }
-      // }
       refetch();
       handleCloseModal();
     } catch (error) {
