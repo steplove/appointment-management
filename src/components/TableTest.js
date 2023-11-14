@@ -767,7 +767,7 @@ function TableApppointments({ onSearch }) {
                                 })
                               }
                             >
-                              <option>เลือกประเภท</option>
+                              <option value="">เลือกประเภท</option>
                               <option value="3">รอยืนยัน</option>
                               <option value="4">ยืนยันนัดหมาย</option>
                               <option value="5">ยกเลิกการนัด</option>
@@ -842,8 +842,9 @@ function TableApppointments({ onSearch }) {
                             <input
                               type="checkbox"
                               checked={
-                                selectedAPM_No &&
-                                selectedAPM_No.includes(hnData)
+                                (selectedAPM_No &&
+                                  selectedAPM_No.includes(hnData)) ||
+                                ""
                               }
                               onChange={() => toggleSelection(hnData)}
                             />
