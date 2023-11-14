@@ -106,8 +106,25 @@ function TableCustomer({ onSearch }) {
       );
       const data = await response.json();
       console.log(data, "ข้อมูลจาก Map HN");
+      // ตัวอย่าง Hardcoded Data
+      const hardcodedData = [
+        {
+          RefNo: "123",
+          TypeRefno: "IDCard",
+          HN: "12345",
+          FirstName: "John",
+          LastName: "Doe",
+          Gender: 1,
+          BirthDate: "1990-01-01",
+        },
+        // เพิ่มข้อมูลอื่น ๆ ตามต้องการ
+      ];
+
+      // ใช้ Hardcoded Data แทนข้อมูลจาก API
+      setMapHN(hardcodedData);
+
       if (data) {
-        setMapHN(data);
+        // setMapHN(data);
         console.log(data, " setMapHN(data)");
         handleShowMapHNModal();
       } else {
@@ -694,7 +711,7 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {Array.isArray(mapHN) ? (
+                  {mapHN && mapHN.length > 0 ? (
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
@@ -725,7 +742,8 @@ function TableCustomer({ onSearch }) {
                   ) : (
                     <tr>
                       <td colSpan="7">
-                        {mapHN ? "No data available" : `HN: ${mapHN.HN}`}
+                        No data available
+                        {mapHN.HN}
                       </td>
                     </tr>
                   )}
