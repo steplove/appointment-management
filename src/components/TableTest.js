@@ -838,7 +838,7 @@ function TableApppointments({ onSearch }) {
                           <td>{hnData.ClinicName}</td>
                           <td>{hnData.AppointDate}</td>
                           <td>{hnData.AppointTime}</td>
-                          <td key="checkbox">
+                          <td>
                             <input
                               type="checkbox"
                               checked={selectedAPM_No.includes(hnData)}
