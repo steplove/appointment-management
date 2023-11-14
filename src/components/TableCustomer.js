@@ -71,7 +71,7 @@ function TableCustomer({ onSearch }) {
   const handleShowMapHNModal = () => setShowModalMapHN(true);
   const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
-  const [mapHN, setMapHN] = useState("");
+  const [mapHN, setMapHN] = useState([]);
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
@@ -692,25 +692,14 @@ function TableCustomer({ onSearch }) {
                     <th>วัน/เดือน/ปีเกิด</th>
                   </tr>
                 </thead>
-                <tbody className="text-center">
+                <tbody>
                   {mapHN && mapHN.length > 0 ? (
-                    mapHN.map((hnData, index) => (
+                    mapHN.map((hnData) => (
                       <tr key={hnData.RefNo}>
-                        <td className="text-center">
-                          <h4>{index + 1}</h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.TypeRefno} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.HN} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.FirstName} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.LastName} </h4>
-                        </td>
+                        <td>{hnData.TypeRefno}</td>
+                        <td>{hnData.HN}</td>
+                        <td>{hnData.FirstName}</td>
+                        <td>{hnData.LastName}</td>
                         <td>
                           {hnData.Gender === 1
                             ? "หญิง"
