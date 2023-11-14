@@ -693,39 +693,33 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN ? (
-                    mapHN.map((hnData, index) => (
-                      <tr key={hnData.RefNo}>
-                        <td className="text-center">
-                          <h4>{index + 1}</h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.TypeRefno} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.HN} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.FirstName} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.LastName} </h4>
-                        </td>
-                        <td>
-                          {hnData.Gender === 1
-                            ? "หญิง"
-                            : hnData.Gender === 2
-                            ? "ชาย"
-                            : ""}
-                        </td>
-                        <td>{hnData.BirthDate.substring(0, 10)}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="7">No data available</td>
+                  {mapHN.map((hnData, index) => (
+                    <tr key={hnData.RefNo}>
+                      <td className="text-center">
+                        <h4>{index + 1}</h4>
+                      </td>
+                      <td>
+                        <h4> {hnData.TypeRefno} </h4>
+                      </td>
+                      <td>
+                        <h4> {hnData.HN} </h4>
+                      </td>
+                      <td>
+                        <h4> {hnData.FirstName} </h4>
+                      </td>
+                      <td>
+                        <h4> {hnData.LastName} </h4>
+                      </td>
+                      <td>
+                        {hnData.Gender === 1
+                          ? "หญิง"
+                          : hnData.Gender === 2
+                          ? "ชาย"
+                          : ""}
+                      </td>
+                      <td>{hnData.BirthDate.substring(0, 10)}</td>
                     </tr>
-                  )}
+                  ))}
                 </tbody>
               </Table>
             </Modal.Body>
