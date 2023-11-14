@@ -493,7 +493,7 @@ function TableCustomer({ onSearch }) {
               </div>
             </div>
             <br />
-            <div>{loadingMap && <LoadingComponent />}</div>
+            <div> <LoadingComponent show={loadingMap} /></div>
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
