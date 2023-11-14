@@ -208,6 +208,7 @@ function TableApppointments({ onSearch }) {
       const response = await fetch(
         `${BASE_URL}/api/searchAllAppointment/?HN=${selectedCustomers.HN}`
       );
+      console.log(response,"responseresponse");
       if (response.ok) {
         const data = await response.json();
         setSearchAPM_No(data);
