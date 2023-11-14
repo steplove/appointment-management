@@ -152,7 +152,7 @@ function TableApppointments({ onSearch }) {
             body: JSON.stringify({
               APM_UID: selectedCustomers.APM_UID,
               StatusFlag: selectedCustomers.StatusFlag,
-              EntryDatetime: selectedCustomers.EntryDatetime,
+              EntryDatetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
             }),
           }
         );
