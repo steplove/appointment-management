@@ -105,13 +105,9 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
-      console.log(data, "ข้อมูลจาก Map HN");
-      // ตัวอย่าง Hardcoded Data
-      const hardcodedData = [data];
-
-      if (hardcodedData.length > 0) {
-        setMapHN(hardcodedData);
-        console.log(data, " setMapHN(data)");
+      const codedData = [data];
+      if (codedData.length > 0) {
+        setMapHN(codedData);
         handleShowMapHNModal();
       } else {
         // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
@@ -124,7 +120,6 @@ function TableCustomer({ onSearch }) {
       }
     } catch (error) {
       // รีเซ็ต state ของ mapHN เมื่อมีข้อผิดพลาด
-      console.error("Failed to fetch data:", error);
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: `ไม่สามารถเข้าถึงข้อมูลได้`,
@@ -408,8 +403,6 @@ function TableCustomer({ onSearch }) {
       });
     }
   };
-
-  console.log(mapHN, "mapHN");
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
