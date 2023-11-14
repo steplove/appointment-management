@@ -136,7 +136,6 @@ function TableApppointments({ onSearch }) {
             DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
             Entryby: User_Code,
-            EntryDatetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
           }),
         }
       );
@@ -152,7 +151,6 @@ function TableApppointments({ onSearch }) {
             body: JSON.stringify({
               APM_UID: selectedCustomers.APM_UID,
               StatusFlag: selectedCustomers.StatusFlag,
-              EntryDatetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
             }),
           }
         );
