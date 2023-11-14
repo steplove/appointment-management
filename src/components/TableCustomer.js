@@ -14,7 +14,7 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-
+import LoadingComponent from "./LoadingComponent";
 function TableCustomer({ onSearch }) {
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
   useTokenCheck();
@@ -25,7 +25,6 @@ function TableCustomer({ onSearch }) {
     refetch,
   } = useFetch(BASE_URL + "/api/AllCustomer");
   const [customers, setCustomers] = useState([]);
-
   useEffect(() => {
     if (fetchedCustomers && Array.isArray(fetchedCustomers)) {
       setCustomers(fetchedCustomers);
@@ -97,8 +96,11 @@ function TableCustomer({ onSearch }) {
     handleShowModal();
   };
   // เมื่อกดปุ่ม MAP HN จะเข้ามาค้นหาID ที่ต้องการจะ MAP ก่อนแล้วจะแสดง Modal
+  const [loadingMap, setLoadingMap] = useState(false);
   const handleMapHnModal = async (IdenNumber) => {
     try {
+      setLoadingMap(true); // เริ่มแสดง loading animation
+
       const response = await fetch(
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
@@ -126,6 +128,8 @@ function TableCustomer({ onSearch }) {
         icon: "error",
         confirmButtonText: "ปิด",
       });
+    } finally {
+      setLoadingMap(false); // ปิด loading animation ที่ไม่ว่าจะเกิดข้อผิดพลาดหรือไม่
     }
   };
 
@@ -489,6 +493,7 @@ function TableCustomer({ onSearch }) {
               </div>
             </div>
             <br />
+            <div>{loading && <LoadingComponent />}</div>
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
