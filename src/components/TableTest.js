@@ -134,7 +134,7 @@ function TableApppointments({ onSearch }) {
             Clinic: selectedCustomers.Clinic,
             DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
-            Entryby: selectedCustomers.Entryby,
+            Entryby: User_Code,
             EntryDatetime: new Date(),
           }),
         }
