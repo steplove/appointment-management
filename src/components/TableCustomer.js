@@ -407,7 +407,7 @@ function TableCustomer({ onSearch }) {
       });
     }
   };
-
+  console.log(mapHN, "mapHN");
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
@@ -723,7 +723,7 @@ function TableCustomer({ onSearch }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5">No data available</td>
+                      <td colSpan="6">No data available</td>
                     </tr>
                   )}
                 </tbody>
