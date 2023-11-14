@@ -105,9 +105,10 @@ function TableCustomer({ onSearch }) {
         BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       );
       const data = await response.json();
-      console.log(data,"ข้อมูลจาก Map HN");
-      if (data ) {
+      console.log(data, "ข้อมูลจาก Map HN");
+      if (data) {
         setMapHN(data);
+        console.log(setMapHN(data), " setMapHN(data)");
         handleShowMapHNModal();
       } else {
         // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
@@ -494,7 +495,10 @@ function TableCustomer({ onSearch }) {
               </div>
             </div>
             <br />
-            <div> <LoadingComponent show={loadingMap} /></div>
+            <div>
+              {" "}
+              <LoadingComponent show={loadingMap} />
+            </div>
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
