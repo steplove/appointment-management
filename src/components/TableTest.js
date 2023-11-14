@@ -101,7 +101,7 @@ function TableApppointments({ onSearch }) {
 
     if (selectedAPM_No.length === 1) {
       // ทดสอบแสดงค่าที่ถูกส่งไปที่คอนโซล
-       //console.log(selectedAPM_No[0]);
+      //console.log(selectedAPM_No[0]);
     } else {
       alert("โปรดเลือกรายการเพียง 1 รายการเท่านั้น");
     }
@@ -208,9 +208,10 @@ function TableApppointments({ onSearch }) {
       const response = await fetch(
         `${BASE_URL}/api/searchAllAppointment/?HN=${selectedCustomers.HN}`
       );
-      console.log(response,"responseresponse");
+      console.log(response, "responseresponse");
       if (response.ok) {
         const data = await response.json();
+        console.log(data, "data");
         setSearchAPM_No(data);
       } else {
         console.error("Failed to fetch data");
