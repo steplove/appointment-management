@@ -108,7 +108,7 @@ function TableCustomer({ onSearch }) {
       console.log(data, "ข้อมูลจาก Map HN");
       if (data) {
         setMapHN(data);
-        console.log(setMapHN(data), " setMapHN(data)");
+        console.log(data, " setMapHN(data)");
         handleShowMapHNModal();
       } else {
         // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
