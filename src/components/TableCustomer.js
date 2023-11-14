@@ -694,7 +694,7 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN?.length ? (
+                  {mapHN  ? (
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
