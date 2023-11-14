@@ -115,7 +115,6 @@ function TableCustomer({ onSearch }) {
         handleShowMapHNModal();
       } else {
         // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
-        setMapHN(null);
         Swal.fire({
           title: "เกิดข้อผิดพลาด!",
           text: `ไม่พบข้อมูลผู้ใช้ในระบบ`,
@@ -125,7 +124,6 @@ function TableCustomer({ onSearch }) {
       }
     } catch (error) {
       // รีเซ็ต state ของ mapHN เมื่อมีข้อผิดพลาด
-      setMapHN(null);
       console.error("Failed to fetch data:", error);
       Swal.fire({
         title: "เกิดข้อผิดพลาด!",
