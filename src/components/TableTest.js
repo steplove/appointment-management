@@ -841,7 +841,10 @@ function TableApppointments({ onSearch }) {
                           <td>
                             <input
                               type="checkbox"
-                              checked={selectedAPM_No.includes(hnData)}
+                              checked={
+                                selectedAPM_No &&
+                                selectedAPM_No.includes(hnData)
+                              }
                               onChange={() => toggleSelection(hnData)}
                             />
                           </td>
