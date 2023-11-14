@@ -14,6 +14,7 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
+import { format } from "date-fns";
 function TableApppointments({ onSearch }) {
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
   const [User_Code] = useTokenCheck();
@@ -135,7 +136,7 @@ function TableApppointments({ onSearch }) {
             DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
             Entryby: User_Code,
-            EntryDatetime: new Date(),
+            EntryDatetime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
           }),
         }
       );
