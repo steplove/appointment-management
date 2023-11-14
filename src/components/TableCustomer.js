@@ -106,9 +106,6 @@ function TableCustomer({ onSearch }) {
       );
       const data = await response.json();
       console.log(data, "ข้อมูลจาก Map HN");
-      let dataDisplay = data.map((object) => {
-        const {}
-      });
       if (data) {
         setMapHN(data);
         console.log(data, " setMapHN(data)");
