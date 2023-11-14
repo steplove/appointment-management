@@ -139,8 +139,8 @@ function TableApppointments({ onSearch }) {
           }),
         }
       );
+      console.log(response, "response1");
       if (response.status === 200) {
-        console.log("111");
         const responseStatus = await fetch(
           `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
           {
@@ -155,7 +155,11 @@ function TableApppointments({ onSearch }) {
             }),
           }
         );
+        console.log(responseStatus, "response2");
+
         const data = (await response.json()) || (await responseStatus.json());
+        console.log(data, "data2");
+
         if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
           Swal.fire({
             title: "การอัปเดตสำเร็จ!",
@@ -175,6 +179,7 @@ function TableApppointments({ onSearch }) {
               return customer;
             })
           );
+          console.log(setSearchResult, "customer");
 
           handleCloseModal();
         } else {
