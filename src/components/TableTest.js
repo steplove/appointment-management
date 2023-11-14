@@ -116,57 +116,6 @@ function TableApppointments({ onSearch }) {
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
     try {
-      // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
-      selectedCustomers.Entryby = User_Code;
-      console.log(
-        selectedCustomers.APM_No,
-        selectedCustomers.Appointment_Date,
-        selectedCustomers.Appointment_Time,
-        selectedCustomers.Clinic,
-        selectedCustomers,
-        "selectedAppointmentNoselectedAppointmentNo"
-      );
-      if (
-        selectedCustomers.StatusFlag > "3" &&
-        selectedCustomers.StatusFlag !== "5"
-      ) {
-        // เช็คว่ามีการกรอกช่องหรือไม่
-        if (
-          !selectedCustomers.Appointment_Date ||
-          !selectedCustomers.Appointment_Time ||
-          !selectedCustomers.Clinic ||
-          !selectedCustomers.DoctorID ||
-          !selectedCustomers.APM_No ||
-          !selectedCustomers.Entryby
-        ) {
-          Swal.fire({
-            title: "กรุณากรอกข้อมูลทุกช่อง!",
-            icon: "error",
-            confirmButtonText: "ตกลง",
-          });
-          handleCloseModal();
-          return;
-        }
-      } else {
-        // ตรวจสอบว่ามีค่า `null` ในข้อมูลที่คุณต้องการ
-        if (
-          selectedCustomers.Appointment_Date === null ||
-          selectedCustomers.Appointment_Time === null ||
-          selectedCustomers.Clinic === null ||
-          selectedCustomers.DoctorID === null ||
-          selectedCustomers.APM_No === null ||
-          selectedCustomers.Entryby === null
-        ) {
-          // แจ้งเตือนให้ลองอีกครั้ง
-          Swal.fire({
-            title: "กรุณาลองใหม่อีกครั้ง!",
-            icon: "error",
-            confirmButtonText: "ตกลง",
-          });
-          handleCloseModal();
-          return;
-        }
-      }
       const response = await fetch(
         `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
         {
