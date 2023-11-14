@@ -839,11 +839,10 @@ function TableApppointments({ onSearch }) {
                           <td>{hnData.AppointDate}</td>
                           <td>{hnData.AppointTime}</td>
                           <td>
-                            <input
-                              type="checkbox"
+                            <Form.Control
+                              as="checkbox"
                               checked={selectedAPM_No.includes(hnData)}
                               onChange={() => toggleSelection(hnData)}
-                              value={""}
                             />
                           </td>
                         </tr>
