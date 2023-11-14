@@ -107,16 +107,10 @@ function TableCustomer({ onSearch }) {
       const data = await response.json();
       console.log(data, "ข้อมูลจาก Map HN");
       // ตัวอย่าง Hardcoded Data
-      const hardcodedData = [
-        data,
-        // เพิ่มข้อมูลอื่น ๆ ตามต้องการ
-      ];
+      const hardcodedData = [data];
 
-      // ใช้ Hardcoded Data แทนข้อมูลจาก API
-      setMapHN(hardcodedData);
-
-      if (data) {
-        // setMapHN(data);
+      if (hardcodedData.length > 0) {
+        setMapHN(hardcodedData);
         console.log(data, " setMapHN(data)");
         handleShowMapHNModal();
       } else {
