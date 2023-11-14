@@ -693,7 +693,7 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN && mapHN.length > 0 ? (
+                  {mapHN ? (
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
@@ -723,8 +723,7 @@ function TableCustomer({ onSearch }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="7">No data available
-                      {mapHN.HN}</td>
+                      <td colSpan="7">No data available</td>
                     </tr>
                   )}
                 </tbody>
