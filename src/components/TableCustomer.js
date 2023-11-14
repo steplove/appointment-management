@@ -692,14 +692,25 @@ function TableCustomer({ onSearch }) {
                     <th>วัน/เดือน/ปีเกิด</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="text-center">
                   {mapHN && mapHN.length > 0 ? (
-                    mapHN.map((hnData) => (
+                    mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
-                        <td>{hnData.TypeRefno}</td>
-                        <td>{hnData.HN}</td>
-                        <td>{hnData.FirstName}</td>
-                        <td>{hnData.LastName}</td>
+                        <td className="text-center">
+                          <h4>{index + 1}</h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.TypeRefno} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.HN} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.FirstName} </h4>
+                        </td>
+                        <td>
+                          <h4> {hnData.LastName} </h4>
+                        </td>
                         <td>
                           {hnData.Gender === 1
                             ? "หญิง"
@@ -712,7 +723,8 @@ function TableCustomer({ onSearch }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6">No data available</td>
+                      <td colSpan="7">No data available
+                      {mapHN.HN}</td>
                     </tr>
                   )}
                 </tbody>
