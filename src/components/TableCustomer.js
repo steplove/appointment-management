@@ -106,6 +106,9 @@ function TableCustomer({ onSearch }) {
       );
       const data = await response.json();
       console.log(data, "ข้อมูลจาก Map HN");
+      let dataDisplay = data.map((object) => {
+        const {}
+      });
       if (data) {
         setMapHN(data);
         console.log(data, " setMapHN(data)");
@@ -407,6 +410,7 @@ function TableCustomer({ onSearch }) {
       });
     }
   };
+
   console.log(mapHN, "mapHN");
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
@@ -693,7 +697,7 @@ function TableCustomer({ onSearch }) {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {mapHN && mapHN.length > 0 ? (
+                  {mapHN?.length ? (
                     mapHN.map((hnData, index) => (
                       <tr key={hnData.RefNo}>
                         <td className="text-center">
@@ -723,8 +727,10 @@ function TableCustomer({ onSearch }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="7">No data available
-                      {mapHN.HN}</td>
+                      <td colSpan="7">
+                        No data available
+                        {mapHN.HN}
+                      </td>
                     </tr>
                   )}
                 </tbody>
