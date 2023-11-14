@@ -8,7 +8,7 @@ import { Container } from "react-bootstrap";
 function Customers() {
   const [, , User_Status] = useTokenCheck();
   if(User_Status){}
-  if (User_Status === 1) {
+  if (User_Status === 1 || User_Status === 2) {
     return (
       <>
         <div id="wrapper">
