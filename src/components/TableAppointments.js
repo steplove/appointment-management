@@ -118,6 +118,7 @@ function TableApppointments({ onSearch }) {
     try {
       // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
       selectedCustomers.Entryby = User_Code;
+      console.log(selectedCustomers, "selectedCustomers");
       if (
         selectedCustomers.StatusFlag > "3" &&
         selectedCustomers.StatusFlag !== "5"
