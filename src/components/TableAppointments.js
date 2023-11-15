@@ -898,7 +898,7 @@ function TableApppointments({ onSearch }) {
                       ))
                     ) : (
                       <tr key="no-data">
-                        <td colSpan="8">No data available</td>
+                        <td colSpan="9">No data available</td>
                       </tr>
                     )}
                   </tbody>
