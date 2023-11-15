@@ -140,24 +140,6 @@ function TableApppointments({ onSearch }) {
           return;
         }
       } else {
-        // ตรวจสอบว่ามีค่า `null` ในข้อมูลที่คุณต้องการ
-        if (
-          selectedCustomers.Appointment_Date === null ||
-          selectedCustomers.Appointment_Time === null ||
-          selectedCustomers.Clinic === null ||
-          selectedCustomers.DoctorID === null ||
-          selectedCustomers.APM_No === null ||
-          selectedCustomers.Entryby === null
-        ) {
-          // แจ้งเตือนให้ลองอีกครั้ง
-          Swal.fire({
-            title: "กรุณาลองใหม่อีกครั้ง!",
-            icon: "error",
-            confirmButtonText: "ตกลง",
-          });
-          handleCloseModal();
-          return;
-        }
       }
       const response = await fetch(
         `${BASE_URL}/api/UpdateAppointments/${selectedCustomers.UID}`,
