@@ -63,7 +63,14 @@ function TableEmployees({ onSearch }) {
   const handleShowEdite = () => setShowEdite(true);
 
   // ฟังก์ชั่นสำหรับซ่อน modal
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    setUserName("");
+    setSearchPayrollNo("");
+    setUserPassword("");
+    setUserStatus("");
+  };
+
   const handleCloseEdite = () => setShowEdite(false);
   const [selectedUsers, setSelectedUsers] = useState(null);
 
