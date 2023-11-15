@@ -101,7 +101,7 @@ function TableApppointments({ onSearch }) {
 
     if (selectedAPM_No.length === 1) {
       // ทดสอบแสดงค่าที่ถูกส่งไปที่คอนโซล
-       //console.log(selectedAPM_No[0]);
+      //console.log(selectedAPM_No[0]);
     } else {
       alert("โปรดเลือกรายการเพียง 1 รายการเท่านั้น");
     }
@@ -186,7 +186,6 @@ function TableApppointments({ onSearch }) {
             DoctorID: selectedCustomers.DoctorID,
             APM_No: selectedCustomers.APM_No,
             Entryby: selectedCustomers.Entryby,
-            EntryDatetime: new Date(),
           }),
         }
       );
@@ -202,7 +201,6 @@ function TableApppointments({ onSearch }) {
             body: JSON.stringify({
               APM_UID: selectedCustomers.APM_UID,
               StatusFlag: selectedCustomers.StatusFlag,
-              EntryDatetime: selectedCustomers.EntryDatetime,
             }),
           }
         );
