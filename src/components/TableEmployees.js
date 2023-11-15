@@ -97,6 +97,10 @@ function TableEmployees({ onSearch }) {
           showConfirmButton: false,
           timer: 1500,
         });
+        setUserName("");
+        setSearchPayrollNo("");
+        setUserPassword("");
+        setUserStatus("");
         refetch();
         // ปิด modal
         handleClose();
@@ -258,7 +262,9 @@ function TableEmployees({ onSearch }) {
         const payrollData = await response.json();
         const keys = Object.keys(payrollData);
         if (keys.length > 0) {
-          setUserName(payrollData.FirstLocalName + " " + payrollData.LastLocalName);
+          setUserName(
+            payrollData.FirstLocalName + " " + payrollData.LastLocalName
+          );
         } else {
           handleClose();
           showAlert({
