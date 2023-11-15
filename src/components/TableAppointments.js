@@ -118,14 +118,6 @@ function TableApppointments({ onSearch }) {
     try {
       // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
       selectedCustomers.Entryby = User_Code;
-      console.log(
-        selectedCustomers.APM_No,
-        selectedCustomers.Appointment_Date,
-        selectedCustomers.Appointment_Time,
-        selectedCustomers.Clinic,
-        selectedCustomers,
-        "selectedAppointmentNoselectedAppointmentNo"
-      );
       if (
         selectedCustomers.StatusFlag > "3" &&
         selectedCustomers.StatusFlag !== "5"
@@ -136,8 +128,7 @@ function TableApppointments({ onSearch }) {
           !selectedCustomers.Appointment_Time ||
           !selectedCustomers.Clinic ||
           !selectedCustomers.DoctorID ||
-          !selectedCustomers.APM_No ||
-          !selectedCustomers.Entryby
+          !selectedCustomers.APM_No
         ) {
           Swal.fire({
             title: "กรุณากรอกข้อมูลทุกช่อง!",
