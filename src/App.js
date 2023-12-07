@@ -6,6 +6,8 @@ import Customers from "./screens/Customers";
 import Departments from "./screens/Departments";
 import Doctors from "./screens/Doctors";
 import Employees from "./screens/Employees";
+import Packages from "./screens/Packages";
+import Blogs from "./screens/Blogs";
 function App() {
   return (
     <Router>
@@ -17,6 +19,8 @@ function App() {
         <Route path="/Doctors" element={<Doctors />} />
         <Route path="/Employees" element={<Employees />} />
         <Route path="/Customers" element={<Customers />} />
+        <Route path="/Packages" element={<Packages />} />
+        <Route path="/Blogs" element={<Blogs />} />
       </Routes>
     </Router>
   );

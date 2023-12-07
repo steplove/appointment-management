@@ -93,6 +93,34 @@ function SlideBar() {
                 </a>
               )}
             </li>
+            <li
+              className={
+                currentPath === "/Packages" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Packages">
+                  <i className="fa  fa-cube"></i>{" "}
+                  <span className="nav-label">จัดการแพ็คเกจ</span>{" "}
+                </a>
+              )}
+            </li>
+            <li
+              className={
+                currentPath === "/Blogs" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Blogs">
+                  <i className="fa  fa-file-text "></i>{" "}
+                  <span className="nav-label">จัดการบทความ</span>{" "}
+                </a>
+              )}
+            </li>
           </ul>
         </div>
       </nav>
