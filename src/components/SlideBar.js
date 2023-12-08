@@ -121,6 +121,20 @@ function SlideBar() {
                 </a>
               )}
             </li>
+            <li
+              className={
+                currentPath === "/Banners" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Banners">
+                  <i className="fa  fa-picture-o "></i>{" "}
+                  <span className="nav-label">จัดการแบนเนอร์</span>{" "}
+                </a>
+              )}
+            </li>
           </ul>
         </div>
       </nav>

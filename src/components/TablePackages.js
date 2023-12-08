@@ -42,6 +42,7 @@ function TablePackages() {
   const [bannerPreview, setBannerPreview] = useState(null);
   const [packageCode, setPackageCode] = useState([]);
   const [packageName, setPackageName] = useState([]);
+  const [packageSearch, setPackageSearch] = useState([]);
   const [packageNameEN, setPackageNameEN] = useState([]);
   const [packageDetails, setPackageDetail] = useState([]);
   const [packageContact, setPackageContact] = useState([]);
@@ -257,7 +258,29 @@ function TablePackages() {
     setBannerImage(null);
     setBannerPreview(null);
   };
-
+  const handleSearch = () => {
+    // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
+    const searchParams = {
+      packageName: packageSearch,
+    };
+    fetch(BASE_URL + "/api/searchPackages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(searchParams),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
+        const newPageCount = Math.ceil(data.result.length / perPage);
+        setPageCount(newPageCount);
+        setCurrentPage(0);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading) return <p>Loading...</p>;
@@ -267,7 +290,7 @@ function TablePackages() {
 
   return (
     <>
-      <div className="row"> 
+      <div className="row">
         <div className="col-lg-12">
           <div className="ibox ">
             <div className="ibox-content">
@@ -284,17 +307,14 @@ function TablePackages() {
                     <Form.Label>ชื่อแพ็คเกจ</Form.Label>
                     <Form.Control
                       type="text"
-                      //   value={usersCode}
-                      //   onChange={(e) => setUsersCode(e.target.value)}
+                      value={packageSearch}
+                      onChange={(e) => setPackageSearch(e.target.value)}
                     />
                   </Form.Group>
                 </div>
                 <div style={{ marginTop: "25px", marginLeft: "20px" }}>
                   <InputGroup>
-                    <Button
-                      //   onClick={handleSearchUsersAppointments}
-                      variant="primary"
-                    >
+                    <Button onClick={handleSearch} variant="primary">
                       ค้นหา
                     </Button>
                   </InputGroup>

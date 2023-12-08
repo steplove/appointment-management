@@ -8,6 +8,7 @@ import Doctors from "./screens/Doctors";
 import Employees from "./screens/Employees";
 import Packages from "./screens/Packages";
 import Blogs from "./screens/Blogs";
+import Banners from "./screens/Banners";
 function App() {
   return (
     <Router>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/Customers" element={<Customers />} />
         <Route path="/Packages" element={<Packages />} />
         <Route path="/Blogs" element={<Blogs />} />
+        <Route path="/Banners" element={<Banners />} />
       </Routes>
     </Router>
   );
