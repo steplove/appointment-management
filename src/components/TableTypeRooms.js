@@ -41,11 +41,6 @@ function TableTypeRooms() {
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
   };
-  const [show, setShow] = useState(false);
-  const handleShow = () => setShow(true);
-  const handleClose = () => {
-    setShow(false);
-  };
   const [showEdite, setShowEdite] = useState(false);
   const handleShowEdite = () => setShowEdite(true);
   const handleCloseEdite = () => setShowEdite(false);

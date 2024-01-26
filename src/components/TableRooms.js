@@ -5,8 +5,6 @@ import { useDropzone } from "react-dropzone";
 import { BASE_URL } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 const dropzoneStyle = {
   border: "2px dashed #cccccc",
   borderRadius: "4px",
@@ -37,7 +35,7 @@ const TableRooms = ({ UID }) => {
     };
 
     fetchRoomType();
-  }, [UID]);
+  }, [UID, typeName]);
   const { data: TypeRooms = [], refetch } = useFetch(
     `${BASE_URL}/api/showTypeRoomID/${dataUID.Room_Type}`
   );
@@ -170,12 +168,9 @@ const TableRooms = ({ UID }) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(
-            `${BASE_URL}/api/typeDelete/${RoomID}`,
-            {
-              method: "DELETE",
-            }
-          );
+          const response = await fetch(`${BASE_URL}/api/typeDelete/${RoomID}`, {
+            method: "DELETE",
+          });
           if (response.ok) {
             Swal.fire({
               title: "ลบสำเร็จ!",
