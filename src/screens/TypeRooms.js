@@ -1,12 +1,11 @@
 import React from "react";
 import NavBar from "../components/navBar";
 import SlideBar from "../components/SlideBar";
-import TableBlog from "../components/TableBlog";
+import TableTypeRooms from "../components/TableTypeRooms";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { Container } from "react-bootstrap";
 
-
-function Blogs() {
+function TypeRooms() {
   const [, , User_Status] = useTokenCheck();
   if (User_Status) {
   }
@@ -21,19 +20,19 @@ function Blogs() {
             </div>
             <div className="row wrapper border-bottom white-bg page-heading">
               <div className="col-lg-10">
-                <h2>จัดการบทความ</h2>
+                <h2>จัดการประเภทห้อง</h2>
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
                     <a href="/">หน้าแรก</a>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href={"/"}>จัดการบทความ</a>
+                    <a href={"/"}>จัดการประเภทห้อง</a>
                   </li>
                 </ol>
               </div>
             </div>
             <div className="wrapper wrapper-content animated fadeInRight">
-              <TableBlog />
+              <TableTypeRooms />
             </div>{" "}
           </div>
         </div>
@@ -48,4 +47,4 @@ function Blogs() {
   }
 }
 
-export default Blogs;
+export default TypeRooms;

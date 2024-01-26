@@ -510,7 +510,7 @@ function TableDoctors({ onSearch }) {
             {/* แก้ไขแพทย์ */}
             <Modal show={showEdite} onHide={handleCloseEdite}>
               <Modal.Header closeButton>
-                <Modal.Title>จัดการข้อมูลแพทย์</Modal.Title>
+                <Modal.Title>แก้ไขแพทย์</Modal.Title>
               </Modal.Header>
 
               <Modal.Body>

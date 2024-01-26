@@ -5,6 +5,11 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
+
+import { EditorState, convertToRaw } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"; // เพิ่มสไตล์ตามต้องการ
+import draftToHtml from "draftjs-to-html";
 function TableDepartments({ onSearch }) {
   useTokenCheck();
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลแผนก, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
@@ -21,7 +26,11 @@ function TableDepartments({ onSearch }) {
       setDepartment(departments);
     }
   }, [departments]);
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
+  const onEditorStateChange = (newEditorState) => {
+    setEditorState(newEditorState);
+  };
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
   const [perPage] = useState(10);
@@ -434,59 +443,75 @@ function TableDepartments({ onSearch }) {
               </Button>
             </Modal.Footer>
           </Modal>
-          <Modal show={showEdite} onHide={handleCloseEdite}>
-            <Modal.Header>
-              <Modal.Title className="font">จัดการแผนก </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {selectedClinics && (
-                <Card>
-                  <Card.Body>
-                    <Form.Group controlId="Clinic_Code">
-                      <Form.Label>
-                        <h4>รหัสแผนก</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="รหัสแผนก"
-                        value={selectedClinics.Clinic_Code}
-                        onChange={(e) =>
-                          setSelectedClinics({
-                            ...selectedClinics,
-                            Clinic_Code: e.target.value,
-                          })
-                        }
-                        disabled
-                      />
-                    </Form.Group>
-                    <br />
-                    <Form.Group>
-                      <Form.Label>
-                        <h4>ชื่อแผนก</h4>
-                      </Form.Label>
-                      <Form.Control
-                        placeholder="ชื่อแผนก"
-                        value={selectedClinics.Clinic_Name}
-                        onChange={(e) =>
-                          setSelectedClinics({
-                            ...selectedClinics,
-                            Clinic_Name: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <br />
-                  </Card.Body>
-                </Card>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseEdite}>
-                ปิด
-              </Button>
-              <Button variant="success" onClick={handleSave}>
-                บันทึก
-              </Button>
-            </Modal.Footer>
+          <Modal
+            show={showEdite}
+            onHide={handleCloseEdite}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
+            <div className=" modal-lg">
+              <Modal.Header>
+                <Modal.Title className="font">จัดการแผนก </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {selectedClinics && (
+                  <Card>
+                    <Card.Body>
+                      <Form.Group controlId="Clinic_Code">
+                        <Form.Label>
+                          <h4>รหัสแผนก</h4>
+                        </Form.Label>
+                        <Form.Control
+                          placeholder="รหัสแผนก"
+                          value={selectedClinics.Clinic_Code}
+                          onChange={(e) =>
+                            setSelectedClinics({
+                              ...selectedClinics,
+                              Clinic_Code: e.target.value,
+                            })
+                          }
+                          disabled
+                        />
+                      </Form.Group>
+                      <br />
+                      <Form.Group>
+                        <Form.Label>
+                          <h4>ชื่อแผนก</h4>
+                        </Form.Label>
+                        <Form.Control
+                          placeholder="ชื่อแผนก"
+                          value={selectedClinics.Clinic_Name}
+                          onChange={(e) =>
+                            setSelectedClinics({
+                              ...selectedClinics,
+                              Clinic_Name: e.target.value,
+                            })
+                          }
+                        />
+                         <br />
+                        <Editor
+                          editorState={editorState}
+                          wrapperClassName="demo-wrapper"
+                          editorClassName="demo-editor"
+                          onEditorStateChange={onEditorStateChange}
+                        />
+                       
+                      </Form.Group>
+                      <br />
+                    </Card.Body>
+                  </Card>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseEdite}>
+                  ปิด
+                </Button>
+                <Button variant="success" onClick={handleSave}>
+                  บันทึก
+                </Button>
+              </Modal.Footer>
+            </div>
           </Modal>
         </div>
       </div>

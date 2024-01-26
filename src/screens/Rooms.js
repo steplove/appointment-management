@@ -1,13 +1,15 @@
 import React from "react";
 import NavBar from "../components/navBar";
 import SlideBar from "../components/SlideBar";
-import TableBlog from "../components/TableBlog";
+import TableRooms from "../components/TableRooms";
 import useTokenCheck from "../hooks/useTokenCheck";
 import { Container } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
-
-function Blogs() {
+function Rooms() {
   const [, , User_Status] = useTokenCheck();
+  const { UID } = useParams();
+
   if (User_Status) {
   }
   if (User_Status === 1) {
@@ -21,19 +23,19 @@ function Blogs() {
             </div>
             <div className="row wrapper border-bottom white-bg page-heading">
               <div className="col-lg-10">
-                <h2>จัดการบทความ</h2>
+                <h2>จัดการรูปห้อง</h2>
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
                     <a href="/">หน้าแรก</a>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href={"/"}>จัดการบทความ</a>
+                    <a href={"/"}>จัดการรูปห้อง</a>
                   </li>
                 </ol>
               </div>
             </div>
             <div className="wrapper wrapper-content animated fadeInRight">
-              <TableBlog />
+              <TableRooms UID={UID}/>
             </div>{" "}
           </div>
         </div>
@@ -48,4 +50,4 @@ function Blogs() {
   }
 }
 
-export default Blogs;
+export default Rooms;

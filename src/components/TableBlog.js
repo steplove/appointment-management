@@ -4,7 +4,8 @@ import ReactPaginate from "react-paginate";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 function TableBlog() {
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const [perPage] = useState(10);
@@ -34,6 +35,7 @@ function TableBlog() {
   const offset = currentPage * perPage;
   displayedBlogs.slice(offset, offset + perPage);
   const [searchResult, setSearchResult] = useState(null);
+  console.log(setSearchResult);
   const shouldShowAllData =
     !searchResult && displayedBlogs && displayedBlogs.length > 0;
 
@@ -53,7 +55,7 @@ function TableBlog() {
 
   const handleEditModal = (Blog_ID) => {
     const packageToEdit = displayedBlogs.find((p) => p.Blog_ID === Blog_ID);
-    console.log(Blog_ID, "Blog_IDBlog_IDBlog_ID");
+    console.log(packageToEdit, "Blog_IDBlog_IDBlog_ID");
     setSelectedBlogs(packageToEdit);
     handleShowEdite();
   };
@@ -301,8 +303,9 @@ function TableBlog() {
                                 <h3>{blogs.Blog_Name}</h3>
                               </td>
                               <td>
-                                <h3>{blogs.Blog_Detail}</h3>
+                                <h3>{blogs.Blog_Detail.slice(0, 50)}</h3>
                               </td>
+
                               <td>
                                 <Button
                                   variant="primary"
@@ -395,7 +398,7 @@ function TableBlog() {
               />
             </div>
             {/* modal เพิ่มบทความ */}
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} size="lg">
               <Modal.Header closeButton>
                 <Modal.Title>เพิ่มบทความ</Modal.Title>
               </Modal.Header>
@@ -416,12 +419,17 @@ function TableBlog() {
                     <Form.Label>
                       <h4>รายละเอียดบทความ</h4>
                     </Form.Label>
-                    <Form.Control
+                    {/* <Form.Control
                       as="textarea"
                       name="Blog_Detail"
                       placeholder="รายละเอียดชื่อบทความ"
                       value={blog_Detail}
                       onChange={(e) => setBlog_Detail(e.target.value)}
+                    /> */}
+                    <ReactQuill
+                      theme="snow"
+                      value={blog_Detail}
+                      onChange={setBlog_Detail}
                     />
                   </Form.Group>
                   {/* ฟิลด์รูปบทความ */}
@@ -493,7 +501,7 @@ function TableBlog() {
               </Modal.Footer>
             </Modal>
             {/* modal จัดการบทความ */}
-            <Modal show={showEdite} onHide={handleClose}>
+            <Modal show={showEdite} onHide={handleClose} size="lg">
               <Modal.Header closeButton>
                 <Modal.Title>จัดการบทความ</Modal.Title>
               </Modal.Header>
@@ -516,7 +524,7 @@ function TableBlog() {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label>รายละเอียดบทความ</Form.Label>
+                      {/* <Form.Label>รายละเอียดบทความ</Form.Label>
                       <Form.Control
                         as="textarea"
                         placeholder="รายละเอียดบทความ"
@@ -525,6 +533,16 @@ function TableBlog() {
                           setSelectedBlogs({
                             ...selectedBlogs,
                             Blog_Detail: e.target.value,
+                          })
+                        }
+                      /> */}
+                      <ReactQuill
+                        theme="snow"
+                        value={selectedBlogs.Blog_Detail}
+                        onChange={(value) =>
+                          setSelectedBlogs({
+                            ...selectedBlogs,
+                            Blog_Detail: value,
                           })
                         }
                       />

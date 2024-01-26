@@ -135,6 +135,20 @@ function SlideBar() {
                 </a>
               )}
             </li>
+            <li
+              className={
+                currentPath === "/TypeRooms" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/TypeRooms">
+                  <i className="fa  fa-picture-o "></i>{" "}
+                  <span className="nav-label">จัดการประเภทห้อง</span>{" "}
+                </a>
+              )}
+            </li>
           </ul>
         </div>
       </nav>

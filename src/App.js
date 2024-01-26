@@ -9,6 +9,9 @@ import Employees from "./screens/Employees";
 import Packages from "./screens/Packages";
 import Blogs from "./screens/Blogs";
 import Banners from "./screens/Banners";
+import TypeRooms from "./screens/TypeRooms";
+import Rooms from "./screens/Rooms";
+import MyEditor from "./components/MyEditor.JS";
 function App() {
   return (
     <Router>
@@ -23,8 +26,12 @@ function App() {
         <Route path="/Packages" element={<Packages />} />
         <Route path="/Blogs" element={<Blogs />} />
         <Route path="/Banners" element={<Banners />} />
+        <Route path="/TypeRooms" element={<TypeRooms />} />
+        <Route path="/Rooms/:UID" element={<Rooms />} />
+        <Route path="/MyEditor" element={<MyEditor />} />
       </Routes>
     </Router>
+    
   );
 }
 

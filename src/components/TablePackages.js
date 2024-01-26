@@ -170,6 +170,7 @@ function TablePackages() {
             showConfirmButton: false,
             timer: 1500,
           });
+          refetch();
           clearForm();
         }
         console.log("Success:", data);
