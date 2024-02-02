@@ -11,6 +11,7 @@ import Blogs from "./screens/Blogs";
 import Banners from "./screens/Banners";
 import TypeRooms from "./screens/TypeRooms";
 import Rooms from "./screens/Rooms";
+import Update from "./screens/Update";
 import MyEditor from "./components/MyEditor.JS";
 function App() {
   return (
@@ -29,9 +30,9 @@ function App() {
         <Route path="/TypeRooms" element={<TypeRooms />} />
         <Route path="/Rooms/:UID" element={<Rooms />} />
         <Route path="/MyEditor" element={<MyEditor />} />
+        <Route path="/Update" element={<Update />} />
       </Routes>
     </Router>
-    
   );
 }
 

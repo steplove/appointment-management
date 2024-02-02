@@ -80,7 +80,7 @@ function TableApppointments({ onSearch }) {
   const handleCloseModalSearchAPM_No = () => setShowModalSearchAPM_No(false);
   const [selectedCustomers, setSelectedCustomers] = useState(null);
   const [searchAPM_No, setSearchAPM_No] = useState([]);
-
+  console.log(searchAPM_No.AppointmentNo);
   //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
   const handleEditModal = (customerId) => {
     const customer = appointmentsCustomers.find(
@@ -229,7 +229,7 @@ function TableApppointments({ onSearch }) {
     handleCloseModal();
     try {
       const response = await fetch(
-        `${BASE_URL}/api/searchAllAppointment/?HN=${selectedCustomers.HN}`
+        `${BASE_URL}/api/getAllAmp/${selectedCustomers.HN}`
       );
       if (response.ok) {
         const data = await response.json();
@@ -839,15 +839,15 @@ function TableApppointments({ onSearch }) {
                       <th>เครื่องมือ</th>
                     </tr>
                   </thead>
-                  <tbody className="text-center">
+                  {/* <tbody className="text-center">
                     {searchAPM_No && searchAPM_No.length > 0 ? (
                       searchAPM_No.map((hnData, index) => (
-                        <tr key={hnData.RefNo}>
+                        <tr key={hnData.HN}>
                           <td>
                             <h4>{index + 1}</h4>
                           </td>
                           <td>
-                            <h4>{hnData.AppointmentNo}</h4>
+                            <h4>{hnData["AppointmentNo"]}</h4>
                           </td>
                           <td>
                             <h4>{hnData.HN}</h4>
@@ -862,15 +862,57 @@ function TableApppointments({ onSearch }) {
                           <td>{hnData.AppointDate}</td>
                           <td>{hnData.AppointTime}</td>
                           <td>
-                            <input
+                            {/* <input
+                              type="checkbox"
+                              checked={selectedAPM_No.includes(hnData)}
+                              onChange={() => toggleSelection(hnData)}
+                            /> */}
+                  {/* <Form.Control
                               type="checkbox"
                               checked={selectedAPM_No.includes(hnData)}
                               onChange={() => toggleSelection(hnData)}
                             />
                           </td>
-                        </tr>
-                      ))
+                        </tr> */}
+                  {/* )) */}
+                  {/* ) : (
+                      <tr key="no-data">
+                        <td colSpan="9">No data available</td>
+                      </tr>
+                    )}
+                  </tbody>  */}
+                  <tbody className="text-center">
+                    {searchAPM_No ? (
+                      // ในกรณีที่ searchAPM_No เป็น Object
+                      <tr key={searchAPM_No.HN}>
+                        <td>
+                          <h4>1</h4>
+                        </td>
+                        <td>
+                          <h4>{searchAPM_No["AppointmentNo"]}</h4>
+                        </td>
+                        <td>
+                          <h4>{searchAPM_No.HN}</h4>
+                        </td>
+                        <td>
+                          <h4>{searchAPM_No.Doctor}</h4>
+                        </td>
+                        <td>
+                          <h4>{searchAPM_No.DoctorName}</h4>
+                        </td>
+                        <td>{searchAPM_No.ClinicName}</td>
+                        <td>{searchAPM_No.AppointDate}</td>
+                        <td>{searchAPM_No.AppointTime}</td>
+                        <td>
+                          <Form.Control
+                            type="checkbox"
+                            checked={selectedAPM_No.includes(searchAPM_No)}
+                            onChange={() => toggleSelection(searchAPM_No)}
+                          />
+                        </td>
+                      </tr>
                     ) : (
+                      // ในกรณีที่ searchAPM_No เป็น falsy (null, undefined, etc.)
                       <tr key="no-data">
                         <td colSpan="9">No data available</td>
                       </tr>

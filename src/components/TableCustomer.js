@@ -101,8 +101,11 @@ function TableCustomer({ onSearch }) {
     try {
       setLoadingMap(true); // เริ่มแสดง loading animation
 
+      // const response = await fetch(
+      //   BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
+      // );
       const response = await fetch(
-        BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
+        BASE_URL + "/api/getAllPatient/" + IdenNumber
       );
       const data = await response.json();
       const codedData = [data];

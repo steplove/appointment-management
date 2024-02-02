@@ -149,6 +149,20 @@ function SlideBar() {
                 </a>
               )}
             </li>
+            {/* <li
+              className={
+                currentPath === "/Update" && User_Status === 1
+                  ? "active"
+                  : "hidden"
+              }
+            >
+              {User_Status === 1 && (
+                <a href="/Update">
+                  <i className="fa fa-refresh "></i>{" "}
+                  <span className="nav-label">อัพเดทข้อมูล</span>{" "}
+                </a>
+              )}
+            </li> */}
           </ul>
         </div>
       </nav>

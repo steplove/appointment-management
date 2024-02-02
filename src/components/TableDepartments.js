@@ -5,15 +5,17 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
+import ReactQuill from "react-quill";
 
-import { EditorState, convertToRaw } from "draft-js";
-import { Editor } from "react-draft-wysiwyg";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"; // เพิ่มสไตล์ตามต้องการ
-import draftToHtml from "draftjs-to-html";
+
 function TableDepartments({ onSearch }) {
   useTokenCheck();
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลแผนก, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
   const [department, setDepartment] = useState([]);
+  const [clinicImage, setClinicImage] = useState(null);
+  const [packagePreview, setPackagePreview] = useState(null);
+  const [clinicImgBanner, setBannerImage] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState(null);
   const {
     data: departments = [],
     loading,
@@ -26,14 +28,11 @@ function TableDepartments({ onSearch }) {
       setDepartment(departments);
     }
   }, [departments]);
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
-  const onEditorStateChange = (newEditorState) => {
-    setEditorState(newEditorState);
-  };
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
   const [perPage] = useState(10);
+
   // ฟังก์ชันสำหรับการเปลี่ยนหน้า
 
   const handlePageChange = (selectedPage) => {
@@ -60,6 +59,7 @@ function TableDepartments({ onSearch }) {
   // สถานะสำหรับเก็บชื่อและรหัสแผนก
   const [clinicName, setClinicName] = useState("");
   const [clinicCode, setClinicCode] = useState("");
+  const [clinicDescription, setClinicDescription] = useState("");
   const [selectedClinics, setSelectedClinics] = useState(null);
 
   // ฟังก์ชั่นสำหรับแสดง modal
@@ -93,39 +93,50 @@ function TableDepartments({ onSearch }) {
   };
   //ฟังก์ชั่น API ตอนกด insert แผนก เพิ่มแผนก
   const handleSubmitInsert = async () => {
-    const response = await fetch(BASE_URL + "/api/InsertClinic", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        clinicCode: clinicCode,
-        clinicName: clinicName,
-      }),
-    });
-    if (response.status === 201) {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลแผนกสำเร็จ
-      Swal.fire({
-        title: "เพิ่มข้อมูลแผนกสำเร็จ!",
-        icon: "success",
-        showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-        timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-      });
+    try {
+      const formData = new FormData();
+      formData.append("clinicCode", clinicCode);
+      formData.append("clinicName", clinicName);
+      formData.append("clinicDescription", clinicDescription);
+      if (clinicImage) {
+        formData.append("clinicImage", clinicImage);
+      }
+      if (clinicImgBanner) {
+        formData.append("clinicImgBanner", clinicImgBanner);
+      }
+      try {
+        const response = await fetch(`${BASE_URL}/api/InsertClinic`, {
+          method: "POST",
+          body: formData,
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-      // ตั้งค่า state ของ clinicCode และ clinicName เป็นค่าว่าง
-      setClinicCode("");
-      setClinicName("");
-      // หลังจากการบันทึกข้อมูล ปิด modal
-      handleClose();
-    } else {
-      // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
-      Swal.fire({
-        title: "มีข้อผิดพลาด!",
-        text: "ไม่สามารถเพิ่มข้อมูลแผนกได้",
-        icon: "error",
-        confirmButtonText: "ตกลง",
-      });
-      handleClose();
+        const data = await response.json();
+        if (response.ok) {
+          setShow(false);
+          Swal.fire({
+            title: "บันทึกสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          refetch();
+        }
+        console.log("Success:", data);
+        // Additional logic after a successful API call
+      } catch (error) {
+        setShow(false);
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // Additional error handling logic
     }
   };
   //ฟังก์ชั่น API ตอนแก้ไขแผนก
@@ -143,17 +154,23 @@ function TableDepartments({ onSearch }) {
         cancelButtonText: "ยกเลิก",
       }).then(async (result) => {
         if (result.isConfirmed) {
+          const formData = new FormData();
+          formData.append("Clinic_Code", selectedClinics.Clinic_Code);
+          formData.append("Clinic_Name", selectedClinics.Clinic_Name);
+          formData.append("Clinic_Detail", selectedClinics.Clinic_Detail);
+          // ตรวจสอบว่ามีการเลือกรูปใหม่หรือไม่
+          if (clinicImage) {
+            formData.append("clinicImage", clinicImage);
+          }
+          if (clinicImgBanner) {
+            formData.append("clinicImgBanner", clinicImgBanner);
+          }
+
           const response = await fetch(
             `${BASE_URL}/api/UpdateClinic/${selectedClinics.Clinic_ID}`,
             {
               method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                Clinic_Code: selectedClinics.Clinic_Code,
-                Clinic_Name: selectedClinics.Clinic_Name,
-              }),
+              body: formData,
             }
           );
 
@@ -187,26 +204,52 @@ function TableDepartments({ onSearch }) {
   };
 
   //ลบข้อมูลแผนก
-  // const handleDelete = () => {
-  //   showAlert({
-  //     title: "คุณแน่ใจที่จะลบ?",
-  //     text: "",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#3085d6",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "ยืนยัน",
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       showAlert({
-  //         title: "ลบข้อมูลแผนกสำเร็จ!",
-  //         icon: "success",
-  //         showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
-  //         timer: 1500, // ปิดหน้าต่างอัตโนมัติภายใน 1.5 วินาที
-  //       });
-  //     }
-  //   });
-  // };
+  const handleDelete = async (clinicCode) => {
+    const result = await Swal.fire({
+      title: "คุณแน่ใจที่จะลบ?",
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ยืนยัน",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/clinicDelete/${clinicCode}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          Swal.fire({
+            title: "ลบสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          refetch();
+        } else {
+          const data = await response.json();
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: data.message,
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+          icon: "error",
+        });
+      }
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      Swal.fire("ยกเลิก", "ข้อมูลของคุณยังคงอยู่", "error");
+    }
+  };
 
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
   const handleSearchClinicAppointments = () => {
@@ -228,16 +271,34 @@ function TableDepartments({ onSearch }) {
         console.error(error);
       });
   };
-
+  const handleImageChange = (e, setImageFunction, setPreviewFunction) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFunction(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewFunction(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (selectedClinics.Banner1) {
+        setImageFunction(selectedClinics.Banner1);
+        setPreviewFunction(selectedClinics.Banner1);
+      } else {
+        setImageFunction(null);
+        setPreviewFunction(null);
+      }
+    }
+  };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
     return (
       <div className="spiner-example">
-        <div class="sk-spinner sk-spinner-three-bounce">
-          <div class="sk-bounce1"></div>
-          <div class="sk-bounce2"></div>
-          <div class="sk-bounce3"></div>
+        <div className="sk-spinner sk-spinner-three-bounce">
+          <div className="sk-bounce1"></div>
+          <div className="sk-bounce2"></div>
+          <div className="sk-bounce3"></div>
         </div>
         <div className="text-center">
           <p>Loading...</p>
@@ -321,9 +382,12 @@ function TableDepartments({ onSearch }) {
                             >
                               <h4>จัดการ</h4>
                             </Button>
-                            {/* <Button variant="danger" onClick={() => handleDelete()}>
-                                          <h4>ลบ</h4>
-                                        </Button> */}
+                            <Button
+                              variant="danger"
+                              onClick={() => handleDelete(department.Clinic_ID)}
+                            >
+                              <h4>ลบ</h4>
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -360,9 +424,14 @@ function TableDepartments({ onSearch }) {
                                 >
                                   <h4>จัดการ</h4>
                                 </Button>
-                                {/* <Button variant="danger" onClick={() => handleDelete()}>
-                                          <h4>ลบ</h4>
-                                        </Button> */}
+                                <Button
+                                  variant="danger"
+                                  onClick={() =>
+                                    handleDelete(department.Clinic_ID)
+                                  }
+                                >
+                                  <h4>ลบ</h4>
+                                </Button>
                               </td>
                             </tr>
                           ))}
@@ -401,7 +470,13 @@ function TableDepartments({ onSearch }) {
             />
           </div>
           {/* เพิ่มแผนก  */}
-          <Modal show={show} onHide={handleClose}>
+          <Modal
+            show={show}
+            onHide={handleClose}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
             <Modal.Header>
               <Modal.Title className="font">เพิ่มแผนก </Modal.Title>
             </Modal.Header>
@@ -431,6 +506,74 @@ function TableDepartments({ onSearch }) {
                     />
                   </Form.Group>
                   <br />
+                  <Form.Group>
+                    <Form.Label>
+                      <h4>รายละเอียด</h4>
+                    </Form.Label>
+                    <ReactQuill
+                      theme="snow"
+                      value={clinicDescription}
+                      onChange={(value) => setClinicDescription(value)}
+                    />
+                  </Form.Group>
+
+                  <br />
+                  {/* ฟิลด์รูปภาพแพ็คเกจ */}
+                  <Form.Group>
+                    <Form.Label>รูปคลินิก</Form.Label>
+                    <div className="custom-file">
+                      <input
+                        id="logo"
+                        type="file"
+                        className="custom-file-input"
+                        onChange={(e) =>
+                          handleImageChange(
+                            e,
+                            setClinicImage,
+                            setPackagePreview
+                          )
+                        }
+                      />
+                      <label className="custom-file-label">
+                        Choose file...
+                      </label>
+                    </div>
+                    {packagePreview && (
+                      <div style={{ marginTop: "20px" }}>
+                        <img
+                          src={packagePreview}
+                          alt="Preview"
+                          style={{ maxWidth: "300px" }}
+                        />
+                      </div>
+                    )}
+                  </Form.Group>
+                  {/* ฟิลด์รูปภาพแบนเนอร์ */}
+                  <Form.Group>
+                    <Form.Label>รูปแบนเนอร์</Form.Label>
+                    <div className="custom-file">
+                      <input
+                        id="logo"
+                        type="file"
+                        className="custom-file-input"
+                        onChange={(e) =>
+                          handleImageChange(e, setBannerImage, setBannerPreview)
+                        }
+                      />
+                      <label className="custom-file-label">
+                        Choose file...
+                      </label>
+                    </div>
+                    {bannerPreview && (
+                      <div style={{ marginTop: "20px" }}>
+                        <img
+                          src={bannerPreview}
+                          alt="Preview"
+                          style={{ maxWidth: "300px" }}
+                        />
+                      </div>
+                    )}
+                  </Form.Group>
                 </Card.Body>
               </Card>
             </Modal.Body>
@@ -471,7 +614,6 @@ function TableDepartments({ onSearch }) {
                               Clinic_Code: e.target.value,
                             })
                           }
-                          disabled
                         />
                       </Form.Group>
                       <br />
@@ -489,15 +631,98 @@ function TableDepartments({ onSearch }) {
                             })
                           }
                         />
-                         <br />
-                        <Editor
-                          editorState={editorState}
-                          wrapperClassName="demo-wrapper"
-                          editorClassName="demo-editor"
-                          onEditorStateChange={onEditorStateChange}
+                        <br />
+                        <ReactQuill
+                          theme="snow"
+                          value={selectedClinics.Clinic_Detail}
+                          onChange={(value) => {
+                            setSelectedClinics({
+                              ...selectedClinics,
+                              Clinic_Detail: value,
+                            });
+                          }}
                         />
-                       
                       </Form.Group>
+                      <Form.Group>
+                        <Form.Label>รูปคลินิก</Form.Label>
+                        <div className="custom-file">
+                          <input
+                            id="clinicImage"
+                            type="file"
+                            className="custom-file-input"
+                            onChange={(e) =>
+                              handleImageChange(
+                                e,
+                                setClinicImage,
+                                setPackagePreview
+                              )
+                            }
+                          />
+                          <label className="custom-file-label">
+                            Choose file...
+                          </label>
+                        </div>
+                        {packagePreview && (
+                          <div style={{ marginTop: "20px" }}>
+                            <img
+                              src={packagePreview}
+                              alt="Preview"
+                              style={{ maxWidth: "300px" }}
+                            />
+                          </div>
+                        )}
+
+                        {selectedClinics.Banner1 && (
+                          <div style={{ marginTop: "20px" }}>
+                            <img
+                              src={`${BASE_URL}/${selectedClinics.Banner1}`}
+                              alt="Banner 1"
+                              style={{ maxWidth: "300px" }}
+                            />
+                          </div>
+                        )}
+                      </Form.Group>
+
+                      <Form.Group>
+                        <Form.Label>รูปแบนเนอร์</Form.Label>
+                        <div className="custom-file">
+                          <input
+                            id="bannerImage"
+                            type="file"
+                            className="custom-file-input"
+                            onChange={(e) =>
+                              handleImageChange(
+                                e,
+                                setBannerImage,
+                                setBannerPreview
+                              )
+                            }
+                          />
+                          <label className="custom-file-label">
+                            Choose file...
+                          </label>
+                        </div>
+                        {bannerPreview && (
+                          <div style={{ marginTop: "20px" }}>
+                            <img
+                              src={bannerPreview}
+                              alt="Preview"
+                              style={{ maxWidth: "300px" }}
+                            />
+                          </div>
+                        )}
+
+                        {selectedClinics.Banner2 && (
+                          <div style={{ marginTop: "20px" }}>
+                            <img
+                              src={`${BASE_URL}/${selectedClinics.Banner2}`}
+                              alt="Banner 2"
+                              style={{ maxWidth: "300px" }}
+                            />
+                          </div>
+                        )}
+                      </Form.Group>
+
                       <br />
                     </Card.Body>
                   </Card>
