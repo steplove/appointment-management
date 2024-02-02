@@ -330,7 +330,6 @@ function TableTypeRooms() {
                       <option value="Superior">Superior</option>
                       <option value="Superior_IPD4">Superior IPD4</option>
                       <option value="VIP_Suite">VIP Suite</option>
-                      ))}
                     </Form.Control>
                   </Form.Group>
                   <Form.Group>
@@ -388,14 +387,13 @@ function TableTypeRooms() {
               <Modal.Body>
                 {selectedRoomType && (
                   <Form>
-                    <Form.Group controlId="doctorName">
-                    </Form.Group>
+                    <Form.Group controlId="doctorName"></Form.Group>
                     <Form.Label>คุณลักษณะห้อง</Form.Label>
                     <ReactQuill
                       theme="snow"
                       value={selectedRoomType.Room_Detail}
                       onChange={(value, delta, source) => {
-                        if (source === 'user') { 
+                        if (source === "user") {
                           setSelectedRoomType({
                             ...selectedRoomType,
                             Room_Detail: value,
