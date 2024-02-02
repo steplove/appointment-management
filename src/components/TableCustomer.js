@@ -406,6 +406,53 @@ function TableCustomer({ onSearch }) {
       });
     }
   };
+
+  const handleDelete = async (IdenNumber) => {
+    const result = await Swal.fire({
+      title: "คุณแน่ใจที่จะลบ?",
+      text: "",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "ยืนยัน",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/CustomerDelete/${IdenNumber}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          Swal.fire({
+            title: "ลบสำเร็จ!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          refetch();
+        } else {
+          const data = await response.json();
+          Swal.fire({
+            title: "เกิดข้อผิดพลาด!",
+            text: data.message,
+            icon: "error",
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          title: "เกิดข้อผิดพลาด!",
+          text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+          icon: "error",
+        });
+      }
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      Swal.fire("ยกเลิก", "ข้อมูลของคุณยังคงอยู่", "error");
+    }
+  };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
@@ -557,6 +604,13 @@ function TableCustomer({ onSearch }) {
                             >
                               <h4>จัดการ</h4>
                             </Button>
+                            <Button
+                              variant="danger"
+                              onClick={() => handleDelete(customer.IdenNumber)}
+                              style={{ margin: "10px" }}
+                            >
+                              <h4>ลบ</h4>
+                            </Button>
                             {customer.Customer_Status === 1 ? (
                               <Button
                                 variant="danger"
@@ -616,6 +670,15 @@ function TableCustomer({ onSearch }) {
                                   }
                                 >
                                   <h4>จัดการ</h4>
+                                </Button>
+                                <Button
+                                  variant="danger"
+                                  onClick={() =>
+                                    handleDelete(customer.IdenNumber)
+                                  }
+                                  style={{ margin: "10px" }}
+                                >
+                                  <h4>ลบ</h4>
                                 </Button>
                                 {customer.Customer_Status === 1 ? (
                                   <Button

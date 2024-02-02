@@ -80,7 +80,7 @@ function TableApppointments({ onSearch }) {
   const handleCloseModalSearchAPM_No = () => setShowModalSearchAPM_No(false);
   const [selectedCustomers, setSelectedCustomers] = useState(null);
   const [searchAPM_No, setSearchAPM_No] = useState([]);
-  console.log(searchAPM_No.AppointmentNo);
+  const [selectedAPM_No, setSelectedAPM_No] = useState([]);
   //ฟังก์แก้ไข เมือกดแก้ไข จะแสดง modal แล้วข้อมูลผู้ที่จะแก้ไข
   const handleEditModal = (customerId) => {
     const customer = appointmentsCustomers.find(
@@ -164,7 +164,6 @@ function TableApppointments({ onSearch }) {
         }
       );
       if (response.status === 200) {
-        console.log("111");
         const responseStatus = await fetch(
           `${BASE_URL}/api/InsertAppointmentStatus/${selectedCustomers.APM_UID}`,
           {
@@ -231,18 +230,27 @@ function TableApppointments({ onSearch }) {
       const response = await fetch(
         `${BASE_URL}/api/getAllAmp/${selectedCustomers.HN}`
       );
+      console.log(response);
       if (response.ok) {
         const data = await response.json();
-        setSearchAPM_No(data);
+        if (data.length === 0) {
+          Swal.fire({
+            icon: "info",
+            title: "ไม่พบข้อมูล",
+            text: "ไม่พบข้อมูลที่ค้นหา",
+          });
+        } else {
+          setSearchAPM_No(data);
+        }
       } else {
         console.error("Failed to fetch data");
+        setSearchAPM_No("");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const [selectedAPM_No, setSelectedAPM_No] = useState([]);
   // หากคุณต้องการเพิ่ม/ลบรายการจากการเลือกในสถานะการเลือก
   const toggleSelection = (hnData) => {
     if (selectedAPM_No.includes(hnData)) {
