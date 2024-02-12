@@ -5,13 +5,6 @@ import { useDropzone } from "react-dropzone";
 import { BASE_URL } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-const dropzoneStyle = {
-  border: "2px dashed #cccccc",
-  borderRadius: "4px",
-  padding: "20px",
-  textAlign: "center",
-  cursor: "pointer",
-};
 
 const TableRooms = ({ UID }) => {
   const [typeName, setTypeName] = useState("");
@@ -46,7 +39,14 @@ const TableRooms = ({ UID }) => {
       setDisplayedTypeRoom(TypeRooms);
     }
   }, [TypeRooms]);
-
+  const dropzoneStyle = {
+    border: "2px dashed #cccccc",
+    borderRadius: "4px",
+    padding: "20px",
+    textAlign: "center",
+    cursor: "pointer",
+  };
+  
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const [perPage] = useState(10);
 

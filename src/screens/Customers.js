@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/navBar";
 import TableCustomer from "../components/TableCustomer";
 import SlideBar from "../components/SlideBar";
@@ -7,8 +7,14 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { Container } from "react-bootstrap";
 function Customers() {
   const [, , User_Status] = useTokenCheck();
-  if(User_Status){}
-  if (User_Status === 1 || User_Status === 2) {
+  const [openLoad, setopenLoad] = useState(false);
+  useEffect(() => {
+    if (User_Status === 1 || User_Status === 2) {
+      // ทำการ render หน้าเว็บใหม่
+      setopenLoad(true);
+    }
+  }, [User_Status]);
+  if (openLoad) {
     return (
       <>
         <div id="wrapper">
@@ -41,8 +47,8 @@ function Customers() {
   } else {
     return (
       <Container className="text-center my-5" style={{ color: "white" }}>
-      <h1 className="text-white">คุณไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
-    </Container>
+        <h1 className="text-white">คุณไม่มีสิทธิ์เข้าถึงหน้านี้</h1>
+      </Container>
     );
   }
 }

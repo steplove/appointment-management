@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/navBar";
 import { Container } from "react-bootstrap";
 import TableAppointments from "../components/TableAppointments";
@@ -7,8 +7,14 @@ import SlideBar from "../components/SlideBar";
 import useTokenCheck from "../hooks/useTokenCheck";
 function Home() {
   const [, , User_Status] = useTokenCheck();
-  if(User_Status){}
-  if (User_Status === 1 || User_Status === 2) {
+  const [openLoad, setopenLoad] = useState(false);
+  useEffect(() => {
+    if (User_Status === 1 || User_Status === 2) {
+      // ทำการ render หน้าเว็บใหม่
+      setopenLoad(true);
+    }
+  }, [User_Status]);
+  if (openLoad) {
     return (
       <>
         <div id="wrapper">

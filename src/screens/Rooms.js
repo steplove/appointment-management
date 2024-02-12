@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/navBar";
 import SlideBar from "../components/SlideBar";
 import TableRooms from "../components/TableRooms";
@@ -10,9 +10,14 @@ function Rooms() {
   const [, , User_Status] = useTokenCheck();
   const { UID } = useParams();
 
-  if (User_Status) {
-  }
-  if (User_Status === 1) {
+  const [openLoad, setopenLoad] = useState(false);
+  useEffect(() => {
+    if (User_Status === 1) {
+      // ทำการ render หน้าเว็บใหม่
+      setopenLoad(true);
+    }
+  }, [User_Status]);
+  if (openLoad) {
     return (
       <>
         <div id="wrapper">
@@ -35,7 +40,7 @@ function Rooms() {
               </div>
             </div>
             <div className="wrapper wrapper-content animated fadeInRight">
-              <TableRooms UID={UID}/>
+              <TableRooms UID={UID} />
             </div>{" "}
           </div>
         </div>

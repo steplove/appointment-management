@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/navBar";
 import SlideBar from "../components/SlideBar";
 import TablePackages from "../components/TablePackages";
@@ -7,8 +7,14 @@ import { Container } from "react-bootstrap";
 
 function Packages() {
   const [, , User_Status] = useTokenCheck();
-  if(User_Status){}
-  if (User_Status === 1) {
+  const [openLoad, setopenLoad] = useState(false);
+  useEffect(() => {
+    if (User_Status === 1) {
+      // ทำการ render หน้าเว็บใหม่
+      setopenLoad(true);
+    }
+  }, [User_Status]);
+  if (openLoad) {
     return (
       <>
         <div id="wrapper">

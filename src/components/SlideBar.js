@@ -37,7 +37,7 @@ function SlideBar() {
                 <span className="nav-label">จัดการนัดหมาย</span>{" "}
               </a>
             </li>
-            <li
+            {/* <li
               className={
                 currentPath === "/Customers" && User_Status === 1
                   ? "active"
@@ -50,7 +50,7 @@ function SlideBar() {
                   <span className="nav-label">จัดการผู้ใช้</span>{" "}
                 </a>
               )}
-            </li>
+            </li> */}
             <li
               className={
                 currentPath === "/Departments" && User_Status === 1

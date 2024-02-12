@@ -118,7 +118,6 @@ function TableApppointments({ onSearch }) {
     try {
       // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
       selectedCustomers.Entryby = User_Code;
-      console.log(selectedCustomers, "selectedCustomers");
       if (
         selectedCustomers.StatusFlag > "3" &&
         selectedCustomers.StatusFlag !== "5"
@@ -230,7 +229,6 @@ function TableApppointments({ onSearch }) {
       const response = await fetch(
         `${BASE_URL}/api/getAllAmp/${selectedCustomers.HN}`
       );
-      console.log(response);
       if (response.ok) {
         const data = await response.json();
         if (data.length === 0) {
