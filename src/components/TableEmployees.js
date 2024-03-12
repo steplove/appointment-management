@@ -24,12 +24,7 @@ function TableEmployees({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/User", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  } = useFetch(BASE_URL + "/api/User");
 
   // state รับค่าการค้นหา
   const [searchResult, setSearchResult] = useState(null);

@@ -9,12 +9,7 @@ import "react-quill/dist/quill.snow.css";
 function TableBlog() {
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const [perPage] = useState(10);
-  const { data: blogs = [], refetch } = useFetch(BASE_URL + "/api/blogShow", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const { data: blogs = [], refetch } = useFetch(BASE_URL + "/api/blogShow");
   const [showEdite, setShowEdite] = useState(false);
   const [selectedBlogs, setSelectedBlogs] = useState(null);
 

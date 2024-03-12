@@ -17,13 +17,7 @@ function TableTypeRooms() {
   const [facility, setFacility] = useState("");
   const [displayedTypeRoom, setDisplayedTypeRoom] = useState([]);
   const { data: TypeRooms = [], refetch } = useFetch(
-    BASE_URL + "/api/showTypeRoomData",
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    BASE_URL + "/api/showTypeRoomData"
   );
   useEffect(() => {
     if (TypeRooms && TypeRooms.length > 0) {

@@ -20,12 +20,7 @@ function TableDepartments({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/clinic", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  } = useFetch(BASE_URL + "/api/clinic");
 
   useEffect(() => {
     if (departments && departments.length > 0) {

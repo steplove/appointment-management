@@ -23,12 +23,7 @@ function TableCustomer({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/AllCustomer", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  } = useFetch(BASE_URL + "/api/AllCustomer");
   const [customers, setCustomers] = useState([]);
   useEffect(() => {
     if (fetchedCustomers && Array.isArray(fetchedCustomers)) {

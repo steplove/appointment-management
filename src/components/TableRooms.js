@@ -35,13 +35,7 @@ const TableRooms = ({ UID }) => {
     fetchRoomType();
   }, [UID, typeName]);
   const { data: TypeRooms = [], refetch } = useFetch(
-    `${BASE_URL}/api/showTypeRoomID/${dataUID.Room_Type}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    `${BASE_URL}/api/showTypeRoomID/${dataUID.Room_Type}`
   );
 
   useEffect(() => {

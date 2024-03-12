@@ -37,32 +37,10 @@ function TableApppointments({ onSearch }) {
   // const offset = currentPage * perPage;
   // const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
   // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
-  const { data: fetchedClinics = [] } = useFetch(
-    `${BASE_URL}/api/showClinics`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const { data: fetchedShowDoctors = [] } = useFetch(
-    `${BASE_URL}/api/doctors`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const { data: fetchedClinics = [] } = useFetch(`${BASE_URL}/api/showClinics`);
+  const { data: fetchedShowDoctors = [] } = useFetch(`${BASE_URL}/api/doctors`);
   const { data: fetchedAppointments, refetch = [] } = useFetch(
-    `${BASE_URL}/api/AllAppointmentsAmin`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    `${BASE_URL}/api/AllAppointmentsAmin`
   );
   const [clinics, setClinics] = useState([]);
   const [doctor, setDoctor] = useState([]);

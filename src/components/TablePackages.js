@@ -11,12 +11,7 @@ function TablePackages() {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/showPackages", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  } = useFetch(BASE_URL + "/api/showPackages");
   useEffect(() => {
     if (Packages && Packages.length > 0) {
       // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า

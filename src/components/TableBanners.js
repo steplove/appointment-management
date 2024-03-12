@@ -18,13 +18,7 @@ function TableBanners() {
   const [maxNumberOfImages] = useState(5); // จำนวนรูปภาพที่อนุญาต
   const [displayedPackage, setDisplayedPackage] = useState([]);
   const { data: Banners = [], refetch } = useFetch(
-    BASE_URL + "/api/showBanners",
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
+    BASE_URL + "/api/showBanners"
   );
   useEffect(() => {
     if (Banners && Banners.length > 0) {

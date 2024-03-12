@@ -13,12 +13,7 @@ function TableDoctors({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/doctors", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  } = useFetch(BASE_URL + "/api/doctors");
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลแพทย์, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
 
   // เมื่อข้อมูลแพทย์มีการเปลี่ยนแปลง หรือหน้าปัจจุบันเปลี่ยน ให้ปรับปรุงข้อมูลที่จะแสดงในหน้านั้น
