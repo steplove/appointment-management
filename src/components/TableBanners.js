@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Form, Button, InputGroup, Modal } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { useDropzone } from "react-dropzone";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 const dropzoneStyle = {
@@ -18,7 +18,13 @@ function TableBanners() {
   const [maxNumberOfImages] = useState(5); // จำนวนรูปภาพที่อนุญาต
   const [displayedPackage, setDisplayedPackage] = useState([]);
   const { data: Banners = [], refetch } = useFetch(
-    BASE_URL + "/api/showBanners"
+    BASE_URL + "/api/showBanners",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   useEffect(() => {
     if (Banners && Banners.length > 0) {
@@ -114,6 +120,11 @@ function TableBanners() {
       // ทำ HTTP request สำหรับบันทึกข้อมูล
       await fetch(BASE_URL + "/api/bannerInsert", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
         body: formData,
       });
 
@@ -150,6 +161,10 @@ function TableBanners() {
             `${BASE_URL}/api/bannerDelete/${BannerID}`,
             {
               method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
           );
           if (response.ok) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 
@@ -11,7 +11,12 @@ function TablePackages() {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/showPackages");
+  } = useFetch(BASE_URL + "/api/showPackages", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   useEffect(() => {
     if (Packages && Packages.length > 0) {
       // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า
@@ -92,6 +97,7 @@ function TablePackages() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             packageCode: selectedPackage.packageCode,
@@ -155,6 +161,10 @@ function TablePackages() {
       try {
         const response = await fetch(`${BASE_URL}/api/packagesInsert`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         });
         if (!response.ok) {
@@ -205,6 +215,10 @@ function TablePackages() {
             `${BASE_URL}/api/packageDelete/${packageCode}`,
             {
               method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
           );
           if (response.ok) {
@@ -237,14 +251,22 @@ function TablePackages() {
   };
   const [clinicId, setClinicId] = useState("");
   const [ClinicShow, setClinicShow] = useState([]);
-  useEffect(() => {
-    fetch(BASE_URL + "/api/showClinics")
+  const fetchshowClnic = async () => {
+    fetch(BASE_URL + "/api/showClinics", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         setClinicShow(data);
       });
+  };
+  useEffect(() => {
+    fetchshowClnic();
   }, []);
   const clearForm = () => {
     setPackageCode(null);
@@ -259,16 +281,18 @@ function TablePackages() {
     setBannerImage(null);
     setBannerPreview(null);
   };
-  const handleSearch = () => {
+  const handleSearch = async () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     const searchParams = {
       packageName: packageSearch,
     };
-    fetch(BASE_URL + "/api/searchPackages", {
+    await fetch(BASE_URL + "/api/searchPackages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
+
       body: JSON.stringify(searchParams),
     })
       .then((response) => response.json())

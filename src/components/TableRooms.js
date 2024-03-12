@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Form, Button, InputGroup, Modal } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { useDropzone } from "react-dropzone";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 
@@ -15,7 +15,12 @@ const TableRooms = ({ UID }) => {
   useEffect(() => {
     const fetchRoomType = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/getRoomType/${UID}`);
+        const response = await fetch(`${BASE_URL}/api/getRoomType/${UID}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -30,7 +35,13 @@ const TableRooms = ({ UID }) => {
     fetchRoomType();
   }, [UID, typeName]);
   const { data: TypeRooms = [], refetch } = useFetch(
-    `${BASE_URL}/api/showTypeRoomID/${dataUID.Room_Type}`
+    `${BASE_URL}/api/showTypeRoomID/${dataUID.Room_Type}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
 
   useEffect(() => {
@@ -46,7 +57,7 @@ const TableRooms = ({ UID }) => {
     textAlign: "center",
     cursor: "pointer",
   };
-  
+
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const [perPage] = useState(10);
 
@@ -134,6 +145,10 @@ const TableRooms = ({ UID }) => {
       // ทำ HTTP request สำหรับบันทึกข้อมูล
       await fetch(BASE_URL + "/api/typeRoomInsert", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
       setTypeName("");
@@ -170,6 +185,10 @@ const TableRooms = ({ UID }) => {
         try {
           const response = await fetch(`${BASE_URL}/api/typeDelete/${RoomID}`, {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           });
           if (response.ok) {
             Swal.fire({

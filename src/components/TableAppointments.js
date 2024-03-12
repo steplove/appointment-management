@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
 function TableApppointments({ onSearch }) {
@@ -37,10 +37,32 @@ function TableApppointments({ onSearch }) {
   // const offset = currentPage * perPage;
   // const currentPageData = appointmentsCustomers.slice(offset, offset + perPage);
   // ใช้ useEffect เพื่อดึงข้อมูลการนัดหมายทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
-  const { data: fetchedClinics = [] } = useFetch(`${BASE_URL}/api/showClinics`);
-  const { data: fetchedShowDoctors = [] } = useFetch(`${BASE_URL}/api/doctors`);
+  const { data: fetchedClinics = [] } = useFetch(
+    `${BASE_URL}/api/showClinics`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const { data: fetchedShowDoctors = [] } = useFetch(
+    `${BASE_URL}/api/doctors`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   const { data: fetchedAppointments, refetch = [] } = useFetch(
-    `${BASE_URL}/api/AllAppointmentsAmin`
+    `${BASE_URL}/api/AllAppointmentsAmin`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   const [clinics, setClinics] = useState([]);
   const [doctor, setDoctor] = useState([]);
@@ -59,7 +81,13 @@ function TableApppointments({ onSearch }) {
   const fetchDoctors = async (ClinicID) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/searchDoctorClinic/${ClinicID}`
+        `${BASE_URL}/api/searchDoctorClinic/${ClinicID}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = await response.json();
       setDoctor(data);
@@ -146,6 +174,7 @@ function TableApppointments({ onSearch }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             UID: selectedCustomers.UID,
@@ -169,6 +198,7 @@ function TableApppointments({ onSearch }) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
               APM_UID: selectedCustomers.APM_UID,
@@ -227,7 +257,13 @@ function TableApppointments({ onSearch }) {
     handleCloseModal();
     try {
       const response = await fetch(
-        `${BASE_URL}/api/getAllAmp/${selectedCustomers.HN}`
+        `${BASE_URL}/api/getAllAmp/${selectedCustomers.HN}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -279,7 +315,7 @@ function TableApppointments({ onSearch }) {
 
   const [pageCount, setPageCount] = useState(1);
   //ฟังก์ชั่นค้นหา
-  const handleSearch = () => {
+  const handleSearch = async () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     const searchParams = {
       HN: searchHN,
@@ -289,10 +325,11 @@ function TableApppointments({ onSearch }) {
       endDate,
       StatusFlag: searchStatus,
     };
-    fetch(BASE_URL + "/api/searchAppointments", {
+    await fetch(BASE_URL + "/api/searchAppointments", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(searchParams),
     })

@@ -2,14 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import Swal from "sweetalert2";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 function TableBlog() {
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const [perPage] = useState(10);
-  const { data: blogs = [], refetch } = useFetch(BASE_URL + "/api/blogShow");
+  const { data: blogs = [], refetch } = useFetch(BASE_URL + "/api/blogShow", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const [showEdite, setShowEdite] = useState(false);
   const [selectedBlogs, setSelectedBlogs] = useState(null);
 
@@ -67,6 +72,7 @@ function TableBlog() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             Blog_Name: selectedBlogs.Blog_Name,
@@ -135,6 +141,10 @@ function TableBlog() {
       try {
         const response = await fetch(`${BASE_URL}/api/blogInsert`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         });
 
@@ -184,6 +194,10 @@ function TableBlog() {
         try {
           const response = await fetch(`${BASE_URL}/api/blogDelete/${blogID}`, {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           });
           if (response.ok) {
             Swal.fire({

@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 import LoadingComponent from "./LoadingComponent";
@@ -23,7 +23,12 @@ function TableCustomer({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/AllCustomer");
+  } = useFetch(BASE_URL + "/api/AllCustomer", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   const [customers, setCustomers] = useState([]);
   useEffect(() => {
     if (fetchedCustomers && Array.isArray(fetchedCustomers)) {
@@ -33,16 +38,25 @@ function TableCustomer({ onSearch }) {
 
   //สถานะของผู้ใช้ guest member
   const [customerStatus, setCustomerStatusShow] = useState([]);
-  useEffect(() => {
-    fetch(BASE_URL + "/api/CustomerStatus")
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setCustomerStatusShow(data);
+  const customerfetchedStatus = async () => {
+    try {
+      const response = await fetch(BASE_URL + "/api/CustomerStatus", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
-  }, []);
 
+      const data = response.data;
+      setCustomerStatusShow(data);
+    } catch (error) {
+      console.error("Error fetching customer status:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    customerfetchedStatus();
+  }, []);
   // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
@@ -105,7 +119,13 @@ function TableCustomer({ onSearch }) {
       //   BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
       // );
       const response = await fetch(
-        BASE_URL + "/api/getAllPatient/" + IdenNumber
+        BASE_URL + "/api/getAllPatient/" + IdenNumber,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       const data = await response.json();
       const codedData = [data];
@@ -154,6 +174,7 @@ function TableCustomer({ onSearch }) {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
                 Customer_Status: 2,
@@ -207,6 +228,7 @@ function TableCustomer({ onSearch }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           IdenType: selectedCustomers.IdenType,
@@ -265,7 +287,7 @@ function TableCustomer({ onSearch }) {
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData = !searchResult && customers && customers.length > 0;
   // ฟังก์ชั่นค้นหา
-  const handleSearch = () => {
+  const handleSearch = async () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     const searchParams = {
       FirstName: searchFirstName,
@@ -273,10 +295,11 @@ function TableCustomer({ onSearch }) {
       MobileNo: searchMobile,
       Customer_Status: searchcustomerStatus,
     };
-    fetch(BASE_URL + "/api/searchCustomers", {
+    await fetch(BASE_URL + "/api/searchCustomers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(searchParams),
     })
@@ -301,8 +324,13 @@ function TableCustomer({ onSearch }) {
   }, []);
   // ดึงข้อมูลจังหวัด
   const [readProvince, setReadProvince] = useState([]);
-  const fetchReadProvinceData = () => {
-    fetch(BASE_URL + "/api/provinces")
+  const fetchReadProvinceData = async () => {
+    await fetch(BASE_URL + "/api/provinces", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
         return response.json();
       })
@@ -312,10 +340,15 @@ function TableCustomer({ onSearch }) {
   };
   // ดึงข้อมูลอำเภอ
   const [amphures, setAmphures] = useState([]);
-  const fetchAmphures = (province_id) => {
+  const fetchAmphures = async (province_id) => {
     if (province_id !== undefined) {
       // เพิ่มการตรวจสอบ
-      fetch(BASE_URL + `/api/amphurs/${province_id}`)
+      await fetch(BASE_URL + `/api/amphurs/${province_id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           setAmphures(data);
@@ -328,9 +361,14 @@ function TableCustomer({ onSearch }) {
 
   // ดึงข้อมูลรหัสตำบล
   const [subDistricts, setSubDistricts] = useState([]);
-  const fetchSubDistricts = (amphure_id) => {
+  const fetchSubDistricts = async (amphure_id) => {
     if (amphure_id !== undefined) {
-      fetch(BASE_URL + `/api/subdistricts/${amphure_id}`)
+      await fetch(BASE_URL + `/api/subdistricts/${amphure_id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           setSubDistricts(data); // ตั้งค่า subDistricts ให้เท่ากับข้อมูลที่ได้
@@ -344,9 +382,14 @@ function TableCustomer({ onSearch }) {
   const [postCodes, setPostCodes] = useState([]);
   if (postCodes) {
   }
-  const fetchPostCodes = (amphure_id) => {
+  const fetchPostCodes = async (amphure_id) => {
     if (amphure_id !== undefined) {
-      fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`)
+      await fetch(BASE_URL + `/api/PostalCodes/${amphure_id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           setPostCodes(data);
@@ -424,6 +467,10 @@ function TableCustomer({ onSearch }) {
           `${BASE_URL}/api/CustomerDelete/${IdenNumber}`,
           {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         if (response.ok) {

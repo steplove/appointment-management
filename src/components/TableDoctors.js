@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
- import useTokenCheck from "../hooks/useTokenCheck";
-import { BASE_URL } from "../constants/constants";
+import useTokenCheck from "../hooks/useTokenCheck";
+import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
 function TableDoctors({ onSearch }) {
@@ -13,7 +13,12 @@ function TableDoctors({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/doctors");
+  } = useFetch(BASE_URL + "/api/doctors", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   // ใช้ custom hook (useFetch) เพื่อดึงข้อมูลแพทย์, สถานะการโหลด และ ข้อผิดพลาด (ถ้ามี)
 
   // เมื่อข้อมูลแพทย์มีการเปลี่ยนแปลง หรือหน้าปัจจุบันเปลี่ยน ให้ปรับปรุงข้อมูลที่จะแสดงในหน้านั้น
@@ -92,10 +97,14 @@ function TableDoctors({ onSearch }) {
   }, [selectedDoctor]);
 
   const [clinics, setClinics] = useState([]);
-
-  useEffect(() => {
+  const fetchClinic = async () => {
     // ทำการเรียก API `/api/clinic` และดึงข้อมูลคลินิก
-    fetch(`${BASE_URL}/api/clinic`)
+    fetch(`${BASE_URL}/api/clinic`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setClinics(data);
@@ -103,6 +112,9 @@ function TableDoctors({ onSearch }) {
       .catch((error) => {
         console.error(error);
       });
+  };
+  useEffect(() => {
+    fetchClinic();
   }, []);
   const handleEditModal = (DoctorID) => {
     const doctorToEdit = displayedDoctors.find((p) => p.DoctorID === DoctorID);
@@ -124,6 +136,11 @@ function TableDoctors({ onSearch }) {
     try {
       const response = await fetch(`${BASE_URL}/api/doctorsInsert`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
         body: formData,
       });
 
@@ -169,7 +186,9 @@ function TableDoctors({ onSearch }) {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
+
           body: JSON.stringify({
             DoctorID: selectedDoctor.DoctorID,
             Doctor_Name: selectedDoctor.Doctor_Name,
@@ -229,6 +248,10 @@ function TableDoctors({ onSearch }) {
             `${BASE_URL}/api/DeleteDoctors/${DoctorID}`,
             {
               method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
           );
           if (response.ok) {
@@ -261,17 +284,19 @@ function TableDoctors({ onSearch }) {
   };
 
   //ค้นหา
-  const handleSearch = () => {
+  const handleSearch = async () => {
     // ตัวแปรสำหรับส่งค่าค้นหาไปยังเซิร์ฟเวอร์
     const searchParams = {
       Doctor_Name: searchDoctorName,
       Clinic_ID: clinicsSearch,
     };
-    fetch(BASE_URL + "/api/searchDoctor", {
+    await fetch(BASE_URL + "/api/searchDoctor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
+
       body: JSON.stringify(searchParams),
     })
       .then((response) => response.json())
@@ -302,14 +327,22 @@ function TableDoctors({ onSearch }) {
     }
   };
   const [ClinicShow, setClinicShow] = useState([]);
-  useEffect(() => {
-    fetch(BASE_URL + "/api/showClinics")
+  const showClinic = async () => {
+    fetch(BASE_URL + "/api/showClinics", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
         setClinicShow(data);
       });
+  };
+  useEffect(() => {
+    showClinic();
   }, []);
 
   //------------------------------------------------------------------------------------//

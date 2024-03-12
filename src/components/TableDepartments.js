@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, Card, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import useTokenCheck from "../hooks/useTokenCheck";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
 import ReactQuill from "react-quill";
-
 
 function TableDepartments({ onSearch }) {
   useTokenCheck();
@@ -21,7 +20,12 @@ function TableDepartments({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/clinic");
+  } = useFetch(BASE_URL + "/api/clinic", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   useEffect(() => {
     if (departments && departments.length > 0) {
@@ -65,7 +69,12 @@ function TableDepartments({ onSearch }) {
   // ฟังก์ชั่นสำหรับแสดง modal
   const handleShow = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/getLastClinicCode`);
+      const response = await fetch(`${BASE_URL}/api/getLastClinicCode`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       if (data && data.lastClinicCode) {
@@ -107,6 +116,10 @@ function TableDepartments({ onSearch }) {
       try {
         const response = await fetch(`${BASE_URL}/api/InsertClinic`, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: formData,
         });
         if (!response.ok) {
@@ -170,6 +183,10 @@ function TableDepartments({ onSearch }) {
             `${BASE_URL}/api/UpdateClinic/${selectedClinics.Clinic_ID}`,
             {
               method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
               body: formData,
             }
           );
@@ -221,6 +238,10 @@ function TableDepartments({ onSearch }) {
           `${BASE_URL}/api/clinicDelete/${clinicCode}`,
           {
             method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         if (response.ok) {
@@ -252,12 +273,14 @@ function TableDepartments({ onSearch }) {
   };
 
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
-  const handleSearchClinicAppointments = () => {
-    fetch(`${BASE_URL}/api/searchClinicsClinic_Name`, {
+  const handleSearchClinicAppointments = async () => {
+    await fetch(`${BASE_URL}/api/searchClinicsClinic_Name`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
+
       body: JSON.stringify({ Clinic_Name: ClinicCodeSearch }),
     })
       .then((response) => response.json())

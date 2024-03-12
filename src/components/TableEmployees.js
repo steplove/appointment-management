@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import { useAlert } from "../hooks/useAlert";
 function TableEmployees({ onSearch }) {
@@ -24,7 +24,12 @@ function TableEmployees({ onSearch }) {
     loading,
     error,
     refetch,
-  } = useFetch(BASE_URL + "/api/User");
+  } = useFetch(BASE_URL + "/api/User", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   // state รับค่าการค้นหา
   const [searchResult, setSearchResult] = useState(null);
@@ -87,7 +92,9 @@ function TableEmployees({ onSearch }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
+
         body: JSON.stringify({
           User_Code: searchPayrollNo,
           User_Name: userName,
@@ -135,6 +142,7 @@ function TableEmployees({ onSearch }) {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             User_Code: selectedUsers.User_Code,
@@ -217,6 +225,7 @@ function TableEmployees({ onSearch }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -232,11 +241,12 @@ function TableEmployees({ onSearch }) {
     }
   };
   //ฟังก์ชั่นค้นหา จากฐานข้อมูล Appointments และแสดงข้อมูลในตาราง
-  const handleSearchUsersAppointments = () => {
-    fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
+  const handleSearchUsersAppointments = async () => {
+    await fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((response) => response.json())
@@ -260,7 +270,13 @@ function TableEmployees({ onSearch }) {
       if (!userExists) {
         // ถ้าไม่มีข้อมูลรหัสนี้ในฐานข้อมูล
         const response = await fetch(
-          `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`
+          `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");

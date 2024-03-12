@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, InputGroup, Modal } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 import ReactQuill from "react-quill";
@@ -17,7 +17,13 @@ function TableTypeRooms() {
   const [facility, setFacility] = useState("");
   const [displayedTypeRoom, setDisplayedTypeRoom] = useState([]);
   const { data: TypeRooms = [], refetch } = useFetch(
-    BASE_URL + "/api/showTypeRoomData"
+    BASE_URL + "/api/showTypeRoomData",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   useEffect(() => {
     if (TypeRooms && TypeRooms.length > 0) {
@@ -56,8 +62,10 @@ function TableTypeRooms() {
       // ทำการส่งข้อมูลที่ป้อนจาก form เข้าไปใน APIrefetch
       const response = await fetch(BASE_URL + "/api/RoomDataInsert", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           Room_Type: typeName,
@@ -111,6 +119,7 @@ function TableTypeRooms() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             UID: selectedRoomType.UID,
@@ -167,6 +176,10 @@ function TableTypeRooms() {
             `${BASE_URL}/api/typeRoomDataDelete/${RoomID}`,
             {
               method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
             }
           );
           if (response.ok) {
@@ -242,13 +255,6 @@ function TableTypeRooms() {
                       <tr key={type.UID} className="text-center">
                         <td>{index + 1}</td>
                         <td>{type.Room_Type}</td>
-                        {/* <td>
-                          <img
-                            src={`${BASE_URL}/${type.image}`}
-                            alt=""
-                            style={{ maxWidth: "300px" }}
-                          />
-                        </td> */}
                         <td>
                           {" "}
                           <Button

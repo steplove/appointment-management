@@ -1,14 +1,26 @@
 import React from "react";
 import useFetch from "../hooks/useFetch";
-import { BASE_URL } from "../constants/constants";
+import { BASE_URL, token } from "../constants/constants";
 
 function Dashboard() {
   const { data: countData, isLoading: countDataLoad } = useFetch(
-    BASE_URL + "/api/AllCountCustomer"
+    BASE_URL + "/api/AllCountCustomer",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
 
   const { data: metrics, isLoading: metricsLoad } = useFetch(
-    BASE_URL + "/api/metrics"
+    BASE_URL + "/api/metrics",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
 
   if (countDataLoad || metricsLoad) {
