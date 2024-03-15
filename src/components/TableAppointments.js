@@ -500,7 +500,7 @@ function TableApppointments({ onSearch }) {
                           (currentPage + 1) * perPage
                         )
                         .map((customer, index) => (
-                          <tr key={customer.APM_UID}>
+                          <tr key={index}>
                             <td>
                               <h3>{index + 1}</h3>
                             </td>
@@ -561,7 +561,7 @@ function TableApppointments({ onSearch }) {
                               (currentPage + 1) * perPage
                             )
                             .map((customer, index) => (
-                              <tr key={customer.APM_UID}>
+                              <tr key={index}>
                                 <td>
                                   <h3>{index + 1}</h3>
                                 </td>
