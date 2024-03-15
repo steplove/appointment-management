@@ -119,20 +119,27 @@ function TableDoctors({ onSearch }) {
 
   //ปุ่มยืนยันใน modal ของการเพิ่ม
   const handleSubmit = async () => {
-    handleClose();
-    const formData = new FormData();
-    formData.append("Doctor_Name", doctorName);
-    formData.append("Doctor_NameEng", doctorNameEng);
-    formData.append("Doctor_Code", doctorCode);
-    formData.append("Clinic_ID", clinicId);
-    if (doctorImage) {
-      formData.append("Doctor_Image", doctorImage);
-    }
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
+      const formData = new FormData();
+      formData.append("Doctor_Name", doctorName);
+      formData.append("Doctor_NameEng", doctorNameEng);
+      formData.append("Doctor_Code", doctorCode);
+      formData.append("Clinic_ID", clinicId);
+      if (doctorImage) {
+        formData.append("Doctor_Image", doctorImage);
+      }
       const response = await fetch(`${BASE_URL}/api/doctorsInsert`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
 
@@ -142,6 +149,7 @@ function TableDoctors({ onSearch }) {
       const data = await response.json();
 
       if (response.ok) {
+        handleClose();
         Swal.fire({
           title: "บันทึกสำเร็จ!",
           icon: "success",
@@ -175,6 +183,15 @@ function TableDoctors({ onSearch }) {
   //ปุ่มยืนยันใน modal ของการแก้ไข
   const handleSubmitEdit = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(
         `${BASE_URL}/api/UpdateDoctor/${selectedDoctor.DoctorID}`,
         {
@@ -197,6 +214,7 @@ function TableDoctors({ onSearch }) {
 
       const data = await response.json();
       if (data.message === "Doctor updated successfully!") {
+        handleClose();
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",

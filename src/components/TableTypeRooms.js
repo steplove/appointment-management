@@ -54,11 +54,18 @@ function TableTypeRooms() {
   const handleSubmitInsert = async () => {
     try {
       // ทำการส่งข้อมูลที่ป้อนจาก form เข้าไปใน APIrefetch
+      handleCloseRooms();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(BASE_URL + "/api/RoomDataInsert", {
         method: "POST",
-
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -71,6 +78,7 @@ function TableTypeRooms() {
 
       if (response.status === 201) {
         // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลพนักงานสำเร็จ
+        handleCloseRooms();
         Swal.fire({
           title: "เพิ่มข้อมูลห้อง!",
           icon: "success",
@@ -107,12 +115,20 @@ function TableTypeRooms() {
   //ปุ่มยืนยันใน modal ของการแก้ไข
   const handleSubmitEdit = async () => {
     try {
+      handleCloseRooms();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(
         `${BASE_URL}/api/UpdateRoomType/${selectedRoomType.UID}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -127,6 +143,7 @@ function TableTypeRooms() {
 
       const data = await response.json();
       if (data.message === "RoomImages updated successfully!") {
+        handleCloseRooms();
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",

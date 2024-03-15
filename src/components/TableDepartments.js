@@ -66,7 +66,6 @@ function TableDepartments({ onSearch }) {
     try {
       const response = await fetch(`${BASE_URL}/api/getLastClinicCode`, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
@@ -98,6 +97,15 @@ function TableDepartments({ onSearch }) {
   //ฟังก์ชั่น API ตอนกด insert แผนก เพิ่มแผนก
   const handleSubmitInsert = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const formData = new FormData();
       formData.append("clinicCode", clinicCode);
       formData.append("clinicName", clinicName);
@@ -123,6 +131,7 @@ function TableDepartments({ onSearch }) {
 
         const data = await response.json();
         if (response.ok) {
+          handleClose();
           setShow(false);
           Swal.fire({
             title: "บันทึกสำเร็จ!",

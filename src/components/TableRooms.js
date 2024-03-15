@@ -125,6 +125,15 @@ const TableRooms = ({ UID }) => {
   }
   const saveBanner = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       // สร้าง FormData object
       const formData = new FormData();
       formData.append("Room_Type", dataUID.Room_Type);
@@ -140,7 +149,6 @@ const TableRooms = ({ UID }) => {
       await fetch(BASE_URL + "/api/typeRoomInsert", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: formData,
@@ -180,7 +188,6 @@ const TableRooms = ({ UID }) => {
           const response = await fetch(`${BASE_URL}/api/typeDelete/${RoomID}`, {
             method: "DELETE",
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           });

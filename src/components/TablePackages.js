@@ -86,12 +86,20 @@ function TablePackages() {
   };
   const handleSubmitEdit = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(
         `${BASE_URL}/api/UpdatePackage/${selectedPackage.packageCode}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -108,6 +116,7 @@ function TablePackages() {
 
       const data = await response.json();
       if (data.message === "packages updated successfully!") {
+        handleClose();
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",
@@ -137,6 +146,15 @@ function TablePackages() {
   };
   const handleSave = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const formData = new FormData();
       formData.append("packageCode", packageCode);
       formData.append("packageName", packageName);
@@ -157,7 +175,6 @@ function TablePackages() {
         const response = await fetch(`${BASE_URL}/api/packagesInsert`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: formData,
@@ -169,6 +186,7 @@ function TablePackages() {
         const data = await response.json();
         if (response.ok) {
           setShow(false);
+          handleClose();
           Swal.fire({
             title: "บันทึกสำเร็จ!",
             icon: "success",
@@ -211,7 +229,6 @@ function TablePackages() {
             {
               method: "DELETE",
               headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
             }

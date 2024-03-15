@@ -39,6 +39,14 @@ export default function Login() {
   const Swal = require("sweetalert2");
   const handleSubmit = (event) => {
     event.preventDefault();
+    Swal.fire({
+      title: "กำลังเข้าสู่ระบบ",
+      html: "กรุณารอสักครู่...",
+      allowOutsideClick: false,
+      onBeforeOpen: () => {
+        Swal.showLoading();
+      },
+    });
     const data = new FormData(event.currentTarget);
     const jsonData = {
       User_Code: data.get("UserCode"),
@@ -56,6 +64,7 @@ export default function Login() {
       .then((data) => {
         if (data.User_Status === 1 || data.User_Status === 2) {
           if (data.status === "ok") {
+            Swal.close();
             Swal.fire({
               title: "เข้าสู่ระบบสำเร็จ",
               text: "ยินดีต้อนรับเข้าสู่ ระบบจัดการนัดหมาย",

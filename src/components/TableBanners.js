@@ -101,13 +101,26 @@ function TableBanners() {
 
   const saveBanner = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       // สร้าง FormData object
+
       const formData = new FormData();
 
       // วนลูปเพื่อเพิ่มรูปภาพใน FormData
       for (let index = 0; index < galleryPreviews.length; index++) {
         const preview = galleryPreviews[index];
-        const file = await dataURLtoFile(preview, `image${index}.png`);
+        const file = await dataURLtoFile(
+          preview,
+          `${BASE_URL}image${index}.png`
+        );
         formData.append("images", file);
       }
 
@@ -115,10 +128,8 @@ function TableBanners() {
       await fetch(BASE_URL + "/api/bannerInsert", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-
         body: formData,
       });
 
@@ -129,8 +140,10 @@ function TableBanners() {
         title: "บันทึกสำเร็จ",
         text: "ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว",
       });
+      refetch();
     } catch (error) {
       console.error("Error saving banner:", error);
+      handleClose();
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
@@ -249,7 +262,7 @@ function TableBanners() {
                         <td>{index + 1}</td>
                         <td>
                           <img
-                            src={`${BASE_URL}/${banner.ImageName}`}
+                            src={`${banner.ImageName}`}
                             alt=""
                             style={{ maxWidth: "300px" }}
                           />

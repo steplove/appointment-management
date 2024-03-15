@@ -3,9 +3,9 @@ import { Form, Button, Modal, InputGroup } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
-import { useAlert } from "../hooks/useAlert";
+import Swal from "sweetalert2";
+
 function TableEmployees({ onSearch }) {
-  const { showAlert } = useAlert();
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
   const dataPerPage = 10;
 
@@ -82,11 +82,19 @@ function TableEmployees({ onSearch }) {
   };
   const handleSubmitInsert = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       // ทำการส่งข้อมูลที่ป้อนจาก form เข้าไปใน APIrefetch
       const response = await fetch(BASE_URL + "/api/registerUsers", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
 
@@ -100,7 +108,8 @@ function TableEmployees({ onSearch }) {
 
       if (response.status === 201) {
         // แสดง sweetalert2 เพื่อแจ้งเตือนว่าเพิ่มข้อมูลพนักงานสำเร็จ
-        showAlert({
+        handleClose();
+        Swal.fire({
           title: "เพิ่มข้อมูลพนักงานสำเร็จ!",
           icon: "success",
           showConfirmButton: false,
@@ -119,7 +128,7 @@ function TableEmployees({ onSearch }) {
       }
     } catch (error) {
       // แสดง sweetalert2 เพื่อแจ้งเตือนว่ามีข้อผิดพลาดในการเพิ่มข้อมูล
-      showAlert({
+      Swal.fire({
         title: "มีข้อผิดพลาด!",
         text: error.message,
         icon: "error",
@@ -131,12 +140,20 @@ function TableEmployees({ onSearch }) {
   //ปุ่มยืนยันใน modal ของการแก้ไข
   const handleSubmitEdite = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(
         `${BASE_URL}/api/user/${selectedUsers.User_Code}`,
         {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -150,7 +167,8 @@ function TableEmployees({ onSearch }) {
       const data = await response.json();
 
       if (data.message === "User updated successfully!") {
-        showAlert({
+        handleClose();
+        Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",
           showConfirmButton: false,
@@ -170,7 +188,7 @@ function TableEmployees({ onSearch }) {
         );
         handleCloseEdite(); // ปิด modal
       } else {
-        showAlert({
+        Swal.fire({
           title: "เกิดข้อผิดพลาด!",
           text: data.message,
           icon: "error",
@@ -180,7 +198,7 @@ function TableEmployees({ onSearch }) {
       refetch();
       handleCloseEdite(); // ปิด modal
     } catch (error) {
-      showAlert({
+      Swal.fire({
         title: "เกิดข้อผิดพลาด!",
         text: "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้",
         icon: "error",
@@ -192,7 +210,7 @@ function TableEmployees({ onSearch }) {
 
   //ลบข้อมูลแพทย์
   // const handleDelete = () => {
-  //   showAlert({
+  //   Swal.fire({
   //     title: "คุณแน่ใจที่จะลบ?",
   //     text: "",
   //     icon: "warning",
@@ -202,7 +220,7 @@ function TableEmployees({ onSearch }) {
   //     confirmButtonText: "ยืนยัน",
   //   }).then((result) => {
   //     if (result.isConfirmed) {
-  //       showAlert({
+  //       Swal.fire({
   //         title: "ลบข้อมูลพนักงานสำเร็จ!",
   //         icon: "success",
   //         showConfirmButton: false, // ไม่แสดงปุ่มยืนยัน
@@ -219,7 +237,6 @@ function TableEmployees({ onSearch }) {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -240,7 +257,6 @@ function TableEmployees({ onSearch }) {
     await fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     })
@@ -268,7 +284,6 @@ function TableEmployees({ onSearch }) {
           `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`,
           {
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -285,7 +300,7 @@ function TableEmployees({ onSearch }) {
           );
         } else {
           handleClose();
-          showAlert({
+          Swal.fire({
             title: "ไม่พบข้อมูลพนักงาน",
             icon: "error",
             showConfirmButton: false,
@@ -294,7 +309,7 @@ function TableEmployees({ onSearch }) {
         }
       } else {
         handleClose();
-        showAlert({
+        Swal.fire({
           title: "รหัสพนักงานได้ลงทะเบียนแล้ว",
           text: "",
           icon: "error",
@@ -304,7 +319,7 @@ function TableEmployees({ onSearch }) {
       }
     } catch (error) {
       handleClose();
-      showAlert({
+      Swal.fire({
         title: "ไม่พบข้อมูลพนักงาน",
         text: "",
         icon: "error",

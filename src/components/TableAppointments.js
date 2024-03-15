@@ -123,6 +123,15 @@ function TableApppointments({ onSearch }) {
   const handleSave = async () => {
     try {
       // เช็คว่าสถานะ value มากกว่า 3 หรือไม่
+      handleCloseModal();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       selectedCustomers.Entryby = User_Code;
       if (
         selectedCustomers.StatusFlag > "3" &&
@@ -186,6 +195,7 @@ function TableApppointments({ onSearch }) {
         );
         const data = (await response.json()) || (await responseStatus.json());
         if (data.message === "นัดหมายถูกแก้ไขเรียบร้อยแล้ว") {
+          handleCloseModal();
           Swal.fire({
             title: "การอัปเดตสำเร็จ!",
             icon: "success",

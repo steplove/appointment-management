@@ -61,6 +61,15 @@ function TableBlog() {
   };
   const handleSubmitEdit = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังแก้ไขข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const response = await fetch(
         `${BASE_URL}/api/UpdateBlog/${selectedBlogs.Blog_ID}`,
         {
@@ -78,6 +87,7 @@ function TableBlog() {
 
       const data = await response.json();
       if (data.message === "Blog updated successfully!") {
+        handleClose();
         Swal.fire({
           title: "การอัปเดตสำเร็จ!",
           icon: "success",
@@ -122,6 +132,15 @@ function TableBlog() {
 
   const handleSave = async () => {
     try {
+      handleClose();
+      Swal.fire({
+        title: "กำลังเพิ่มข้อมูล",
+        html: "กรุณารอสักครู่...",
+        allowOutsideClick: false,
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+      });
       const formData = new FormData();
       formData.append("Blog_Name", blog_Name);
       formData.append("Blog_Detail", blog_Detail);
@@ -151,6 +170,7 @@ function TableBlog() {
 
         if (response.ok) {
           setShow(false);
+          handleClose();
           Swal.fire({
             title: "บันทึกสำเร็จ!",
             icon: "success",
@@ -303,7 +323,7 @@ function TableBlog() {
                               <td>
                                 {" "}
                                 <img
-                                  src={`${BASE_URL}/${blogs.Blog_ImageBanner}`}
+                                  src={`${blogs.Blog_ImageBanner}`}
                                   alt=""
                                   style={{ maxWidth: "300px" }}
                                 />
