@@ -23,7 +23,6 @@ function TableTypeRooms() {
     if (TypeRooms && TypeRooms.length > 0) {
       // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า
       setDisplayedTypeRoom(TypeRooms);
-      console.log(TypeRooms, "TypeRoomsTypeRooms");
     }
   }, [TypeRooms]);
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า

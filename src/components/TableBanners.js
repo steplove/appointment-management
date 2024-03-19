@@ -24,7 +24,6 @@ function TableBanners() {
     if (Banners && Banners.length > 0) {
       // ตัดข้อมูลที่ต้องการแสดงตามจำนวนข้อมูลในหนึ่งหน้า
       setDisplayedPackage(Banners);
-      console.log(Banners);
     }
   }, [Banners]);
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
