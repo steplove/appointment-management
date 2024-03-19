@@ -463,11 +463,11 @@ function TableBlog() {
                   {/* ฟิลด์รูปบทความ */}
                   <Form.Group>
                     <Form.Label>รูปบทความ</Form.Label>
-                    <div class="custom-file">
+                    <div className="custom-file">
                       <input
                         id="logo"
                         type="file"
-                        class="custom-file-input"
+                        className="custom-file-input"
                         onChange={(e) =>
                           handleImageChange(
                             e,
@@ -476,7 +476,7 @@ function TableBlog() {
                           )
                         }
                       />
-                      <label for="logo" class="custom-file-label">
+                      <label for="logo" className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
@@ -493,16 +493,16 @@ function TableBlog() {
                   {/* ฟิลด์รูปภาพแบนเนอร์ */}
                   <Form.Group>
                     <Form.Label>รูปแบนเนอร์</Form.Label>
-                    <div class="custom-file">
+                    <div className="custom-file">
                       <input
                         id="logo"
                         type="file"
-                        class="custom-file-input"
+                        className="custom-file-input"
                         onChange={(e) =>
                           handleImageChange(e, setBannerImage, setBannerPreview)
                         }
                       />
-                      <label for="logo" class="custom-file-label">
+                      <label for="logo" className="custom-file-label">
                         Choose file...
                       </label>
                     </div>

@@ -742,11 +742,11 @@ function TableDoctors({ onSearch }) {
                   </Form.Group> */}
                   <Form.Group controlId="doctorImage">
                     <Form.Label>รูปแพทย์</Form.Label>
-                    <div class="custom-file">
+                    <div className="custom-file">
                       <input
                         id="logo"
                         type="file"
-                        class="custom-file-input"
+                        className="custom-file-input"
                         onChange={handleImageChange}
                       />
                       <label for="logo" class="custom-file-label">

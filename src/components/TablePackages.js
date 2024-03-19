@@ -621,11 +621,11 @@ function TablePackages() {
                   {/* ฟิลด์รูปภาพแพ็คเกจ */}
                   <Form.Group>
                     <Form.Label htmlFor="packageImage">รูปแพ็คเกจ</Form.Label>
-                    <div class="custom-file">
+                    <div className="custom-file">
                       <input
                         id="logo"
                         type="file"
-                        class="custom-file-input"
+                        className="custom-file-input"
                         onChange={(e) =>
                           handleImageChange(
                             e,
@@ -634,7 +634,7 @@ function TablePackages() {
                           )
                         }
                       />
-                      <label for="logo" class="custom-file-label">
+                      <label for="logo" className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
@@ -653,16 +653,16 @@ function TablePackages() {
                     <Form.Label htmlFor="packageImgBanner">
                       รูปแบนเนอร์
                     </Form.Label>
-                    <div class="custom-file">
+                    <div className="custom-file">
                       <input
                         id="logo"
                         type="file"
-                        class="custom-file-input"
+                        className="custom-file-input"
                         onChange={(e) =>
                           handleImageChange(e, setBannerImage, setBannerPreview)
                         }
                       />
-                      <label for="logo" class="custom-file-label">
+                      <label for="logo" className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
