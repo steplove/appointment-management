@@ -35,6 +35,8 @@ function TableBlog() {
   const offset = currentPage * perPage;
   displayedBlogs.slice(offset, offset + perPage);
   const [searchResult, setSearchResult] = useState(null);
+  if (setSearchResult) {
+  }
   const shouldShowAllData =
     !searchResult && displayedBlogs && displayedBlogs.length > 0;
 

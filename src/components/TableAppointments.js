@@ -662,7 +662,11 @@ function TableApppointments({ onSearch }) {
                             <Form.Label>ชื่อ</Form.Label>
                             <Form.Control
                               placeholder="ชื่อ"
-                              value={selectedCustomers.FirstName}
+                              value={
+                                selectedCustomers && selectedCustomers.FirstName
+                                  ? selectedCustomers.FirstName
+                                  : ""
+                              }
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -679,7 +683,11 @@ function TableApppointments({ onSearch }) {
                             <Form.Label>นามสกุล</Form.Label>
                             <Form.Control
                               placeholder="นามสกุล"
-                              value={selectedCustomers.LastName}
+                              value={
+                                selectedCustomers && selectedCustomers.LastName
+                                  ? selectedCustomers.LastName
+                                  : ""
+                              }
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -697,10 +705,14 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               type="date"
                               placeholder="วันที่นัด"
-                              value={selectedCustomers.Appointment_Date.substring(
-                                0,
-                                10
-                              )}
+                              value={
+                                selectedCustomers.Appointment_Date
+                                  ? selectedCustomers.Appointment_Date.substring(
+                                      0,
+                                      10
+                                    )
+                                  : ""
+                              }
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -717,10 +729,16 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               type="time"
                               placeholder="เวลา"
-                              value={selectedCustomers.Appointment_Time.substring(
-                                11,
-                                16
-                              )} // ตัดข้อมูลเวลาเพื่อแสดงเฉพาะ HH:mm
+                              value={
+                                selectedCustomers &&
+                                selectedCustomers.Appointment_Date
+                                  ? selectedCustomers.Appointment_Date.substring(
+                                      0,
+                                      10
+                                    )
+                                  : ""
+                              }
+                              // ตัดข้อมูลเวลาเพื่อแสดงเฉพาะ HH:mm
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -737,7 +755,11 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               name="Clinic"
-                              value={selectedCustomers.Clinic}
+                              value={
+                                selectedCustomers && selectedCustomers.Clinic
+                                  ? selectedCustomers.Clinic
+                                  : ""
+                              }
                               onChange={handleInputChange}
                             >
                               {clinics &&
@@ -760,7 +782,11 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               name="Doctor"
-                              value={selectedCustomers.Doctor}
+                              value={
+                                selectedCustomers && selectedCustomers.Doctor
+                                  ? selectedCustomers.Doctor
+                                  : ""
+                              }
                               onChange={handleInputChange}
                             >
                               {doctor &&
@@ -782,7 +808,11 @@ function TableApppointments({ onSearch }) {
                             <Form.Label>หมายเลขนัดหมาย</Form.Label>
                             <Form.Control
                               placeholder="หมายเลขนัดหมาย"
-                              value={selectedCustomers.APM_No}
+                              value={
+                                selectedCustomers && selectedCustomers.APM_No
+                                  ? selectedCustomers.APM_No
+                                  : ""
+                              }
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
@@ -813,7 +843,12 @@ function TableApppointments({ onSearch }) {
                             <Form.Control
                               as="select"
                               aria-label="Default select example"
-                              value={selectedCustomers.StatusFlag}
+                              value={
+                                selectedCustomers &&
+                                selectedCustomers.StatusFlag
+                                  ? selectedCustomers.StatusFlag
+                                  : ""
+                              }
                               onChange={(e) =>
                                 setSelectedCustomers({
                                   ...selectedCustomers,
