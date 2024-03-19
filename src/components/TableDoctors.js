@@ -749,7 +749,7 @@ function TableDoctors({ onSearch }) {
                         className="custom-file-input"
                         onChange={handleImageChange}
                       />
-                      <label class="custom-file-label">
+                      <label className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
