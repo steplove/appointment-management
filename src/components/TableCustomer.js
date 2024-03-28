@@ -5,7 +5,7 @@ import {
   Card,
   Modal,
   InputGroup,
-  Table,
+  // Table,
   Row,
   Col,
 } from "react-bootstrap";
@@ -26,32 +26,29 @@ function TableCustomer({ onSearch }) {
   } = useFetch(BASE_URL + "/api/AllCustomer");
   const [customers, setCustomers] = useState([]);
   useEffect(() => {
+    // customerfetchedStatus();
     if (fetchedCustomers && Array.isArray(fetchedCustomers)) {
       setCustomers(fetchedCustomers);
     }
   }, [fetchedCustomers]);
 
   //สถานะของผู้ใช้ guest member
-  const [customerStatus, setCustomerStatusShow] = useState([]);
-  const customerfetchedStatus = async () => {
-    try {
-      const response = await fetch(BASE_URL + "/api/CustomerStatus", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  // const [customerStatus, setCustomerStatusShow] = useState([]);
+  // console.log("1");
+  // const customerfetchedStatus = async () => {
+  //   try {
+  //     const response = await fetch(BASE_URL + "/api/CustomerStatus", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
 
-      const data = response.data;
-      setCustomerStatusShow(data);
-    } catch (error) {
-      console.error("Error fetching customer status:", error.message);
-    }
-  };
-
-  useEffect(() => {
-    customerfetchedStatus();
-  }, []);
+  //     const data = response.data;
+  //     setCustomerStatusShow(data);
+  //   } catch (error) {
+  //     console.error("Error fetching customer status:", error.message);
+  //   }
+  // };
   // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
@@ -74,13 +71,13 @@ function TableCustomer({ onSearch }) {
     setPageCount(totalPageCount);
   }, [customers, perPage]);
   const [showModal, setShowModal] = useState(false);
-  const [showModalMapHN, setShowModalMapHN] = useState(false);
+  // const [showModalMapHN, setShowModalMapHN] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  const handleShowMapHNModal = () => setShowModalMapHN(true);
-  const handleCloseMapHNModal = () => setShowModalMapHN(false);
+  // const handleShowMapHNModal = () => setShowModalMapHN(true);
+  // const handleCloseMapHNModal = () => setShowModalMapHN(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
-  const [mapHN, setMapHN] = useState([]);
+  // const [mapHN, setMapHN] = useState([]);
   // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
@@ -125,8 +122,8 @@ function TableCustomer({ onSearch }) {
       const data = await response.json();
       const codedData = [data];
       if (codedData.length > 0) {
-        setMapHN(codedData);
-        handleShowMapHNModal();
+        // setMapHN(codedData);
+        // handleShowMapHNModal();
       } else {
         // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
         Swal.fire({
@@ -150,69 +147,69 @@ function TableCustomer({ onSearch }) {
   };
 
   // ฟังก์ชั่น MAP HN
-  const handleMapHN = () => {
-    setShowModalMapHN(false);
-    Swal.fire({
-      title: "คุณแน่ใจที่จะMap HN?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "ยืนยัน",
-      cancelButtonText: "ยกเลิก",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await fetch(
-            `${BASE_URL}/api/mapHN/${mapHN[0].RefNo}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                Customer_Status: 2,
-                HN: mapHN[0].HN,
-              }),
-            }
-          );
-          const data = await response.json();
+  // const handleMapHN = () => {
+  //   setShowModalMapHN(false);
+  //   Swal.fire({
+  //     title: "คุณแน่ใจที่จะMap HN?",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "ยืนยัน",
+  //     cancelButtonText: "ยกเลิก",
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       try {
+  //         const response = await fetch(
+  //           `${BASE_URL}/api/mapHN/${mapHN[0].RefNo}`,
+  //           {
+  //             method: "PUT",
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //               Authorization: `Bearer ${token}`,
+  //             },
+  //             body: JSON.stringify({
+  //               Customer_Status: 2,
+  //               HN: mapHN[0].HN,
+  //             }),
+  //           }
+  //         );
+  //         const data = await response.json();
 
-          if (response.ok) {
-            if (data.message === "Data updated successfully!") {
-              Swal.fire({
-                title: "บันทึกสำเร็จ!",
-                icon: "success",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-              refetch();
-              handleCloseMapHNModal();
-            } else {
-              Swal.fire({
-                title: "เกิดข้อผิดพลาด!",
-                text: data.message,
-                icon: "error",
-              });
-            }
-          } else {
-            Swal.fire({
-              title: "เกิดข้อผิดพลาด!",
-              text: data.message || "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
-              icon: "error",
-            });
-          }
-        } catch (error) {
-          Swal.fire({
-            title: "เกิดข้อผิดพลาด!",
-            text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
-            icon: "error",
-          });
-        }
-      }
-    });
-  };
+  //         if (response.ok) {
+  //           if (data.message === "Data updated successfully!") {
+  //             Swal.fire({
+  //               title: "บันทึกสำเร็จ!",
+  //               icon: "success",
+  //               showConfirmButton: false,
+  //               timer: 1500,
+  //             });
+  //             refetch();
+  //             handleCloseMapHNModal();
+  //           } else {
+  //             Swal.fire({
+  //               title: "เกิดข้อผิดพลาด!",
+  //               text: data.message,
+  //               icon: "error",
+  //             });
+  //           }
+  //         } else {
+  //           Swal.fire({
+  //             title: "เกิดข้อผิดพลาด!",
+  //             text: data.message || "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+  //             icon: "error",
+  //           });
+  //         }
+  //       } catch (error) {
+  //         Swal.fire({
+  //           title: "เกิดข้อผิดพลาด!",
+  //           text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
+  //           icon: "error",
+  //         });
+  //       }
+  //     }
+  //   });
+  // };
 
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
@@ -278,7 +275,7 @@ function TableCustomer({ onSearch }) {
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
-  const [searchcustomerStatus, setCustomerStatus] = useState("");
+  // const [searchcustomerStatus, setCustomerStatus] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData = !searchResult && customers && customers.length > 0;
   // ฟังก์ชั่นค้นหา
@@ -288,7 +285,7 @@ function TableCustomer({ onSearch }) {
       FirstName: searchFirstName,
       LastName: searchLastName,
       MobileNo: searchMobile,
-      Customer_Status: searchcustomerStatus,
+      // Customer_Status: searchcustomerStatus,
     };
     await fetch(BASE_URL + "/api/searchCustomers", {
       method: "POST",
@@ -552,7 +549,7 @@ function TableCustomer({ onSearch }) {
                   />
                 </Form.Group>
               </div>
-              <div className="col-sm-2">
+              {/* <div className="col-sm-2">
                 <Form.Group controlId="searchcustomerStatus">
                   <Form.Label>สถานะ</Form.Label>
                   <Form.Control
@@ -572,7 +569,7 @@ function TableCustomer({ onSearch }) {
                     ))}
                   </Form.Control>
                 </Form.Group>
-              </div>
+              </div> */}
               <div className="col-sm-2" style={{ marginTop: "25px" }}>
                 <InputGroup>
                   <Button variant="primary" onClick={handleSearch}>
@@ -653,7 +650,7 @@ function TableCustomer({ onSearch }) {
                             >
                               <h4>ลบ</h4>
                             </Button>
-                            {customer.Customer_Status === 1 ? (
+                            {/* {customer.Customer_Status === 1 ? (
                               <Button
                                 variant="danger"
                                 onClick={() =>
@@ -665,7 +662,7 @@ function TableCustomer({ onSearch }) {
                             ) : (
                               // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
                               <></>
-                            )}
+                            )} */}
                           </td>
                         </tr>
                       ))}
@@ -723,14 +720,15 @@ function TableCustomer({ onSearch }) {
                                   <h4>ลบ</h4>
                                 </Button>
                                 {customer.Customer_Status === 1 ? (
-                                  <Button
-                                    variant="danger"
-                                    onClick={() =>
-                                      handleMapHnModal(customer.IdenNumber)
-                                    }
-                                  >
-                                    <h4>Map HN</h4>
-                                  </Button>
+                                  <></>
+                                  // <Button
+                                  //   variant="danger"
+                                  //   onClick={() =>
+                                  //     handleMapHnModal(customer.IdenNumber)
+                                  //   }
+                                  // >
+                                  //   <h4>Map HN</h4>
+                                  // </Button>
                                 ) : (
                                   // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
                                   <></>
@@ -772,7 +770,7 @@ function TableCustomer({ onSearch }) {
             />
           </div>
           {/* modal MAP HN */}
-          <Modal
+          {/* <Modal
             show={showModalMapHN}
             onHide={handleCloseMapHNModal}
             size="lg"
@@ -852,7 +850,7 @@ function TableCustomer({ onSearch }) {
                 Close
               </Button>
             </Modal.Footer>
-          </Modal>
+          </Modal> */}
           {/* modal edite  */}
           <Modal show={showModal} onHide={handleCloseModal} size="lg">
             <Modal.Header>
@@ -911,7 +909,7 @@ function TableCustomer({ onSearch }) {
                                 HN: e.target.value,
                               })
                             }
-                            disabled
+                            
                           />
                         </Form.Group>
                       </Col>
