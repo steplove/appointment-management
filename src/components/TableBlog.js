@@ -380,7 +380,7 @@ function TableBlog() {
                                   <h3>{blogs.Blog_Name}</h3>
                                 </td>
                                 <td>
-                                  <h3>{blogs.Blog_Detail}</h3>
+                                  <h3>{blogs.Blog_Detail.slice(0, 50)}</h3>
                                 </td>
                                 <td>
                                   <Button variant="primary">
@@ -554,18 +554,7 @@ function TableBlog() {
                       />
                     </Form.Group>
                     <Form.Group>
-                      {/* <Form.Label>รายละเอียดบทความ</Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        placeholder="รายละเอียดบทความ"
-                        value={selectedBlogs.Blog_Detail}
-                        onChange={(e) =>
-                          setSelectedBlogs({
-                            ...selectedBlogs,
-                            Blog_Detail: e.target.value,
-                          })
-                        }
-                      /> */}
+                    
                       <ReactQuill
                         theme="snow"
                         value={selectedBlogs.Blog_Detail}

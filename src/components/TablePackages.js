@@ -4,7 +4,8 @@ import ReactPaginate from "react-paginate";
 import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 function TablePackages() {
   const {
     data: Packages = [],
@@ -61,7 +62,6 @@ function TablePackages() {
     const packageToEdit = displayedPackage.find(
       (p) => p.packageCode === packageCode
     );
-    console.log(packageCode, "PackageIDPackageID");
     setSelectedPackage(packageToEdit);
     handleShowEdite();
   };
@@ -86,6 +86,7 @@ function TablePackages() {
   };
   const handleSubmitEdit = async () => {
     try {
+      console.log(selectedPackage, "selectedPackage");
       handleClose();
       Swal.fire({
         title: "กำลังแก้ไขข้อมูล",
@@ -100,6 +101,7 @@ function TablePackages() {
         {
           method: "PUT",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -301,7 +303,6 @@ function TablePackages() {
     await fetch(BASE_URL + "/api/searchPackages", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
 
@@ -396,7 +397,7 @@ function TablePackages() {
                               <h3>{Package.packageName}</h3>
                             </td>
                             <td>
-                              <h3>{Package.packageDetails}</h3>
+                              <h3>{Package.packageDetails.slice(0, 50)}</h3>
                             </td>
                             <td>
                               <h3>
@@ -428,7 +429,7 @@ function TablePackages() {
                         ))
                       ) : (
                         <tr className="text-center">
-                          <td colSpan={4}>
+                          <td colSpan={5}>
                             <h2>ไม่มีข้อมูล</h2>
                           </td>
                         </tr>
@@ -456,7 +457,14 @@ function TablePackages() {
                                   <h3>{Package.packageName}</h3>
                                 </td>
                                 <td>
-                                  <h3>{Package.packageDetails}</h3>
+                                  <h3
+                                    dangerouslySetInnerHTML={{
+                                      __html: Package.packageDetails.slice(
+                                        0,
+                                        50
+                                      ),
+                                    }}
+                                  />
                                 </td>
                                 <td>
                                   <h3>
@@ -469,15 +477,17 @@ function TablePackages() {
                                 <td>
                                   <Button
                                     variant="primary"
-                                    // onClick={() =>
-                                    //   handleEditModal(Package.DoctorID)
-                                    // }
+                                    onClick={() =>
+                                      handleEditModal(Package.packageCode)
+                                    }
                                   >
                                     <h4>จัดการ</h4>
                                   </Button>{" "}
                                   <Button
                                     variant="danger"
-                                    // onClick={() => handleDelete(Package.DoctorID)}
+                                    onClick={() =>
+                                      handleDelete(Package.packageCode)
+                                    }
                                   >
                                     <h4>ลบ</h4>
                                   </Button>
@@ -487,7 +497,7 @@ function TablePackages() {
                         </>
                       ) : (
                         <tr className="text-center">
-                          <td colSpan={4}>
+                          <td colSpan={5}>
                             <h2>ไม่มีข้อมูล</h2>
                           </td>
                         </tr>
@@ -519,7 +529,7 @@ function TablePackages() {
             </div>
 
             {/* modal เพิ่มแพ็คเกจ */}
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} size="lg">
               <Modal.Header closeButton>
                 <Modal.Title>เพิ่มแพ็คเกจ</Modal.Title>
               </Modal.Header>
@@ -528,7 +538,7 @@ function TablePackages() {
                 <Form>
                   {/* ฟอร์มข้อมูลอื่น ๆ */}
                   <Form.Group>
-                    <Form.Label htmlFor="packageName">รหัสแพ็คเกจ</Form.Label>
+                    <Form.Label>รหัสแพ็คเกจ</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="รหัสแพ็คเกจ"
@@ -537,7 +547,7 @@ function TablePackages() {
                     />
                   </Form.Group>
                   <Form.Group>
-                    <Form.Label htmlFor="packageName">ชื่อแพ็คเกจ</Form.Label>
+                    <Form.Label>ชื่อแพ็คเกจ</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="ชื่อแพ็คเกจ"
@@ -547,9 +557,7 @@ function TablePackages() {
                   </Form.Group>
 
                   <Form.Group>
-                    <Form.Label htmlFor="packageNameEN">
-                      ชื่อแพ็คเกจ (en)
-                    </Form.Label>
+                    <Form.Label>ชื่อแพ็คเกจ (en)</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="ชื่อแพ็คเกจ (en)"
@@ -576,19 +584,18 @@ function TablePackages() {
                     </Form.Control>
                   </Form.Group>
                   <Form.Group>
-                    <Form.Label htmlFor="packageDetails">
-                      รายละเอียดแพ็คเกจ
+                    <Form.Label>
+                      <h4>รายละเอียดแพ็คเกจ</h4>
                     </Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="รายละเอียดแพ็คเกจ"
+
+                    <ReactQuill
+                      theme="snow"
                       value={packageDetails}
-                      onChange={(e) => setPackageDetail(e.target.value)}
+                      onChange={setPackageDetail}
                     />
                   </Form.Group>
-
                   <Form.Group>
-                    <Form.Label htmlFor="packageContact">ติดต่อ</Form.Label>
+                    <Form.Label>ติดต่อ</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="ติดต่อ"
@@ -598,9 +605,9 @@ function TablePackages() {
                   </Form.Group>
 
                   <Form.Group>
-                    <Form.Label htmlFor="packagePrice">ราคา</Form.Label>
+                    <Form.Label>ราคา</Form.Label>
                     <Form.Control
-                      type="number"
+                      type="text"
                       placeholder="ราคา"
                       value={packagePrice}
                       onChange={(e) => setPackagePrice(e.target.value)}
@@ -608,9 +615,7 @@ function TablePackages() {
                   </Form.Group>
 
                   <Form.Group>
-                    <Form.Label htmlFor="promoEndDate">
-                      วันหมดอายุ โปรโมชั่น
-                    </Form.Label>
+                    <Form.Label>วันหมดอายุ โปรโมชั่น</Form.Label>
                     <Form.Control
                       type="date"
                       placeholder="วันหมดอายุ โปรโมชั่น"
@@ -620,7 +625,7 @@ function TablePackages() {
                   </Form.Group>
                   {/* ฟิลด์รูปภาพแพ็คเกจ */}
                   <Form.Group>
-                    <Form.Label htmlFor="packageImage">รูปแพ็คเกจ</Form.Label>
+                    <Form.Label>รูปแพ็คเกจ</Form.Label>
                     <div className="custom-file">
                       <input
                         id="logo"
@@ -634,7 +639,7 @@ function TablePackages() {
                           )
                         }
                       />
-                      <label for="logo" className="custom-file-label">
+                      <label className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
@@ -650,9 +655,7 @@ function TablePackages() {
                   </Form.Group>
                   {/* ฟิลด์รูปภาพแบนเนอร์ */}
                   <Form.Group>
-                    <Form.Label htmlFor="packageImgBanner">
-                      รูปแบนเนอร์
-                    </Form.Label>
+                    <Form.Label>รูปแบนเนอร์</Form.Label>
                     <div className="custom-file">
                       <input
                         id="logo"
@@ -662,7 +665,7 @@ function TablePackages() {
                           handleImageChange(e, setBannerImage, setBannerPreview)
                         }
                       />
-                      <label for="logo" className="custom-file-label">
+                      <label className="custom-file-label">
                         Choose file...
                       </label>
                     </div>
@@ -689,7 +692,7 @@ function TablePackages() {
               </Modal.Footer>
             </Modal>
             {/* modal จัดการแพ็คเกจ */}
-            <Modal show={showEdite} onHide={handleClose}>
+            <Modal show={showEdite} onHide={handleClose} size="lg">
               <Modal.Header closeButton>
                 <Modal.Title>จัดการแพ็คเกจ</Modal.Title>
               </Modal.Header>
@@ -697,7 +700,7 @@ function TablePackages() {
               <Modal.Body>
                 {selectedPackage && (
                   <Form>
-                    <Form.Group controlId="packageName">
+                    <Form.Group>
                       <Form.Label>ชื่อแพ็คเกจ</Form.Label>
                       <Form.Control
                         type="text"
@@ -712,23 +715,7 @@ function TablePackages() {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label htmlFor="packageName">ชื่อแพ็คเกจ</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="ชื่อแพ็คเกจ"
-                        value={selectedPackage.packageName}
-                        onChange={(e) =>
-                          setSelectedPackage({
-                            ...selectedPackage,
-                            packageName: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label htmlFor="packageNameEN">
-                        ชื่อแพ็คเกจ (en)
-                      </Form.Label>
+                      <Form.Label>ชื่อแพ็คเกจ (en)</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="ชื่อแพ็คเกจ (en)"
@@ -741,25 +728,24 @@ function TablePackages() {
                         }
                       />
                     </Form.Group>
-
                     <Form.Group>
-                      <Form.Label htmlFor="packageDetails">
-                        รายละเอียดแพ็คเกจ
+                      <Form.Label>
+                        <h4>รายละเอียดแพ็คเกจ</h4>
                       </Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="รายละเอียดแพ็คเกจ"
+
+                      <ReactQuill
+                        theme="snow"
                         value={selectedPackage.packageDetails}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           setSelectedPackage({
                             ...selectedPackage,
-                            packageDetails: e.target.value,
+                            packageDetails: value,
                           })
                         }
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label htmlFor="packageContact">ติดต่อ</Form.Label>
+                      <Form.Label>ติดต่อ</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="ติดต่อ"
@@ -773,9 +759,9 @@ function TablePackages() {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label htmlFor="packagePrice">ราคา</Form.Label>
+                      <Form.Label>ราคา</Form.Label>
                       <Form.Control
-                        type="number"
+                        type="text"
                         placeholder="ราคา"
                         value={selectedPackage.packagePrice}
                         onChange={(e) =>
@@ -787,9 +773,7 @@ function TablePackages() {
                       />
                     </Form.Group>
                     <Form.Group>
-                      <Form.Label htmlFor="promoEndDate">
-                        วันหมดอายุ โปรโมชั่น
-                      </Form.Label>
+                      <Form.Label>วันหมดอายุ โปรโมชั่น</Form.Label>
                       <Form.Control
                         type="date"
                         placeholder="วันหมดอายุ โปรโมชั่น"
