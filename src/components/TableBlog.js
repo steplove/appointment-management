@@ -56,7 +56,6 @@ function TableBlog() {
 
   const handleEditModal = (Blog_ID) => {
     const packageToEdit = displayedBlogs.find((p) => p.Blog_ID === Blog_ID);
-    console.log(packageToEdit, "Blog_IDBlog_IDBlog_ID");
     setSelectedBlogs(packageToEdit);
     handleShowEdite();
   };
@@ -180,7 +179,6 @@ function TableBlog() {
           });
         }
         refetch();
-        console.log("Success:", data);
         clearForm();
         // Additional logic after a successful API call
       } catch (error) {

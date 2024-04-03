@@ -86,7 +86,6 @@ function TablePackages() {
   };
   const handleSubmitEdit = async () => {
     try {
-      console.log(selectedPackage, "selectedPackage");
       handleClose();
       Swal.fire({
         title: "กำลังแก้ไขข้อมูล",
@@ -166,7 +165,6 @@ function TablePackages() {
       formData.append("packagePrice", packagePrice);
       formData.append("promoEndDate", promoEndDate);
       formData.append("Clinic_Code", clinicId);
-      console.log(formData);
       if (packageImage) {
         formData.append("packageImage", packageImage);
       }
@@ -198,7 +196,6 @@ function TablePackages() {
           refetch();
           clearForm();
         }
-        console.log("Success:", data);
         // Additional logic after a successful API call
       } catch (error) {
         setShow(false);

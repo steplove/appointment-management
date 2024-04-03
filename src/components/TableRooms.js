@@ -142,7 +142,6 @@ const TableRooms = ({ UID }) => {
         const preview = galleryPreviews[index];
         const file = await dataURLtoFile(preview, `image${index}.png`);
         formData.append("image", file);
-        console.log(file, "formDataformData");
       }
 
       // ทำ HTTP request สำหรับบันทึกข้อมูล

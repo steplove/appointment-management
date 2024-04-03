@@ -141,7 +141,6 @@ function TableDepartments({ onSearch }) {
           });
           refetch();
         }
-        console.log("Success:", data);
         // Additional logic after a successful API call
       } catch (error) {
         setShow(false);

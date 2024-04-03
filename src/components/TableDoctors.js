@@ -314,7 +314,6 @@ function TableDoctors({ onSearch }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data, "data");
         setSearchResult(data.result); // เก็บผลลัพธ์การค้นหาใน state searchResult
         const newPageCount = Math.ceil(data.result.length / perPage);
         setPageCount(newPageCount);

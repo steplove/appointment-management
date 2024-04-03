@@ -291,7 +291,6 @@ function TableEmployees({ onSearch }) {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        console.log(response, "response");
         const payrollData = await response.json();
         const keys = Object.keys(payrollData);
         if (keys.length > 0) {
