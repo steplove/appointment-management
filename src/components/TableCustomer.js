@@ -15,6 +15,7 @@ import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
 import LoadingComponent from "./LoadingComponent";
+import axios from "axios";
 function TableCustomer({ onSearch }) {
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
   useTokenCheck();
@@ -26,29 +27,26 @@ function TableCustomer({ onSearch }) {
   } = useFetch(BASE_URL + "/api/AllCustomer");
   const [customers, setCustomers] = useState([]);
   useEffect(() => {
-    // customerfetchedStatus();
+    customerfetchedStatus();
     if (fetchedCustomers && Array.isArray(fetchedCustomers)) {
       setCustomers(fetchedCustomers);
     }
   }, [fetchedCustomers]);
-
   //สถานะของผู้ใช้ guest member
-  // const [customerStatus, setCustomerStatusShow] = useState([]);
-  // console.log("1");
-  // const customerfetchedStatus = async () => {
-  //   try {
-  //     const response = await fetch(BASE_URL + "/api/CustomerStatus", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     const data = response.data;
-  //     setCustomerStatusShow(data);
-  //   } catch (error) {
-  //     console.error("Error fetching customer status:", error.message);
-  //   }
-  // };
+  const [customerStatus, setCustomerStatusShow] = useState([]);
+  const customerfetchedStatus = async () => {
+    try {
+      const response = await axios.get(BASE_URL + "/api/CustomerStatus", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = response.data;
+      setCustomerStatusShow(data);
+    } catch (error) {
+      console.error("Error fetching customer status:", error.message);
+    }
+  };
   // กำหนด state สำหรับจัดการข้อมูลของผู้ใช้และการเปลี่ยนแปลงข้อมูล
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(1); // ตั้งค่าเริ่มต้นเป็น 1 หรือค่าที่เหมาะสม
@@ -239,6 +237,7 @@ function TableCustomer({ onSearch }) {
           Address: selectedCustomers.Address,
           MobileNo: selectedCustomers.MobileNo,
           Email: selectedCustomers.Email,
+          Customer_Status: selectedCustomers.Customer_Status,
         }),
       });
 
@@ -549,27 +548,7 @@ function TableCustomer({ onSearch }) {
                   />
                 </Form.Group>
               </div>
-              {/* <div className="col-sm-2">
-                <Form.Group controlId="searchcustomerStatus">
-                  <Form.Label>สถานะ</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={searchcustomerStatus}
-                    onChange={(e) => setCustomerStatus(e.target.value)}
-                  >
-                    <option value="">เลือกสถานะ...</option>
-                    {customerStatus.map((status) => (
-                      <option key={status.ID} value={status.ID}>
-                        {status.Customer_Status === 1
-                          ? "ผู้ใช้ทั่วไป"
-                          : status.Customer_Status === 2
-                          ? "สมาชิก"
-                          : ""}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-              </div> */}
+
               <div className="col-sm-2" style={{ marginTop: "25px" }}>
                 <InputGroup>
                   <Button variant="primary" onClick={handleSearch}>
@@ -721,6 +700,7 @@ function TableCustomer({ onSearch }) {
                                 </Button>
                                 {customer.Customer_Status === 1 ? (
                                   <></>
+                                ) : (
                                   // <Button
                                   //   variant="danger"
                                   //   onClick={() =>
@@ -729,7 +709,6 @@ function TableCustomer({ onSearch }) {
                                   // >
                                   //   <h4>Map HN</h4>
                                   // </Button>
-                                ) : (
                                   // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
                                   <></>
                                 )}
@@ -889,7 +868,6 @@ function TableCustomer({ onSearch }) {
                                 IdenNumber: e.target.value,
                               })
                             }
-                            disabled
                           />
                         </Form.Group>
                       </Col>
@@ -909,7 +887,6 @@ function TableCustomer({ onSearch }) {
                                 HN: e.target.value,
                               })
                             }
-                            
                           />
                         </Form.Group>
                       </Col>
@@ -1164,6 +1141,32 @@ function TableCustomer({ onSearch }) {
                         </Form.Group>
                       </Col>
                       <br />
+                      <Col xs={6}>
+                        <Form.Group>
+                          <Form.Label>สถานะ</Form.Label>
+                          <Form.Control
+                            as="select"
+                            value={selectedCustomers.Customer_Status}
+                            onChange={(e) =>
+                              setSelectedCustomers({
+                                ...selectedCustomers,
+                                Customer_Status: e.target.value,
+                              })
+                            }
+                          >
+                            <option value="">เลือกสถานะ...</option>
+                            {customerStatus.map((status) => (
+                              <option key={status.ID} value={status.ID}>
+                                {status.Customer_Status === 1
+                                  ? "ผู้ใช้ทั่วไป"
+                                  : status.Customer_Status === 2
+                                  ? "สมาชิก"
+                                  : ""}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
                     </Row>
                   </Card.Body>
                 </Card>

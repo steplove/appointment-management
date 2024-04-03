@@ -220,7 +220,6 @@ const TableRooms = ({ UID }) => {
     });
   };
   return (
-    <>
       <div className="row">
         <div className="col-lg-12">
           <div className="ibox ">
@@ -263,7 +262,7 @@ const TableRooms = ({ UID }) => {
                         <td>{type.Room_Type}</td>
                         <td>
                           <img
-                            src={`${BASE_URL}/${type.image}`}
+                            src={`${type.image}`}
                             alt=""
                             style={{ maxWidth: "300px" }}
                           />
@@ -379,7 +378,6 @@ const TableRooms = ({ UID }) => {
           </div>
         </div>
       </div>
-    </>
   );
 };
 
