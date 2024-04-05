@@ -4,6 +4,7 @@ import ReactPaginate from "react-paginate";
 import { BASE_URL, token } from "../constants/constants";
 import useFetch from "../hooks/useFetch";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 function TableEmployees({ onSearch }) {
   // กำหนดตัวแปรสำหรับจำนวนข้อมูลที่ต้องการแสดงในแต่ละหน้า
@@ -149,23 +150,19 @@ function TableEmployees({ onSearch }) {
           Swal.showLoading();
         },
       });
-      const response = await fetch(
-        `${BASE_URL}/api/user/${selectedUsers.User_Code}`,
+      const response = await axios.post(
+        `${BASE_URL}/api/userupdate/${selectedUsers.User_ID}`,
         {
-          method: "PUT",
+          User_Status: selectedUsers.User_Status,
+        },
+        {
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            User_Code: selectedUsers.User_Code,
-            User_Name: selectedUsers.User_Name,
-            User_Status: selectedUsers.User_Status,
-          }),
         }
       );
-
-      const data = await response.json();
-
+      const data = response.data;
       if (data.message === "User updated successfully!") {
         handleClose();
         Swal.fire({
@@ -175,17 +172,17 @@ function TableEmployees({ onSearch }) {
           timer: 1500,
         });
         refetch();
-        setSearchResult((prevResult) =>
-          (prevResult || []).map((employee) => {
-            if (employee.User_Code === selectedUsers.User_Code) {
-              return {
-                ...employee,
-                User_Status: selectedUsers.User_Status,
-              };
-            }
-            return employee;
-          })
-        );
+        // setSearchResult((prevResult) =>
+        //   (prevResult || []).map((employee) => {
+        //     if (employee.User_Code === selectedUsers.User_Code) {
+        //       return {
+        //         ...employee,
+        //         User_Status: selectedUsers.User_Status,
+        //       };
+        //     }
+        //     return employee;
+        //   })
+        // );
         handleCloseEdite(); // ปิด modal
       } else {
         Swal.fire({
@@ -196,6 +193,7 @@ function TableEmployees({ onSearch }) {
         });
       }
       refetch();
+      console.log(selectedUsers);
       handleCloseEdite(); // ปิด modal
     } catch (error) {
       Swal.fire({
@@ -606,7 +604,7 @@ function TableEmployees({ onSearch }) {
             <Modal.Body>
               {selectedUsers && (
                 <Form>
-                  <Form.Group controlId="userCode">
+                  <Form.Group>
                     <Form.Label>รหัสพนักงาน</Form.Label>
                     <Form.Control
                       type="text"
