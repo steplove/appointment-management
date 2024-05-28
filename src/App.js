@@ -12,6 +12,7 @@ import Banners from "./screens/Banners";
 import TypeRooms from "./screens/TypeRooms";
 import Rooms from "./screens/Rooms";
 import Update from "./screens/Update";
+import ChackUp from "./screens/ChackUp";
 import MyEditor from "./components/MyEditor.JS";
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/Rooms/:UID" element={<Rooms />} />
         <Route path="/MyEditor" element={<MyEditor />} />
         <Route path="/Update" element={<Update />} />
+        <Route path="/ChackUp" element={<ChackUp />} />
       </Routes>
     </Router>
   );

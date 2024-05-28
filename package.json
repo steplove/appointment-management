@@ -17,6 +17,7 @@
     "dateformat": "^5.0.3",
     "draftjs-to-html": "^0.9.1",
     "dropzone": "^6.0.0-beta.2",
+    "footable": "^2.0.6",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",
     "react-calendar": "^4.5.0",

@@ -168,7 +168,7 @@ function TableBlog() {
 
         const data = await response.json();
 
-        if (response.ok) {
+        if (data.response.ok) {
           setShow(false);
           handleClose();
           Swal.fire({

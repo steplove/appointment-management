@@ -193,7 +193,7 @@ function TableEmployees({ onSearch }) {
         });
       }
       refetch();
-      console.log(selectedUsers);
+      // console.log(selectedUsers);
       handleCloseEdite(); // ปิด modal
     } catch (error) {
       Swal.fire({

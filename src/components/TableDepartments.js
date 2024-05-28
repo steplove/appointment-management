@@ -130,7 +130,7 @@ function TableDepartments({ onSearch }) {
         }
 
         const data = await response.json();
-        if (response.ok) {
+        if (data.response.ok) {
           handleClose();
           setShow(false);
           Swal.fire({

@@ -14,8 +14,33 @@ import useTokenCheck from "../hooks/useTokenCheck";
 import { BASE_URL, token } from "../constants/constants";
 import Swal from "sweetalert2";
 import useFetch from "../hooks/useFetch";
-// import LoadingComponent from "./LoadingComponent";
 import axios from "axios";
+
+const containerStyle = {
+  display: "flex",
+  alignItems: "center",
+};
+
+const fileLabelStyle = {
+  padding: "10px 20px",
+  backgroundColor: "#007bff",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+};
+
+const uploadButtonStyle = {
+  padding: "10px 20px",
+  backgroundColor: "#28a745",
+  color: "white",
+  border: "none",
+  borderRadius: "5px",
+  cursor: "pointer",
+  marginLeft: "10px",
+  marginTop: "-9px",
+};
+
 function TableCustomer({ onSearch }) {
   // ดึงข้อมูล token จากฟังก์ชัน useTokenCheck
   useTokenCheck();
@@ -60,23 +85,18 @@ function TableCustomer({ onSearch }) {
 
   const offset = currentPage * perPage;
   customers.slice(offset, offset + perPage);
-  // ใช้ useEffect เพื่อดึงข้อมูลผู้ใช้ทั้งหมดจากเซิร์ฟเวอร์เมื่อ component ถูก render ครั้งแรก
-
-  // ใช้ useEffect เพื่อคำนวณจำนวนหน้าทั้งหมดเมื่อข้อมูลผูใช้เปลี่ยนแปลง
-
   useEffect(() => {
     const totalPageCount = Math.ceil(customers.length / perPage);
     setPageCount(totalPageCount);
   }, [customers, perPage]);
   const [showModal, setShowModal] = useState(false);
+  const [showModalFile, setShowModalfile] = useState(false);
   // const [showModalMapHN, setShowModalMapHN] = useState(false);
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  // const handleShowMapHNModal = () => setShowModalMapHN(true);
-  // const handleCloseMapHNModal = () => setShowModalMapHN(false);
+  const handleShowModalFile = () => setShowModalfile(true);
+  const handleCloseModalFile = () => setShowModalfile(false);
   const [selectedCustomers, setSelectedCustomers] = useState("");
-  // const [mapHN, setMapHN] = useState([]);
-  // ฟัง์กชั่นเรียกใช้ อำเภอ ตำบล รหัสไปรยณีย์
   const fetchAddressData = (province_id, amphure_id) => {
     fetchAmphures(province_id);
     fetchSubDistricts(amphure_id);
@@ -99,115 +119,6 @@ function TableCustomer({ onSearch }) {
     }
     handleShowModal();
   };
-  // เมื่อกดปุ่ม MAP HN จะเข้ามาค้นหาID ที่ต้องการจะ MAP ก่อนแล้วจะแสดง Modal
-  // const [loadingMap, setLoadingMap] = useState(false);
-  // const handleMapHnModal = async (IdenNumber) => {
-  //   try {
-  //     setLoadingMap(true); // เริ่มแสดง loading animation
-
-  //     // const response = await fetch(
-  //     //   BASE_URL + "/api/searchStaffRefNo?RefNo=" + IdenNumber
-  //     // );
-  //     const response = await fetch(
-  //       BASE_URL + "/api/getAllPatient/" + IdenNumber,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
-  //     const codedData = [data];
-  //     if (codedData.length > 0) {
-  //       // setMapHN(codedData);
-  //       // handleShowMapHNModal();
-  //     } else {
-  //       // รีเซ็ต state ของ mapHN เมื่อไม่พบข้อมูล
-  //       Swal.fire({
-  //         title: "เกิดข้อผิดพลาด!",
-  //         text: `ไม่พบข้อมูลผู้ใช้ในระบบ`,
-  //         icon: "error",
-  //         confirmButtonText: "ปิด",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     // รีเซ็ต state ของ mapHN เมื่อมีข้อผิดพลาด
-  //     Swal.fire({
-  //       title: "เกิดข้อผิดพลาด!",
-  //       text: `ไม่สามารถเข้าถึงข้อมูลได้`,
-  //       icon: "error",
-  //       confirmButtonText: "ปิด",
-  //     });
-  //   } finally {
-  //     setLoadingMap(false); // ปิด loading animation ที่ไม่ว่าจะเกิดข้อผิดพลาดหรือไม่
-  //   }
-  // };
-
-  // ฟังก์ชั่น MAP HN
-  // const handleMapHN = () => {
-  //   setShowModalMapHN(false);
-  //   Swal.fire({
-  //     title: "คุณแน่ใจที่จะMap HN?",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#3085d6",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "ยืนยัน",
-  //     cancelButtonText: "ยกเลิก",
-  //   }).then(async (result) => {
-  //     if (result.isConfirmed) {
-  //       try {
-  //         const response = await fetch(
-  //           `${BASE_URL}/api/mapHN/${mapHN[0].RefNo}`,
-  //           {
-  //             method: "PUT",
-  //             headers: {
-  //               "Content-Type": "application/json",
-  //               Authorization: `Bearer ${token}`,
-  //             },
-  //             body: JSON.stringify({
-  //               Customer_Status: 2,
-  //               HN: mapHN[0].HN,
-  //             }),
-  //           }
-  //         );
-  //         const data = await response.json();
-
-  //         if (response.ok) {
-  //           if (data.message === "Data updated successfully!") {
-  //             Swal.fire({
-  //               title: "บันทึกสำเร็จ!",
-  //               icon: "success",
-  //               showConfirmButton: false,
-  //               timer: 1500,
-  //             });
-  //             refetch();
-  //             handleCloseMapHNModal();
-  //           } else {
-  //             Swal.fire({
-  //               title: "เกิดข้อผิดพลาด!",
-  //               text: data.message,
-  //               icon: "error",
-  //             });
-  //           }
-  //         } else {
-  //           Swal.fire({
-  //             title: "เกิดข้อผิดพลาด!",
-  //             text: data.message || "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
-  //             icon: "error",
-  //           });
-  //         }
-  //       } catch (error) {
-  //         Swal.fire({
-  //           title: "เกิดข้อผิดพลาด!",
-  //           text: "ไม่สามารถติดต่อกับเซิร์ฟเวอร์",
-  //           icon: "error",
-  //         });
-  //       }
-  //     }
-  //   });
-  // };
 
   // ฟังก์ชั่นบันทึกข้อมูล
   const handleSave = async () => {
@@ -274,7 +185,6 @@ function TableCustomer({ onSearch }) {
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchLastName, setSearchLastName] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
-  // const [searchcustomerStatus, setCustomerStatus] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData = !searchResult && customers && customers.length > 0;
   // ฟังก์ชั่นค้นหา
@@ -284,7 +194,6 @@ function TableCustomer({ onSearch }) {
       FirstName: searchFirstName,
       LastName: searchLastName,
       MobileNo: searchMobile,
-      // Customer_Status: searchcustomerStatus,
     };
     await fetch(BASE_URL + "/api/searchCustomers", {
       method: "POST",
@@ -491,6 +400,48 @@ function TableCustomer({ onSearch }) {
       Swal.fire("ยกเลิก", "ข้อมูลของคุณยังคงอยู่", "error");
     }
   };
+  const [file, setFile] = useState(null);
+  const handleChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+  const handleFileModal = () => {
+    handleShowModalFile();
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setShowModalfile(false);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(BASE_URL + "/api/uploadpdf", {
+        method: "POST",
+        body: formData,
+      });
+      const text = await response.text();
+
+      if (text === "File uploaded and saved to database.") {
+        Swal.fire({
+          icon: "success",
+          title: "Upload Success",
+          text: "File uploaded successfully",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Upload Failed",
+          text: "An error occurred during upload, please try again.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Upload Failed",
+        text: "An error occurred during upload, please try again.",
+      });
+      console.error("Error:", error);
+    }
+  };
   //------------------------------------------------------------------------------------//
   // ตรวจสอบสถานะการโหลด หากกำลังโหลดข้อมูล แสดงข้อความ "Loading..."
   if (loading)
@@ -558,10 +509,6 @@ function TableCustomer({ onSearch }) {
               </div>
             </div>
             <br />
-            <div>
-              {" "}
-              {/* <LoadingComponent show={loadingMap} /> */}
-            </div>
             <table className="table table-striped ">
               <thead>
                 <tr className="text-center">
@@ -623,25 +570,24 @@ function TableCustomer({ onSearch }) {
                               <h4>จัดการ</h4>
                             </Button>
                             <Button
+                              variant="warning"
+                              style={{
+                                margin: "5px",
+                                borderRadius: "10px",
+                                padding: "10px 20px",
+                              }}
+                              onClick={() => handleFileModal(customer.IdenNumber)}
+                            >
+                              <h4 style={{ marginBottom: "0" }}>ไฟล์</h4>{" "}
+                              {/* ตัวอย่างการเพิ่มสไตล์เพิ่มเติมสำหรับข้อความ */}
+                            </Button>
+                            <Button
                               variant="danger"
                               onClick={() => handleDelete(customer.IdenNumber)}
-                              style={{ margin: "10px" }}
+                              style={{ margin: "5px" }}
                             >
                               <h4>ลบ</h4>
                             </Button>
-                            {/* {customer.Customer_Status === 1 ? (
-                              <Button
-                                variant="danger"
-                                onClick={() =>
-                                  handleMapHnModal(customer.IdenNumber)
-                                }
-                              >
-                                <h4>Map HN</h4>
-                              </Button>
-                            ) : (
-                              // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
-                              <></>
-                            )} */}
                           </td>
                         </tr>
                       ))}
@@ -698,20 +644,7 @@ function TableCustomer({ onSearch }) {
                                 >
                                   <h4>ลบ</h4>
                                 </Button>
-                                {customer.Customer_Status === 1 ? (
-                                  <></>
-                                ) : (
-                                  // <Button
-                                  //   variant="danger"
-                                  //   onClick={() =>
-                                  //     handleMapHnModal(customer.IdenNumber)
-                                  //   }
-                                  // >
-                                  //   <h4>Map HN</h4>
-                                  // </Button>
-                                  // แสดงเนื้อหาว่าไม่มีปุ่มเมื่อไม่ใช่ "guest"
-                                  <></>
-                                )}
+                                {customer.Customer_Status === 1 ? <></> : <></>}
                               </td>
                             </tr>
                           ))}
@@ -727,6 +660,7 @@ function TableCustomer({ onSearch }) {
                 )}
               </tbody>
             </table>
+
             {/* เลขหน้า  */}
             <ReactPaginate
               previousLabel={"ก่อนหน้า"}
@@ -748,88 +682,6 @@ function TableCustomer({ onSearch }) {
               disabledClassName={"disabled"} // เพิ่มคลาสสำหรับหน้าที่ถูกปิดใช้งาน
             />
           </div>
-          {/* modal MAP HN */}
-          {/* <Modal
-            show={showModalMapHN}
-            onHide={handleCloseMapHNModal}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>Map HN</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Table striped bordered hover>
-                <thead>
-                  <tr className="text-center">
-                    <th>ลำดับ</th>
-                    <th>ประเภทบัตร</th>
-                    <th>HN</th>
-                    <th>ชื่อ</th>
-                    <th>นามสกุล</th>
-                    <th>เพศ</th>
-                    <th>วัน/เดือน/ปีเกิด</th>
-                  </tr>
-                </thead>
-                <tbody className="text-center">
-                  {mapHN && mapHN.length > 0 ? (
-                    mapHN.map((hnData, index) => (
-                      <tr key={hnData.RefNo}>
-                        <td className="text-center">
-                          <h4>{index + 1}</h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.TypeRefno} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.HN} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.FirstName} </h4>
-                        </td>
-                        <td>
-                          <h4> {hnData.LastName} </h4>
-                        </td>
-                        <td>
-                          {hnData.Gender === 1
-                            ? "หญิง"
-                            : hnData.Gender === 2
-                            ? "ชาย"
-                            : ""}
-                        </td>
-                        <td>{hnData.BirthDate.substring(0, 10)}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="7">
-                        No data available
-                        {mapHN.HN}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </Table>
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  if (mapHN && mapHN.length === 1) {
-                    handleMapHN(mapHN.RefNo);
-                  }
-                }}
-                disabled={!(mapHN && mapHN.length === 1)}
-              >
-                Map HN
-              </Button>
-              <Button variant="secondary" onClick={handleCloseMapHNModal}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal> */}
           {/* modal edite  */}
           <Modal show={showModal} onHide={handleCloseModal} size="lg">
             <Modal.Header>
@@ -1179,6 +1031,41 @@ function TableCustomer({ onSearch }) {
               <Button variant="success" onClick={handleSave}>
                 บันทึก
               </Button>
+            </Modal.Footer>
+          </Modal>
+          {/* modal file  */}
+          <Modal show={showModalFile} onHide={handleCloseModalFile} size="lg">
+            <Modal.Header>
+              <Modal.Title className="font">ไฟล์ </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div style={containerStyle}>
+                <label htmlFor="fileInput" style={fileLabelStyle}>
+                  Choose File
+                  <input
+                    type="file"
+                    onChange={handleChange}
+                    style={{ display: "none" }}
+                    id="fileInput"
+                  />
+                </label>
+                {file && <span>{file.name}</span>}
+                <button
+                  type="submit"
+                  style={uploadButtonStyle}
+                  onClick={handleSubmit}
+                >
+                  Upload
+                </button>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModalFile}>
+                ปิด
+              </Button>
+              {/* <Button variant="success" onClick={handleSubmit}>
+                บันทึก
+              </Button> */}
             </Modal.Footer>
           </Modal>
         </div>
