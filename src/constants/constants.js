@@ -1,4 +1,5 @@
-export const BASE_URL = "https://appointapi.kasemrad.co.th";
+export const BASE_URL = "https://api.ksbrhospital.com";
+// export const BASE_URL = "https://appointapi.kasemrad.co.th";
 // export const BASE_URL = "http://localhost:3000";
 
 export const token =
