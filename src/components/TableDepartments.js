@@ -119,10 +119,6 @@ function TableDepartments({ onSearch }) {
       try {
         const response = await fetch(`${BASE_URL}/api/InsertClinic`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
           body: formData,
         });
         if (!response.ok) {
@@ -186,10 +182,6 @@ function TableDepartments({ onSearch }) {
             `${BASE_URL}/api/UpdateClinic/${selectedClinics.Clinic_ID}`,
             {
               method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
               body: formData,
             }
           );

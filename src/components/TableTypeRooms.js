@@ -65,6 +65,7 @@ function TableTypeRooms() {
       const response = await fetch(BASE_URL + "/api/RoomDataInsert", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
@@ -128,7 +129,8 @@ function TableTypeRooms() {
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+  
           },
           body: JSON.stringify({
             UID: selectedRoomType.UID,
@@ -188,7 +190,6 @@ function TableTypeRooms() {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
               },
             }
           );

@@ -307,9 +307,7 @@ function TableDoctors({ onSearch }) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
-
       body: JSON.stringify(searchParams),
     })
       .then((response) => response.json())

@@ -298,7 +298,9 @@ function TableApppointments({ onSearch }) {
   const [searchStatus, setSearchStatus] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const shouldShowAllData =
-    !searchResult && appointmentsCustomers && appointmentsCustomers.length > 0;
+    (!searchResult || searchResult.length === 0) &&
+    appointmentsCustomers &&
+    appointmentsCustomers.length > 0;
   // ตั้งค่าเริ่มต้นของจำนวนหน้า
 
   const [pageCount, setPageCount] = useState(1);
