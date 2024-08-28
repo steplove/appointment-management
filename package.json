@@ -1,4 +1,5 @@
 {
+  "homepage": "http://web.ksbrhospital.com/",
   "name": "appointment-management",
   "version": "0.1.0",
   "private": true,
@@ -12,6 +13,8 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.0",
     "dateformat": "^5.0.3",
@@ -38,7 +41,8 @@
   },
   "scripts": {
     "start": "set PORT=8080 &&react-scripts start",
-    "build": "set PORT=8080 \"GENERATE_SOURCEMAP=false\" && react-scripts build",
+    "build": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
+    "build:prod": "cross-env NODE_ENV=production && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -61,6 +65,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "terser": "^5.31.6"
   }
 }
