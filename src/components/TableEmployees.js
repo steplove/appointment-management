@@ -96,6 +96,7 @@ function TableEmployees({ onSearch }) {
       const response = await fetch(BASE_URL + "/api/registerUsers", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
 
@@ -235,6 +236,7 @@ function TableEmployees({ onSearch }) {
         {
           method: "POST",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -255,6 +257,7 @@ function TableEmployees({ onSearch }) {
     await fetch(`${BASE_URL}/api/searchUsersUser_Code?User_Code=${usersCode}`, {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     })
@@ -282,6 +285,7 @@ function TableEmployees({ onSearch }) {
           `${BASE_URL}/api/searchStaffPayrollNo?PayrollNo=${searchPayrollNo}`,
           {
             headers: {
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
